@@ -8,7 +8,8 @@ const cors = require('@fastify/cors');
 const options = {}
 
 module.exports = async function (fastify, opts) {
-  const corsOrigins = process.env.CORS_ORIGIN.split(',')
+  const corsOriginEnv = process.env.CORS_ORIGIN
+  const corsOrigins = corsOriginEnv ? corsOriginEnv.split(',') : true
 
   fastify.register(cors, {
     origin: corsOrigins,
