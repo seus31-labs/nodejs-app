@@ -1,0 +1,42 @@
+<div class="auth-wrapper">
+  <div class="auth-content">
+    <div class="auth-bg">
+      <span class="r"></span>
+      <span class="r s"></span>
+      <span class="r s"></span>
+      <span class="r"></span>
+    </div>
+    <div class="card">
+      <div class="card-body text-center">
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          <div class="mb-4">
+            <i class="feather icon-user-plus auth-icon"></i>
+          </div>
+          <h3 class="mb-4">Sign up</h3>
+          <div class="input-group mb-3">
+            <input id="name" type="text" class="form-control" placeholder="Username" formControlName="name" />
+            <div *ngIf="registerForm.get('name').invalid && registerForm.get('name').touched">
+              Name is required
+            </div>        </div>
+          <div class="input-group mb-3">
+            <input id="email" type="email" class="form-control" placeholder="Email" formControlName="email" />
+            <div *ngIf="registerForm.get('email').invalid && registerForm.get('email').touched">
+              Invalid email
+            </div>
+          </div>
+          <div class="input-group mb-4">
+            <input id="password" type="password" class="form-control" placeholder="Password" formControlName="password" />
+            <div *ngIf="registerForm.get('password').invalid && registerForm.get('password').touched">
+              Password is required
+            </div>
+          </div>
+          <button class="btn btn-primary shadow-2 mb-4" type="submit" [disabled]="registerForm.invalid">Sign up</button>
+          <p class="mb-0 text-muted">
+            Already have an account?
+            <a [routerLink]="['/auth/signin']">Log in</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

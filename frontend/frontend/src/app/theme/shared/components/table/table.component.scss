@@ -1,0 +1,9 @@
+@use '@angular/material' as mat;
+
+#table-id {
+  @include mat.table-overrides((
+    background-color: #fff,
+    header-headline-color: #000,
+    row-item-label-text-color: #000,
+  ));
+}
