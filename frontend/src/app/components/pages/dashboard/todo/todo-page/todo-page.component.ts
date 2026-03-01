@@ -6,7 +6,7 @@ import { TodoListComponent } from '../todo-list/todo-list.component'
 import { TodoFormComponent } from '../todo-form/todo-form.component'
 import { SearchBarComponent } from '../search-bar/search-bar.component'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
-import type { Todo, TodoCreateUpdate } from '../../../../../models/todo.interface'
+import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 
 @Component({
   selector: 'app-todo-page',
@@ -46,8 +46,15 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     if (this.filterPriority !== null) filters.priority = this.filterPriority
 
     const q = this.searchQuery.trim()
-    const req = q
-      ? this.todoService.search({ q, ...filters })
+    const searchParams = q
+      ? {
+          q,
+          completed: filters.completed,
+          priority: filters.priority as TodoPriority | undefined,
+        }
+      : null
+    const req = searchParams
+      ? this.todoService.search(searchParams)
       : this.todoService.list(filters)
 
     req.pipe(takeUntil(this.destroy$)).subscribe({

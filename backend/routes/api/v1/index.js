@@ -101,7 +101,7 @@ module.exports = async function (fastify, opts) {
       querystring: {
         type: 'object',
         properties: {
-          q: { type: 'string' },
+          q: { type: 'string', maxLength: 255 },
           completed: { type: 'string', enum: ['true', 'false'] },
           priority: { type: 'string', enum: ['low', 'medium', 'high'] },
         },

@@ -63,6 +63,43 @@ test('GET /api/v1/todos/search with auth returns matching todos', async (t) => {
   assert(todos.some((todo) => todo.title.includes('買い物') || (todo.description && todo.description.includes('買い物'))))
 })
 
+test('search returns only own todos (other user todos not included)', async (t) => {
+  const app = await build(t)
+  const suffix = Date.now()
+  const userA = { name: `searchA-${suffix}`, email: `searchA-${suffix}@test.local`, password: 'pass123' }
+  const userB = { name: `searchB-${suffix}`, email: `searchB-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA })
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB })
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } })
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } })
+  const tokenA = JSON.parse(loginA.payload).token
+  const tokenB = JSON.parse(loginB.payload).token
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { title: 'userA only secret', description: 'A' }
+  })
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${tokenB}` },
+    payload: { title: 'userB only secret', description: 'B' }
+  })
+  const searchAsB = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/search',
+    headers: { authorization: `Bearer ${tokenB}` },
+    query: { q: 'secret' }
+  })
+  assert.strictEqual(searchAsB.statusCode, 200)
+  const todosB = JSON.parse(searchAsB.payload)
+  assert(Array.isArray(todosB))
+  assert.strictEqual(todosB.length, 1)
+  assert.strictEqual(todosB[0].title, 'userB only secret')
+  assert(todosB.every((todo) => todo.userId === todosB[0].userId))
+})
+
 test('other user cannot access todo (GET) - 404', async (t) => {
   const app = await build(t)
   const suffix = Date.now()

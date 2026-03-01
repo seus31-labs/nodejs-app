@@ -3,10 +3,9 @@
     type="text"
     class="form-control"
     placeholder="タイトル・説明で検索..."
-    [(ngModel)]="query"
-    (ngModelChange)="onInput()"
+    [formControl]="query"
   />
-  @if (query) {
+  @if (query.value) {
     <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClear()" aria-label="検索をクリア">
       クリア
     </button>
