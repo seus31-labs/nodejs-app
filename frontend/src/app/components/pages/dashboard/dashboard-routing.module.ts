@@ -13,6 +13,10 @@ const routes: Routes = [
         path: 'todos',
         loadComponent: () => import('./todo/todo-page/todo-page.component')
       },
+      {
+        path: 'archived',
+        loadComponent: () => import('./archived-todos/archived-todos-page.component')
+      },
     ]
   }
 ]

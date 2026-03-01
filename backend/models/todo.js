@@ -52,6 +52,16 @@ module.exports = (sequelize) => {
         defaultValue: 0,
         field: 'sort_order',
       },
+      archived: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      archivedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        field: 'archived_at',
+      },
     },
     {
       tableName: 'todos',

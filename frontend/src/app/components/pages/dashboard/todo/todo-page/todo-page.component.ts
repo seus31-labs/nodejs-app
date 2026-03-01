@@ -125,6 +125,18 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       })
   }
 
+  onArchived(id: number): void {
+    this.todoService
+      .archiveTodo(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => this.loadTodos(),
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? 'アーカイブに失敗しました'
+        }
+      })
+  }
+
   onToggle(id: number): void {
     this.todoService
       .toggleComplete(id)

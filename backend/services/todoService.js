@@ -42,7 +42,7 @@ async function createTodo(fastify, userId, todoData) {
  * @returns {Promise<object[]>} Todo 配列
  */
 async function getTodosByUserId(fastify, userId, options = {}) {
-  const where = { userId };
+  const where = { userId, archived: false };
   if (typeof options.completed === 'boolean') {
     where.completed = options.completed;
   }
@@ -61,13 +61,27 @@ async function getTodosByUserId(fastify, userId, options = {}) {
 }
 
 /**
- * ID とユーザーで Todo を 1 件取得する（他ユーザーの場合は null）
+ * 未アーカイブの Todo を ID とユーザーで 1 件取得する（他ユーザー・アーカイブ済みは null）
+ * 通常の GET/PUT/DELETE/toggle は未アーカイブのみ操作可能とする。
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
  * @param {number} userId - ユーザー ID
  * @returns {Promise<object|null>}
  */
 async function getTodoById(fastify, todoId, userId) {
+  return fastify.models.Todo.findOne({
+    where: { id: todoId, userId, archived: false },
+  });
+}
+
+/**
+ * アーカイブ有無を問わず Todo を 1 件取得する（archive/unarchive 専用）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} todoId - Todo ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<object|null>}
+ */
+async function getTodoByIdIncludingArchived(fastify, todoId, userId) {
   return fastify.models.Todo.findOne({
     where: { id: todoId, userId },
   });
@@ -130,7 +144,7 @@ async function toggleComplete(fastify, todoId, userId) {
  * @returns {Promise<object[]>} Todo 配列
  */
 async function searchTodos(fastify, userId, params = {}) {
-  const where = { userId };
+  const where = { userId, archived: false };
   if (typeof params.completed === 'boolean') {
     where.completed = params.completed;
   }
@@ -187,6 +201,65 @@ async function reorderTodos(fastify, userId, todoIds) {
   }
 }
 
+/**
+ * Todo をアーカイブする（所有者のみ。完了済みでなくても API 上はアーカイブ可能）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} todoId - Todo ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<object|null>} 更新後の Todo、存在しなければ null
+ */
+async function archiveTodo(fastify, todoId, userId) {
+  const todo = await getTodoByIdIncludingArchived(fastify, todoId, userId);
+  if (!todo) return null;
+  if (todo.archived) return todo;
+  todo.archived = true;
+  todo.archivedAt = new Date();
+  await todo.save();
+  return todo;
+}
+
+/**
+ * Todo のアーカイブを解除する（所有者のみ）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} todoId - Todo ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<object|null>} 更新後の Todo、存在しなければ null
+ */
+async function unarchiveTodo(fastify, todoId, userId) {
+  const todo = await getTodoByIdIncludingArchived(fastify, todoId, userId);
+  if (!todo) return null;
+  todo.archived = false;
+  todo.archivedAt = null;
+  await todo.save();
+  return todo;
+}
+
+/**
+ * アーカイブ済み Todo 一覧を取得する（作成日降順）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<object[]>} Todo 配列
+ */
+async function getArchivedTodos(fastify, userId) {
+  return fastify.models.Todo.findAll({
+    where: { userId, archived: true },
+    order: [['archivedAt', 'DESC']],
+  });
+}
+
+/**
+ * アーカイブ済み Todo を一括削除する（所有者のみ）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<number>} 削除件数
+ */
+async function deleteArchivedTodos(fastify, userId) {
+  const result = await fastify.models.Todo.destroy({
+    where: { userId, archived: true },
+  });
+  return result;
+}
+
 module.exports = {
   createTodo,
   getTodosByUserId,
@@ -196,4 +269,8 @@ module.exports = {
   toggleComplete,
   searchTodos,
   reorderTodos,
+  archiveTodo,
+  unarchiveTodo,
+  getArchivedTodos,
+  deleteArchivedTodos,
 };

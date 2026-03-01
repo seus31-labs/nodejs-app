@@ -457,3 +457,225 @@ test('reorder with other user todo id returns 204 and does not change other user
   assert.strictEqual(titlesA[0], 'A2')
   assert.strictEqual(titlesA[1], 'A1')
 })
+
+test('PATCH /api/v1/todos/:id/archive without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'PATCH',
+    url: '/api/v1/todos/1/archive'
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('PATCH /api/v1/todos/:id/archive archives todo and GET /todos excludes it', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `arch-${suffix}`, email: `arch-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'To archive' }
+  })
+  const todoId = JSON.parse(createRes.payload).id
+  const archiveRes = await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${todoId}/archive`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(archiveRes.statusCode, 200)
+  const archived = JSON.parse(archiveRes.payload)
+  assert.strictEqual(archived.archived, true)
+  assert(archived.archivedAt != null)
+  const listRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  const list = JSON.parse(listRes.payload)
+  assert(!list.some((todo) => todo.id === todoId))
+  const archivedListRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/archived',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(archivedListRes.statusCode, 200)
+  const archivedList = JSON.parse(archivedListRes.payload)
+  assert(archivedList.some((todo) => todo.id === todoId))
+})
+
+test('PATCH /api/v1/todos/:id/unarchive restores todo to list', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `unarch-${suffix}`, email: `unarch-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Archived one' }
+  })
+  const todoId = JSON.parse(createRes.payload).id
+  await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${todoId}/archive`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  const unarchiveRes = await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${todoId}/unarchive`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(unarchiveRes.statusCode, 200)
+  const todo = JSON.parse(unarchiveRes.payload)
+  assert.strictEqual(todo.archived, false)
+  assert.strictEqual(todo.archivedAt, null)
+  const listRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert(listRes.statusCode === 200 && JSON.parse(listRes.payload).some((todo) => todo.id === todoId))
+})
+
+test('DELETE /api/v1/todos/archived without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({ method: 'DELETE', url: '/api/v1/todos/archived' })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('DELETE /api/v1/todos/archived deletes all archived todos', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `delarch-${suffix}`, email: `delarch-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'One' }
+  })
+  const c2 = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Two' }
+  })
+  const id2 = JSON.parse(c2.payload).id
+  await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${id2}/archive`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  const delRes = await app.inject({
+    method: 'DELETE',
+    url: '/api/v1/todos/archived',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(delRes.statusCode, 204)
+  const archivedRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/archived',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  const archived = JSON.parse(archivedRes.payload)
+  assert.strictEqual(archived.length, 0)
+})
+
+test('other user cannot archive my todo (404)', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const userA = { name: `archA-${suffix}`, email: `archA-${suffix}@test.local`, password: 'pass123' }
+  const userB = { name: `archB-${suffix}`, email: `archB-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA })
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB })
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } })
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } })
+  const tokenA = JSON.parse(loginA.payload).token
+  const tokenB = JSON.parse(loginB.payload).token
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { title: 'A todo' }
+  })
+  const todoId = JSON.parse(createRes.payload).id
+  const archiveAsB = await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${todoId}/archive`,
+    headers: { authorization: `Bearer ${tokenB}` }
+  })
+  assert.strictEqual(archiveAsB.statusCode, 404)
+})
+
+test('archived todo returns 404 for GET /todos/:id and PUT /todos/:id', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `getarch-${suffix}`, email: `getarch-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'To archive' }
+  })
+  const todoId = JSON.parse(createRes.payload).id
+  await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${todoId}/archive`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  const getRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${todoId}`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(getRes.statusCode, 404)
+  const putRes = await app.inject({
+    method: 'PUT',
+    url: `/api/v1/todos/${todoId}`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Updated' }
+  })
+  assert.strictEqual(putRes.statusCode, 404)
+})
+
+test('other user cannot unarchive my todo (404)', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const userA = { name: `unarchA-${suffix}`, email: `unarchA-${suffix}@test.local`, password: 'pass123' }
+  const userB = { name: `unarchB-${suffix}`, email: `unarchB-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA })
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB })
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } })
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } })
+  const tokenA = JSON.parse(loginA.payload).token
+  const tokenB = JSON.parse(loginB.payload).token
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { title: 'A todo' }
+  })
+  const todoId = JSON.parse(createRes.payload).id
+  await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${todoId}/archive`,
+    headers: { authorization: `Bearer ${tokenA}` }
+  })
+  const unarchiveAsB = await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${todoId}/unarchive`,
+    headers: { authorization: `Bearer ${tokenB}` }
+  })
+  assert.strictEqual(unarchiveAsB.statusCode, 404)
+})
