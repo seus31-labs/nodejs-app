@@ -1,12 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
 import type { SortBy, SortOrder, SortOptions } from '../../../../../models/sort-options.interface'
 
 @Component({
   selector: 'app-sort-selector',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './sort-selector.component.html',
   styleUrls: ['./sort-selector.component.scss']
 })

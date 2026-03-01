@@ -3,8 +3,8 @@
   <select
     class="form-select form-select-sm"
     style="width: auto;"
-    [ngModel]="sortBy"
-    (ngModelChange)="onSortByChange($event)"
+    [value]="sortBy"
+    (change)="onSortByChange($any($event.target).value)"
   >
     @for (opt of sortByOptions; track opt.value) {
       <option [value]="opt.value">{{ opt.label }}</option>

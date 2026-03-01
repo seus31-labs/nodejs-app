@@ -13,7 +13,7 @@ function buildOrder(sequelize, sortBy, sortOrder) {
   if (SORT_BY_ALLOWED.includes(sortBy)) {
     return [[sortBy, dir]];
   }
-  return [['createdAt', 'ASC']];
+  return [['createdAt', dir]];
 }
 
 /**
@@ -165,16 +165,21 @@ async function searchTodos(fastify, userId, params = {}) {
  */
 async function reorderTodos(fastify, userId, todoIds) {
   if (!Array.isArray(todoIds) || todoIds.length === 0) return;
+  const safeIds = todoIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0);
+  if (safeIds.length === 0) return;
   const transaction = await fastify.sequelize.transaction();
   try {
-    for (let i = 0; i < todoIds.length; i++) {
-      const id = Number(todoIds[i]);
-      if (!Number.isInteger(id)) continue;
-      await fastify.models.Todo.update(
-        { sortOrder: i },
-        { where: { id, userId }, transaction }
-      );
-    }
+    const sequelize = fastify.sequelize;
+    const caseWhen = safeIds.map((_, i) => `WHEN id = :id${i} THEN ${i}`).join(' ');
+    const inList = safeIds.map((_, i) => `:id${i}`).join(', ');
+    const replacements = { userId };
+    safeIds.forEach((id, i) => {
+      replacements[`id${i}`] = id;
+    });
+    await sequelize.query(
+      `UPDATE todos SET sort_order = CASE ${caseWhen} END, updated_at = NOW() WHERE user_id = :userId AND id IN (${inList})`,
+      { replacements, transaction }
+    );
     await transaction.commit();
   } catch (err) {
     await transaction.rollback();
