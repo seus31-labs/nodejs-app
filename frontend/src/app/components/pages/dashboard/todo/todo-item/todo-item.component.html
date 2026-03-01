@@ -1,0 +1,23 @@
+<div class="d-flex align-items-center gap-2 py-2 border-bottom todo-item" [class.completed]="todo.completed">
+  <input
+    type="checkbox"
+    class="form-check-input"
+    [checked]="todo.completed"
+    (change)="onToggle()"
+    [attr.aria-label]="'完了: ' + todo.title"
+  />
+  <div class="flex-grow-1 min-width-0">
+    <span class="todo-title" [class.text-decoration-line-through]="todo.completed" [class.text-muted]="todo.completed">
+      {{ todo.title }}
+    </span>
+    <span *ngIf="todo.description" class="d-block small text-muted">{{ todo.description }}</span>
+    <span class="badge ms-1" [ngClass]="priorityClass(todo.priority)">{{ todo.priority }}</span>
+    <span *ngIf="todo.dueDate" class="ms-2 small" [ngClass]="dueDateClass(todo.dueDate)">
+      {{ todo.dueDate }}
+    </span>
+  </div>
+  <div class="btn-group btn-group-sm">
+    <button type="button" class="btn btn-outline-primary" (click)="onEdit()">編集</button>
+    <button type="button" class="btn btn-outline-danger" (click)="onDelete()">削除</button>
+  </div>
+</div>

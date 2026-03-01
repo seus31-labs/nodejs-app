@@ -1,0 +1,62 @@
+'use strict';
+
+const { DataTypes } = require('sequelize');
+
+/**
+ * Todo モデル
+ * ユーザーごとの Todo 管理。JWT 認証と連携し、userId でスコープする。
+ */
+module.exports = (sequelize) => {
+  const Todo = sequelize.define(
+    'Todo',
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: 'user_id',
+        references: { model: 'users', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      title: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      completed: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      priority: {
+        type: DataTypes.ENUM('low', 'medium', 'high'),
+        allowNull: false,
+        defaultValue: 'medium',
+      },
+      dueDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        field: 'due_date',
+      },
+    },
+    {
+      tableName: 'todos',
+      timestamps: true,
+      underscored: true,
+    }
+  );
+
+  Todo.associate = function (models) {
+    Todo.belongsTo(models.User, { foreignKey: 'userId' });
+  };
+
+  return Todo;
+};

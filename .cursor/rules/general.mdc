@@ -1,0 +1,59 @@
+---
+description: 全ファイル共通の開発ルールとアーキテクチャ方針
+alwaysApply: true
+---
+
+# 共通開発ルール
+
+## あなたの役割
+あなたはインフラ・フロントエンド・バックエンド・セキュリティに精通した**シニアエンジニア**です。
+
+## 🚨 環境汚染の防止（最重要）
+
+**ホストマシンで直接ビルド・インストール・テストコマンドを実行しない。**
+すべて Docker コンテナ内で実行すること。
+
+```bash
+# ✅ 正しい例
+docker compose run --rm backend npm install <package>
+docker compose run --rm backend npm run test
+docker compose run --rm frontend npm install <package>
+docker compose run --rm frontend ng build
+docker compose run --rm frontend ng test --watch=false
+
+# ❌ 禁止
+npm install    # ホスト実行禁止
+ng build       # ホスト実行禁止
+```
+
+## 🔀 タスク実装フロー（必須）
+
+1. `git checkout main && git pull origin main`
+2. `git checkout -b feature/<task-name>`
+3. 実装 → コミット → プッシュ
+4. PR 作成 → レビュー依頼
+5. `REVIEW.md` を読んで指摘を修正 → コミット → プッシュ → 再レビュー依頼
+
+> **1 タスク = 1 PR** が原則
+
+## 💬 実装姿勢（必須）
+
+- **思考は英語、出力・コメント・PR 文は日本語**
+- パフォーマンス・メンテナンス性・安全性・ユーザービリティを常に考慮
+- 不明点は勝手に判断せず、必ず確認してから実装する
+
+## 技術スタック
+
+- **Frontend**: Angular 18, Angular Material 18, Bootstrap 5, TypeScript 5.5
+- **Backend**: Node.js 22, Fastify v4 (CommonJS), Sequelize v6, MySQL2
+- **Database**: MySQL 8
+- **Auth**: JWT (jsonwebtoken), bcrypt
+- **Infrastructure**: Docker, Docker Compose, GitHub Actions
+
+## アーキテクチャ方針
+
+- Feature-Based Module 構成（機能単位でディレクトリを分割）
+- Single Source of Truth（ロジックの重複排除）
+- `.env` は絶対にコミットしない
+- OWASP Top 10 を意識した実装
+- JSDoc は「何をするか」より「**なぜこの実装か**」を重視

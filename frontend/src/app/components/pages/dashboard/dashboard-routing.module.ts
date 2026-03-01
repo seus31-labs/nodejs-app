@@ -10,8 +10,8 @@ const routes: Routes = [
         loadComponent: () => import('./home/home.component')
       },
       {
-        path: 'tasks/list',
-        loadComponent: () => import('./tasks/task-list/task-list.component')
+        path: 'todos',
+        loadComponent: () => import('./todo/todo-page/todo-page.component')
       },
     ]
   }

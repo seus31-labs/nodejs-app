@@ -37,11 +37,11 @@ const NavigationItems = [
         classes: 'nav-item'
       },
       {
-        id: 'tasks',
-        title: 'Tasks',
+        id: 'todos',
+        title: 'Todo',
         type: 'item',
-        url: '/dashboard/tasks/list',
-        icon: 'feather icon-list',
+        url: '/dashboard/todos',
+        icon: 'feather icon-check-square',
         classes: 'nav-item'
       }
     ]

@@ -24,11 +24,19 @@ async function login(fastify, req) {
     where: { email }
   });
   if (!user) return 'InValid';
+  if (!user.password) return 'InValid';
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  let isMatch = false;
+  try {
+    isMatch = await bcrypt.compare(password, user.password);
+  } catch {
+    return 'InValid';
+  }
   if (!isMatch) return 'InValid';
 
-  return jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error('JWT_SECRET is not set');
+  return jwt.sign({ id: user.id }, secret, { expiresIn: '1h' });
 }
 
 module.exports = {

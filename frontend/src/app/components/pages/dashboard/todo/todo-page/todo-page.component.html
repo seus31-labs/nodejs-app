@@ -1,0 +1,60 @@
+<div class="row">
+  <div class="col-12">
+    <app-card cardTitle="Todo リスト（{{ todos.length }} 件）">
+      <div class="mb-3">
+        <div class="row g-2 align-items-center flex-wrap">
+          <div class="col-auto">
+            <label class="form-label mb-0 me-1">完了</label>
+            <select
+              class="form-select form-select-sm"
+              style="width: auto;"
+              [value]="completedFilterValue"
+              (change)="onCompletedFilterChange($event)"
+            >
+              <option value="">すべて</option>
+              <option value="false">未完了</option>
+              <option value="true">完了</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <label class="form-label mb-0 me-1">優先度</label>
+            <select
+              class="form-select form-select-sm"
+              style="width: auto;"
+              [value]="priorityFilterValue"
+              (change)="onPriorityFilterChange($event)"
+            >
+              <option value="">すべて</option>
+              <option value="low">low</option>
+              <option value="medium">medium</option>
+              <option value="high">high</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      @if (editingTodo) {
+        <app-todo-form
+          [editingTodo]="editingTodo"
+          (submitForm)="onSubmitForm($event)"
+          (cancel)="onCancelEdit()"
+        />
+      } @else {
+        <app-todo-form
+          (submitForm)="onSubmitForm($event)"
+        />
+      }
+
+      <hr class="my-3" />
+
+      <app-todo-list
+        [todos]="todos"
+        [loading]="loading"
+        [error]="error"
+        (toggle)="onToggle($event)"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+      />
+    </app-card>
+  </div>
+</div>
