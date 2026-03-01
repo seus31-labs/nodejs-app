@@ -11,7 +11,12 @@ async function register(fastify, req, reply) {
     }
     reply.code(201).send({ token: registerResponse });
   } catch (error) {
-    reply.code(400).send({ error: 'User registration failed' });
+    fastify.log.error(error, 'User registration failed');
+    const message =
+      process.env.NODE_ENV === 'development' && error?.message
+        ? error.message
+        : 'User registration failed';
+    reply.code(400).send({ error: message });
   }
 }
 
@@ -23,7 +28,12 @@ async function login(fastify, req, reply) {
     }
     reply.send({ token: loginResponse });
   } catch (error) {
-    reply.code(500).send({ error: 'Login failed' });
+    fastify.log.error({ err: error, message: error?.message, stack: error?.stack }, 'Login failed');
+    const message =
+      process.env.NODE_ENV === 'development' && error?.message
+        ? error.message
+        : 'Login failed';
+    reply.code(500).send({ error: message });
   }
 }
 

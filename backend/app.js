@@ -9,11 +9,17 @@ const options = {}
 
 module.exports = async function (fastify, opts) {
   const corsOriginEnv = process.env.CORS_ORIGIN
-  const corsOrigins = corsOriginEnv ? corsOriginEnv.split(',') : true
+  let corsOrigins = corsOriginEnv ? corsOriginEnv.split(',').map((s) => s.trim()) : true
+  if (process.env.NODE_ENV === 'development' && Array.isArray(corsOrigins)) {
+    const extra = ['http://localhost:4200', 'http://localhost:4242'].filter(
+      (o) => !corsOrigins.includes(o)
+    )
+    corsOrigins = [...corsOrigins, ...extra]
+  }
 
   fastify.register(cors, {
     origin: corsOrigins,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
   });
 

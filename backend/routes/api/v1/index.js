@@ -1,8 +1,15 @@
 'use strict'
 
 const { getUsers, getUser, updateUser, deleteUser } = require('../../../controllers/userController');
-const { createTask, getTasks } = require('../../../controllers/taskController');
 const { register, login } = require('../../../controllers/authController');
+const {
+  createTodo,
+  getTodos,
+  getTodoById,
+  updateTodo,
+  deleteTodo,
+  toggleComplete,
+} = require('../../../controllers/todoController');
 
 module.exports = async function (fastify, opts) {
   /**
@@ -57,21 +64,88 @@ module.exports = async function (fastify, opts) {
   fastify.delete('/users/:id', { preHandler: [fastify.authenticate] }, async (request, reply)=> deleteUser(fastify, request, reply));
 
   /**
-   * tasks CRUD API routes.
+   * todos CRUD API routes (JWT 必須)
    */
-  fastify.get('/tasks', { preHandler: [fastify.authenticate]}, async (request, reply) => getTasks(fastify, request, reply));
-  fastify.post('/tasks', {
+  fastify.post('/todos', {
     schema: {
       body: {
         type: 'object',
-        required: ['taskName', 'status'],
+        required: ['title'],
         properties: {
-          taskName: {type: 'string'},
-          status: {type: 'number'},
-        }
-      }
+          title: { type: 'string', maxLength: 255 },
+          description: { type: 'string' },
+          priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+          dueDate: { type: 'string', format: 'date' },
+        },
+      },
     },
     preHandler: [fastify.authenticate],
-    handler: async (request, reply) => createTask(fastify, request, reply)
+    handler: async (request, reply) => createTodo(fastify, request, reply),
+  });
+  fastify.get('/todos', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          completed: { type: 'string', enum: ['true', 'false'] },
+          priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getTodos(fastify, request, reply),
+  });
+  fastify.get('/todos/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getTodoById(fastify, request, reply),
+  });
+  fastify.put('/todos/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        properties: {
+          title: { type: 'string', maxLength: 255 },
+          description: { type: 'string' },
+          priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+          dueDate: { type: 'string', format: 'date' },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => updateTodo(fastify, request, reply),
+  });
+  fastify.delete('/todos/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => deleteTodo(fastify, request, reply),
+  });
+  fastify.patch('/todos/:id/toggle', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => toggleComplete(fastify, request, reply),
   });
 }

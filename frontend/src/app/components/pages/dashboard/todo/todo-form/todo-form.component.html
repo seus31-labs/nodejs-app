@@ -1,0 +1,53 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="todo-form">
+  <div class="mb-2">
+    <label for="todo-title" class="form-label">タイトル <span class="text-danger">*</span></label>
+    <input
+      id="todo-title"
+      type="text"
+      class="form-control"
+      formControlName="title"
+      placeholder="Todo のタイトル"
+      maxlength="255"
+    />
+    @if (form.get('title')?.invalid && form.get('title')?.touched) {
+      <div class="invalid-feedback d-block">タイトルを入力してください。</div>
+    }
+  </div>
+  <div class="mb-2">
+    <label for="todo-description" class="form-label">説明</label>
+    <textarea
+      id="todo-description"
+      class="form-control"
+      formControlName="description"
+      rows="2"
+      placeholder="詳細（任意）"
+    ></textarea>
+  </div>
+  <div class="row mb-2">
+    <div class="col-md-6">
+      <label for="todo-priority" class="form-label">優先度</label>
+      <select id="todo-priority" class="form-select" formControlName="priority">
+        <option value="low">low</option>
+        <option value="medium">medium</option>
+        <option value="high">high</option>
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label for="todo-dueDate" class="form-label">期限</label>
+      <input
+        id="todo-dueDate"
+        type="date"
+        class="form-control"
+        formControlName="dueDate"
+      />
+    </div>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+      {{ editingTodo ? '更新' : '作成' }}
+    </button>
+    @if (editingTodo) {
+      <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">キャンセル</button>
+    }
+  </div>
+</form>

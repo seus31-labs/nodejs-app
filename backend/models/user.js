@@ -26,5 +26,9 @@ module.exports = (sequelize) => {
     user.password = await bcrypt.hash(user.password, salt);
   });
 
+  User.associate = function (models) {
+    User.hasMany(models.Todo, { foreignKey: 'userId' });
+  };
+
   return User;
 };

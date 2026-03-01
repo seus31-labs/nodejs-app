@@ -1,0 +1,23 @@
+@if (error) {
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+}
+@if (loading) {
+  <div class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">読み込み中...</span>
+    </div>
+  </div>
+} @else if (todos.length === 0) {
+  <p class="text-muted py-3">Todo がありません。</p>
+} @else {
+  <div class="todo-list">
+    @for (todo of todos; track todo.id) {
+      <app-todo-item
+        [todo]="todo"
+        (toggle)="toggle.emit($event)"
+        (edit)="edit.emit($event)"
+        (delete)="delete.emit($event)"
+      />
+    }
+  </div>
+}
