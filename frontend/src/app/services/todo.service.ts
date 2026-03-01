@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { environment } from '../../environments/environment'
-import type { Todo, TodoCreateUpdate } from '../models/todo.interface'
+import type { Todo, TodoCreateUpdate, TodoPriority } from '../models/todo.interface'
+import type { SearchParams } from '../models/search-params.interface'
 
 export interface TodoListFilters {
   completed?: boolean
-  priority?: string
+  priority?: TodoPriority
 }
 
 @Injectable({
@@ -47,5 +48,15 @@ export class TodoService {
 
   toggleComplete(id: number): Observable<Todo> {
     return this.http.patch<Todo>(`${this.apiUrl}/todos/${id}/toggle`, {})
+  }
+
+  /**
+   * タイトル・説明で検索（q 必須。completed, priority で絞り込み可）
+   */
+  search(params: SearchParams): Observable<Todo[]> {
+    const p: Record<string, string> = { q: params.q.trim() }
+    if (params.completed !== undefined) p['completed'] = String(params.completed)
+    if (params.priority) p['priority'] = params.priority
+    return this.http.get<Todo[]>(`${this.apiUrl}/todos/search`, { params: p })
   }
 }

@@ -2,6 +2,7 @@
   <div class="col-12">
     <app-card cardTitle="Todo リスト（{{ todos.length }} 件）">
       <div class="mb-3">
+        <app-search-bar (searchTerm)="onSearch($event)" />
         <div class="row g-2 align-items-center flex-wrap">
           <div class="col-auto">
             <label class="form-label mb-0 me-1">完了</label>

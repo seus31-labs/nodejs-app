@@ -100,6 +100,26 @@ async function toggleComplete(fastify, req, reply) {
   }
 }
 
+async function searchTodos(fastify, req, reply) {
+  try {
+    const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+    if (!q) {
+      return reply.code(400).send({ error: 'Search query q is required and must be non-empty' });
+    }
+    const userId = req.user.id;
+    const params = {
+      query: q,
+      priority: req.query.priority,
+      completed:
+        req.query.completed === 'true' ? true : req.query.completed === 'false' ? false : undefined,
+    };
+    const todos = await todoService.searchTodos(fastify, userId, params);
+    reply.code(200).send(todos.map((t) => t.toJSON()));
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Search failed');
+  }
+}
+
 module.exports = {
   createTodo,
   getTodos,
@@ -107,4 +127,5 @@ module.exports = {
   updateTodo,
   deleteTodo,
   toggleComplete,
+  searchTodos,
 };

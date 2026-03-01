@@ -4,13 +4,14 @@ import { Subject, takeUntil } from 'rxjs'
 import { TodoService } from '../../../../../services/todo.service'
 import { TodoListComponent } from '../todo-list/todo-list.component'
 import { TodoFormComponent } from '../todo-form/todo-form.component'
+import { SearchBarComponent } from '../search-bar/search-bar.component'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
-import type { Todo, TodoCreateUpdate } from '../../../../../models/todo.interface'
+import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 
 @Component({
   selector: 'app-todo-page',
   standalone: true,
-  imports: [CommonModule, TodoListComponent, TodoFormComponent, CardComponent],
+  imports: [CommonModule, TodoListComponent, TodoFormComponent, SearchBarComponent, CardComponent],
   templateUrl: './todo-page.component.html',
   styleUrls: ['./todo-page.component.scss']
 })
@@ -21,7 +22,8 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   editingTodo: Todo | null = null
 
   filterCompleted: boolean | null = null
-  filterPriority: string | null = null
+  filterPriority: TodoPriority | null = null
+  searchQuery = ''
 
   private destroy$ = new Subject<void>()
 
@@ -39,23 +41,31 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   loadTodos(): void {
     this.loading = true
     this.error = null
-    const filters: { completed?: boolean; priority?: string } = {}
+    const filters: { completed?: boolean; priority?: TodoPriority } = {}
     if (this.filterCompleted !== null) filters.completed = this.filterCompleted
     if (this.filterPriority !== null) filters.priority = this.filterPriority
 
-    this.todoService
-      .list(filters)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (list) => {
-          this.todos = list
-          this.loading = false
-        },
-        error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '取得に失敗しました'
-          this.loading = false
-        }
-      })
+    const q = this.searchQuery.trim()
+    const searchParams = q ? { q, ...filters } : null
+    const req = searchParams
+      ? this.todoService.search(searchParams)
+      : this.todoService.list(filters)
+
+    req.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (list) => {
+        this.todos = list
+        this.loading = false
+      },
+      error: (err) => {
+        this.error = err?.error?.message ?? err?.message ?? '取得に失敗しました'
+        this.loading = false
+      }
+    })
+  }
+
+  onSearch(term: string): void {
+    this.searchQuery = term
+    this.loadTodos()
   }
 
   onFiltersChange(): void {
@@ -81,7 +91,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
 
   onPriorityFilterChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value
-    this.filterPriority = value === '' ? null : value
+    this.filterPriority = value === '' ? null : (value as TodoPriority)
     this.onFiltersChange()
   }
 

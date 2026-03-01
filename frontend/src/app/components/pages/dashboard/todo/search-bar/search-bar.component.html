@@ -1,0 +1,13 @@
+<div class="search-bar d-flex align-items-center gap-2 mb-2">
+  <input
+    type="text"
+    class="form-control"
+    placeholder="タイトル・説明で検索..."
+    [formControl]="query"
+  />
+  @if (query.value) {
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClear()" aria-label="検索をクリア">
+      クリア
+    </button>
+  }
+</div>
