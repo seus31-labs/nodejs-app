@@ -15,6 +15,23 @@
     <span *ngIf="todo.dueDate" class="ms-2 small" [ngClass]="dueDateClass(todo.dueDate)">
       {{ todo.dueDate }}
     </span>
+    <div class="mt-1 d-flex flex-wrap align-items-center gap-1">
+      @for (tag of tags; track tag.id) {
+        <app-tag-chip [tag]="tag" [removable]="true" (removed)="onTagRemoved(tag)" />
+      }
+      @if (availableTagsToAdd.length > 0) {
+        <div ngbDropdown class="d-inline-block">
+          <button type="button" class="btn btn-sm btn-link p-0 small" ngbDropdownToggle>+ タグ</button>
+          <ul ngbDropdownMenu class="dropdown-menu">
+            @for (tag of availableTagsToAdd; track tag.id) {
+              <li>
+                <a class="dropdown-item" href="javascript:" (click)="onAddTag(tag.id)">{{ tag.name }}</a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
   </div>
   <div class="btn-group btn-group-sm">
     @if (todo.completed) {

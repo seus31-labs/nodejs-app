@@ -1,10 +1,12 @@
+import type { Tag } from './tag.interface'
+
 /**
  * Todo 優先度
  */
 export type TodoPriority = 'low' | 'medium' | 'high'
 
 /**
- * API から返却される Todo 型
+ * API から返却される Todo 型（タグ付き）
  */
 export interface Todo {
   id: number
@@ -19,6 +21,7 @@ export interface Todo {
   archivedAt: string | null
   createdAt: string
   updatedAt: string
+  Tags?: Tag[]
 }
 
 /**

@@ -9,6 +9,7 @@ import type { SortOptions } from '../models/sort-options.interface'
 export interface TodoListFilters {
   completed?: boolean
   priority?: TodoPriority
+  tagIds?: number[]
 }
 
 @Injectable({
@@ -27,6 +28,7 @@ export class TodoService {
     const params: Record<string, string> = {}
     if (filters?.completed !== undefined) params['completed'] = String(filters.completed)
     if (filters?.priority) params['priority'] = filters.priority
+    if (filters?.tagIds?.length) params['tags'] = filters.tagIds.join(',')
     if (sort?.sortBy) params['sortBy'] = sort.sortBy
     if (sort?.sortOrder) params['sortOrder'] = sort.sortOrder
     return this.http.get<Todo[]>(`${this.apiUrl}/todos`, { params })
@@ -55,6 +57,7 @@ export class TodoService {
     const p: Record<string, string> = { q: params.q.trim() }
     if (params.completed !== undefined) p['completed'] = String(params.completed)
     if (params.priority) p['priority'] = params.priority
+    if (params.tagIds?.length) p['tags'] = params.tagIds.join(',')
     if (sort?.sortBy) p['sortBy'] = sort.sortBy
     if (sort?.sortOrder) p['sortOrder'] = sort.sortOrder
     return this.http.get<Todo[]>(`${this.apiUrl}/todos/search`, { params: p })
@@ -93,5 +96,13 @@ export class TodoService {
 
   bulkArchive(todoIds: number[]): Observable<{ updated: number }> {
     return this.http.post<{ updated: number }>(`${this.apiUrl}/todos/bulk-archive`, { todoIds })
+  }
+
+  addTagToTodo(todoId: number, tagId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/todos/${todoId}/tags`, { tagId })
+  }
+
+  removeTagFromTodo(todoId: number, tagId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/todos/${todoId}/tags/${tagId}`)
   }
 }

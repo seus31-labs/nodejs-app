@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common'
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
 import { TodoItemComponent } from '../todo-item/todo-item.component'
 import type { Todo } from '../../../../../models/todo.interface'
+import type { Tag } from '../../../../../models/tag.interface'
 
 @Component({
   selector: 'app-todo-list',
@@ -13,6 +14,7 @@ import type { Todo } from '../../../../../models/todo.interface'
 })
 export class TodoListComponent {
   @Input() todos: Todo[] = []
+  @Input() allTags: Tag[] = []
   @Input() loading = false
   @Input() error: string | null = null
   /** true のときドラッグ無効（ソートが「手動」以外のとき） */
@@ -24,6 +26,8 @@ export class TodoListComponent {
   @Output() delete = new EventEmitter<number>()
   @Output() archive = new EventEmitter<number>()
   @Output() reorder = new EventEmitter<number[]>()
+  @Output() tagRemoved = new EventEmitter<{ todoId: number; tag: Tag }>()
+  @Output() tagAdded = new EventEmitter<{ todoId: number; tagId: number }>()
 
   toggleSelection(id: number): void {
     const next = this.selectedIds.includes(id)

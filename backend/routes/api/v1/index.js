@@ -18,7 +18,16 @@ const {
   bulkComplete,
   bulkDelete,
   bulkArchive,
+  addTagToTodo,
+  removeTagFromTodo,
 } = require('../../../controllers/todoController');
+const {
+  createTag,
+  getTags,
+  getTagById,
+  updateTag,
+  deleteTag,
+} = require('../../../controllers/tagController');
 
 module.exports = async function (fastify, opts) {
   /**
@@ -73,6 +82,68 @@ module.exports = async function (fastify, opts) {
   fastify.delete('/users/:id', { preHandler: [fastify.authenticate] }, async (request, reply)=> deleteUser(fastify, request, reply));
 
   /**
+   * tags CRUD API routes (JWT 必須)
+   */
+  fastify.post('/tags', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['name'],
+        properties: {
+          name: { type: 'string', maxLength: 50 },
+          color: { type: 'string', maxLength: 7 },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => createTag(fastify, request, reply),
+  });
+  fastify.get('/tags', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getTags(fastify, request, reply),
+  });
+  fastify.get('/tags/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getTagById(fastify, request, reply),
+  });
+  fastify.put('/tags/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', maxLength: 50 },
+          color: { type: 'string', maxLength: 7 },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => updateTag(fastify, request, reply),
+  });
+  fastify.delete('/tags/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => deleteTag(fastify, request, reply),
+  });
+
+  /**
    * todos CRUD API routes (JWT 必須)
    */
   fastify.post('/todos', {
@@ -100,6 +171,7 @@ module.exports = async function (fastify, opts) {
           priority: { type: 'string', enum: ['low', 'medium', 'high'] },
           sortBy: { type: 'string', enum: ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'] },
           sortOrder: { type: 'string', enum: ['asc', 'desc'] },
+          tags: { type: 'string' },
         },
       },
     },
@@ -133,6 +205,7 @@ module.exports = async function (fastify, opts) {
           priority: { type: 'string', enum: ['low', 'medium', 'high'] },
           sortBy: { type: 'string', enum: ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'] },
           sortOrder: { type: 'string', enum: ['asc', 'desc'] },
+          tags: { type: 'string' },
         },
       },
     },
@@ -173,6 +246,36 @@ module.exports = async function (fastify, opts) {
     schema: { body: bulkBodySchema },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => bulkArchive(fastify, request, reply),
+  });
+  fastify.post('/todos/:todoId/tags', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['todoId'],
+        properties: { todoId: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        required: ['tagId'],
+        properties: { tagId: { type: 'integer' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => addTagToTodo(fastify, request, reply),
+  });
+  fastify.delete('/todos/:todoId/tags/:tagId', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['todoId', 'tagId'],
+        properties: {
+          todoId: { type: 'string', pattern: '^[0-9]+$' },
+          tagId: { type: 'string', pattern: '^[0-9]+$' },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => removeTagFromTodo(fastify, request, reply),
   });
   fastify.get('/todos/:id', {
     schema: {

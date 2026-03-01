@@ -28,10 +28,13 @@
         <div class="flex-grow-1 min-width-0">
         <app-todo-item
           [todo]="todo"
+          [allTags]="allTags"
           (toggle)="toggle.emit($event)"
           (edit)="edit.emit($event)"
           (delete)="delete.emit($event)"
           (archive)="archive.emit($event)"
+          (tagRemoved)="tagRemoved.emit($event)"
+          (tagAdded)="tagAdded.emit($event)"
         />
         </div>
       </div>

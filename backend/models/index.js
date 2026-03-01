@@ -3,6 +3,8 @@
 const fp = require('fastify-plugin')
 const User = require('./user')
 const Todo = require('./todo')
+const Tag = require('./tag')
+const TodoTag = require('./todoTag')
 
 module.exports = fp(async function (fastify, opts) {
   const sequelize = fastify.sequelize
@@ -10,6 +12,8 @@ module.exports = fp(async function (fastify, opts) {
   const models = {
     User: User(sequelize),
     Todo: Todo(sequelize),
+    Tag: Tag(sequelize),
+    TodoTag: TodoTag(sequelize),
   }
 
   Object.keys(models).forEach((name) => {

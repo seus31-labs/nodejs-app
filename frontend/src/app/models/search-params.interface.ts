@@ -7,4 +7,5 @@ export interface SearchParams {
   q: string
   completed?: boolean
   priority?: TodoPriority
+  tagIds?: number[]
 }

@@ -51,6 +51,14 @@ const NavigationItems = [
         url: '/dashboard/archived',
         icon: 'feather icon-archive',
         classes: 'nav-item'
+      },
+      {
+        id: 'tags',
+        title: 'タグ管理',
+        type: 'item',
+        url: '/dashboard/tags',
+        icon: 'feather icon-tag',
+        classes: 'nav-item'
       }
     ]
   },
