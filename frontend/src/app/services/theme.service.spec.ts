@@ -5,12 +5,12 @@ describe('ThemeService', () => {
   let service: ThemeService
 
   beforeEach(() => {
-    TestBed.configureTestingModule({})
-    service = TestBed.inject(ThemeService)
-    // テストごとに localStorage をクリア
+    // サービス生成前にクリア（順序依存を防ぐ）
     if (typeof window !== 'undefined' && window.localStorage) {
       window.localStorage.removeItem('app-theme')
     }
+    TestBed.configureTestingModule({})
+    service = TestBed.inject(ThemeService)
   })
 
   it('should be created', () => {
@@ -51,5 +51,19 @@ describe('ThemeService', () => {
       done()
     })
     service.setTheme('dark')
+  })
+
+  it('init() should apply dark-mode class to body when theme is dark', () => {
+    service.setTheme('dark')
+    document.body.classList.remove('dark-mode')
+    service.init()
+    expect(document.body.classList.contains('dark-mode')).toBe(true)
+  })
+
+  it('init() should remove dark-mode class from body when theme is light', () => {
+    service.setTheme('dark')
+    service.setTheme('light')
+    service.init()
+    expect(document.body.classList.contains('dark-mode')).toBe(false)
   })
 })
