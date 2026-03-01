@@ -14,6 +14,7 @@ export interface Todo {
   completed: boolean
   priority: TodoPriority
   dueDate: string | null
+  sortOrder: number
   createdAt: string
   updatedAt: string
 }

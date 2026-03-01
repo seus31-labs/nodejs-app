@@ -279,3 +279,112 @@ test('other user cannot delete todo (DELETE) - 404', async (t) => {
   })
   assert.strictEqual(delAsB.statusCode, 404)
 })
+
+test('GET /api/v1/todos with sortBy and sortOrder returns sorted list', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `sort-${suffix}`, email: `sort-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'First' }
+  })
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Second' }
+  })
+  const listRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    query: { sortBy: 'createdAt', sortOrder: 'desc' }
+  })
+  assert.strictEqual(listRes.statusCode, 200)
+  const todos = JSON.parse(listRes.payload)
+  assert(Array.isArray(todos) && todos.length >= 2)
+  const created = todos.map((todo) => new Date(todo.createdAt).getTime())
+  for (let i = 1; i < created.length; i++) {
+    assert(created[i] <= created[i - 1], 'desc order: newer first')
+  }
+})
+
+test('PUT /api/v1/todos/reorder without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'PUT',
+    url: '/api/v1/todos/reorder',
+    payload: { todoIds: [1, 2, 3] }
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('PUT /api/v1/todos/reorder with empty todoIds returns 400', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `reorder-${suffix}`, email: `reorder-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const res = await app.inject({
+    method: 'PUT',
+    url: '/api/v1/todos/reorder',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { todoIds: [] }
+  })
+  assert.strictEqual(res.statusCode, 400)
+})
+
+test('PUT /api/v1/todos/reorder updates order and GET sortBy=sortOrder returns new order', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `reorder2-${suffix}`, email: `reorder2-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const c1 = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'A' }
+  })
+  const c2 = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'B' }
+  })
+  const c3 = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'C' }
+  })
+  const idA = JSON.parse(c1.payload).id
+  const idB = JSON.parse(c2.payload).id
+  const idC = JSON.parse(c3.payload).id
+  const reorderRes = await app.inject({
+    method: 'PUT',
+    url: '/api/v1/todos/reorder',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { todoIds: [idC, idA, idB] }
+  })
+  assert.strictEqual(reorderRes.statusCode, 204)
+  const listRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    query: { sortBy: 'sortOrder', sortOrder: 'asc' }
+  })
+  assert.strictEqual(listRes.statusCode, 200)
+  const todos = JSON.parse(listRes.payload)
+  const titles = todos.map((todo) => todo.title)
+  assert.strictEqual(titles[0], 'C')
+  assert.strictEqual(titles[1], 'A')
+  assert.strictEqual(titles[2], 'B')
+})

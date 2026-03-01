@@ -5,13 +5,22 @@ import { TodoService } from '../../../../../services/todo.service'
 import { TodoListComponent } from '../todo-list/todo-list.component'
 import { TodoFormComponent } from '../todo-form/todo-form.component'
 import { SearchBarComponent } from '../search-bar/search-bar.component'
+import { SortSelectorComponent } from '../sort-selector/sort-selector.component'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
+import type { SortBy, SortOrder } from '../../../../../models/sort-options.interface'
 
 @Component({
   selector: 'app-todo-page',
   standalone: true,
-  imports: [CommonModule, TodoListComponent, TodoFormComponent, SearchBarComponent, CardComponent],
+  imports: [
+    CommonModule,
+    TodoListComponent,
+    TodoFormComponent,
+    SearchBarComponent,
+    SortSelectorComponent,
+    CardComponent
+  ],
   templateUrl: './todo-page.component.html',
   styleUrls: ['./todo-page.component.scss']
 })
@@ -24,6 +33,8 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   filterCompleted: boolean | null = null
   filterPriority: TodoPriority | null = null
   searchQuery = ''
+  sortBy: SortBy = 'createdAt'
+  sortOrder: SortOrder = 'asc'
 
   private destroy$ = new Subject<void>()
 
@@ -44,12 +55,13 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     const filters: { completed?: boolean; priority?: TodoPriority } = {}
     if (this.filterCompleted !== null) filters.completed = this.filterCompleted
     if (this.filterPriority !== null) filters.priority = this.filterPriority
+    const sort = { sortBy: this.sortBy, sortOrder: this.sortOrder }
 
     const q = this.searchQuery.trim()
     const searchParams = q ? { q, ...filters } : null
     const req = searchParams
-      ? this.todoService.search(searchParams)
-      : this.todoService.list(filters)
+      ? this.todoService.search(searchParams, sort)
+      : this.todoService.list(filters, sort)
 
     req.pipe(takeUntil(this.destroy$)).subscribe({
       next: (list) => {
@@ -93,6 +105,24 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     const value = (event.target as HTMLSelectElement).value
     this.filterPriority = value === '' ? null : (value as TodoPriority)
     this.onFiltersChange()
+  }
+
+  onSortChange(sort: { sortBy: SortBy; sortOrder: SortOrder }): void {
+    this.sortBy = sort.sortBy
+    this.sortOrder = sort.sortOrder
+    this.loadTodos()
+  }
+
+  onReorder(todoIds: number[]): void {
+    this.todoService
+      .reorderTodos(todoIds)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => this.loadTodos(),
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? '並び替えに失敗しました'
+        }
+      })
   }
 
   onToggle(id: number): void {

@@ -31,6 +31,13 @@
               <option value="high">high</option>
             </select>
           </div>
+          <div class="col-auto">
+            <app-sort-selector
+              [sortBy]="sortBy"
+              [sortOrder]="sortOrder"
+              (sortChanged)="onSortChange($event)"
+            />
+          </div>
         </div>
       </div>
 
@@ -52,9 +59,11 @@
         [todos]="todos"
         [loading]="loading"
         [error]="error"
+        [dragDisabled]="sortBy !== 'sortOrder'"
         (toggle)="onToggle($event)"
         (edit)="onEdit($event)"
         (delete)="onDelete($event)"
+        (reorder)="onReorder($event)"
       />
     </app-card>
   </div>

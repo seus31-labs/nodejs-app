@@ -10,6 +10,7 @@ const {
   deleteTodo,
   toggleComplete,
   searchTodos,
+  reorderTodos,
 } = require('../../../controllers/todoController');
 
 module.exports = async function (fastify, opts) {
@@ -90,11 +91,30 @@ module.exports = async function (fastify, opts) {
         properties: {
           completed: { type: 'string', enum: ['true', 'false'] },
           priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+          sortBy: { type: 'string', enum: ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'] },
+          sortOrder: { type: 'string', enum: ['asc', 'desc'] },
         },
       },
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => getTodos(fastify, request, reply),
+  });
+  fastify.put('/todos/reorder', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['todoIds'],
+        properties: {
+          todoIds: {
+            type: 'array',
+            items: { type: 'integer' },
+            minItems: 1,
+          },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => reorderTodos(fastify, request, reply),
   });
   fastify.get('/todos/search', {
     schema: {
@@ -104,6 +124,8 @@ module.exports = async function (fastify, opts) {
           q: { type: 'string', maxLength: 255 },
           completed: { type: 'string', enum: ['true', 'false'] },
           priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+          sortBy: { type: 'string', enum: ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'] },
+          sortOrder: { type: 'string', enum: ['asc', 'desc'] },
         },
       },
     },

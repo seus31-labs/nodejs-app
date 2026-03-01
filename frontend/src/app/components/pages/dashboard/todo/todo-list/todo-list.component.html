@@ -10,14 +10,21 @@
 } @else if (todos.length === 0) {
   <p class="text-muted py-3">Todo がありません。</p>
 } @else {
-  <div class="todo-list">
+  <div
+    class="todo-list"
+    cdkDropList
+    [cdkDropListDisabled]="dragDisabled"
+    (cdkDropListDropped)="onDrop($event)"
+  >
     @for (todo of todos; track todo.id) {
-      <app-todo-item
-        [todo]="todo"
-        (toggle)="toggle.emit($event)"
-        (edit)="edit.emit($event)"
-        (delete)="delete.emit($event)"
-      />
+      <div cdkDrag [cdkDragDisabled]="dragDisabled">
+        <app-todo-item
+          [todo]="todo"
+          (toggle)="toggle.emit($event)"
+          (edit)="edit.emit($event)"
+          (delete)="delete.emit($event)"
+        />
+      </div>
     }
   </div>
 }

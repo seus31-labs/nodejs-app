@@ -46,6 +46,12 @@ module.exports = (sequelize) => {
         allowNull: true,
         field: 'due_date',
       },
+      sortOrder: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        field: 'sort_order',
+      },
     },
     {
       tableName: 'todos',

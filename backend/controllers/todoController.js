@@ -25,11 +25,13 @@ async function createTodo(fastify, req, reply) {
 async function getTodos(fastify, req, reply) {
   try {
     const userId = req.user.id;
-    const filters = {
+    const options = {
       completed: req.query.completed === 'true' ? true : req.query.completed === 'false' ? false : undefined,
       priority: req.query.priority,
+      sortBy: req.query.sortBy,
+      sortOrder: req.query.sortOrder,
     };
-    const todos = await todoService.getTodosByUserId(fastify, userId, filters);
+    const todos = await todoService.getTodosByUserId(fastify, userId, options);
     reply.code(200).send(todos.map((t) => t.toJSON()));
   } catch (error) {
     handleTodoError(fastify, reply, error, 'Failed to get todos');
@@ -112,11 +114,27 @@ async function searchTodos(fastify, req, reply) {
       priority: req.query.priority,
       completed:
         req.query.completed === 'true' ? true : req.query.completed === 'false' ? false : undefined,
+      sortBy: req.query.sortBy,
+      sortOrder: req.query.sortOrder,
     };
     const todos = await todoService.searchTodos(fastify, userId, params);
     reply.code(200).send(todos.map((t) => t.toJSON()));
   } catch (error) {
     handleTodoError(fastify, reply, error, 'Search failed');
+  }
+}
+
+async function reorderTodos(fastify, req, reply) {
+  try {
+    const userId = req.user.id;
+    const todoIds = req.body.todoIds;
+    if (!Array.isArray(todoIds) || todoIds.length === 0) {
+      return reply.code(400).send({ error: 'todoIds array is required and must be non-empty' });
+    }
+    await todoService.reorderTodos(fastify, userId, todoIds);
+    reply.code(204).send();
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Reorder failed');
   }
 }
 
@@ -128,4 +146,5 @@ module.exports = {
   deleteTodo,
   toggleComplete,
   searchTodos,
+  reorderTodos,
 };
