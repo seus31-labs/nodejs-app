@@ -291,7 +291,7 @@ frontend/src/app/
 - [x] Task 1.1: Sequelize マイグレーション作成
 - [x] Task 1.2: Todo モデル定義
 - [x] Task 1.3: User モデルに関連付け追加
-- [ ] Task 1.4: マイグレーション実行（要: 環境で `docker compose run --rm backend npx sequelize-cli db:migrate`）
+- [x] Task 1.4: マイグレーション実行（要: 環境で `docker compose run --rm backend npx sequelize-cli db:migrate`）
 
 ### Phase 2: Backend - Service Layer
 

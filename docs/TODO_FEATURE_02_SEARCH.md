@@ -38,7 +38,7 @@ GET /api/todos/search?q=買い物&priority=high&completed=false&tags=1,2
 
 - [x] 2.1.1: マイグレーション生成 `add-fulltext-index-to-todos`
 - [x] 2.1.2: todos テーブルに FULLTEXT インデックス追加（title, description）
-- [ ] 2.1.3: マイグレーション実行（要: 環境で db:migrate）
+- [x] 2.1.3: マイグレーション実行（要: 環境で db:migrate）
 
 ### Task 2.2: TodoService に検索機能追加
 
@@ -47,7 +47,7 @@ GET /api/todos/search?q=買い物&priority=high&completed=false&tags=1,2
 - [x] 2.2.3: タイトル・説明文での検索実装
 - [ ] 2.2.4: タグ名での検索実装（Tag モデル JOIN）※タグ機能実装後に対応
 - [x] 2.2.5: 複数条件の AND 結合実装
-- [ ] 2.2.6: 検索結果にタグを include※タグ機能実装後に対応
+- [x] 2.2.6: 検索結果にタグを include※タグ機能実装後に対応
 
 ### Task 2.3: TodoController に検索ハンドラ追加
 
@@ -113,7 +113,7 @@ GET /api/todos/search?q=買い物&priority=high&completed=false&tags=1,2
 
 ### Task 2.12: スタイリング
 
-- [ ] 2.12.1: 検索バーのスタイル実装
+- [x] 2.12.1: 検索バーのスタイル実装
 - [ ] 2.12.2: 検索結果のハイライト表示
 - [ ] 2.12.3: レスポンシブ対応
 
