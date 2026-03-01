@@ -1,10 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { CommonModule } from '@angular/common'
 
 @Component({
   selector: 'app-bulk-action-bar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './bulk-action-bar.component.html',
   styleUrls: ['./bulk-action-bar.component.scss']
 })

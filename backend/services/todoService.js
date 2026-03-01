@@ -290,7 +290,7 @@ async function bulkDelete(fastify, todoIds, userId) {
   const safeIds = todoIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0);
   if (safeIds.length === 0) return 0;
   return fastify.models.Todo.destroy({
-    where: { id: { [Op.in]: safeIds }, userId },
+    where: { id: { [Op.in]: safeIds }, userId, archived: false },
   });
 }
 

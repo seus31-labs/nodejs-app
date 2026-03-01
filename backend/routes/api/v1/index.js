@@ -155,6 +155,7 @@ module.exports = async function (fastify, opts) {
         type: 'array',
         items: { type: 'integer' },
         minItems: 1,
+        maxItems: 100,
       },
     },
   };

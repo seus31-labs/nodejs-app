@@ -80,10 +80,12 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
 
   onSearch(term: string): void {
     this.searchQuery = term
+    this.selectedIds = []
     this.loadTodos()
   }
 
   onFiltersChange(): void {
+    this.selectedIds = []
     this.loadTodos()
   }
 
@@ -113,6 +115,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   onSortChange(sort: { sortBy: SortBy; sortOrder: SortOrder }): void {
     this.sortBy = sort.sortBy
     this.sortOrder = sort.sortOrder
+    this.selectedIds = []
     this.loadTodos()
   }
 
