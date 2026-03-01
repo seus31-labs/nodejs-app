@@ -15,6 +15,9 @@ const {
   unarchiveTodo,
   getArchivedTodos,
   deleteArchivedTodos,
+  bulkComplete,
+  bulkDelete,
+  bulkArchive,
 } = require('../../../controllers/todoController');
 
 module.exports = async function (fastify, opts) {
@@ -143,6 +146,32 @@ module.exports = async function (fastify, opts) {
   fastify.delete('/todos/archived', {
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => deleteArchivedTodos(fastify, request, reply),
+  });
+  const bulkBodySchema = {
+    type: 'object',
+    required: ['todoIds'],
+    properties: {
+      todoIds: {
+        type: 'array',
+        items: { type: 'integer' },
+        minItems: 1,
+      },
+    },
+  };
+  fastify.post('/todos/bulk-complete', {
+    schema: { body: bulkBodySchema },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => bulkComplete(fastify, request, reply),
+  });
+  fastify.post('/todos/bulk-delete', {
+    schema: { body: bulkBodySchema },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => bulkDelete(fastify, request, reply),
+  });
+  fastify.post('/todos/bulk-archive', {
+    schema: { body: bulkBodySchema },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => bulkArchive(fastify, request, reply),
   });
   fastify.get('/todos/:id', {
     schema: {

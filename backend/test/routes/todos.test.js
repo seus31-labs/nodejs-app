@@ -679,3 +679,131 @@ test('other user cannot unarchive my todo (404)', async (t) => {
   })
   assert.strictEqual(unarchiveAsB.statusCode, 404)
 })
+
+test('POST /api/v1/todos/bulk-complete without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-complete',
+    payload: { todoIds: [1, 2] }
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('POST /api/v1/todos/bulk-complete with empty todoIds returns 400', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `bulk-${suffix}`, email: `bulk-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-complete',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { todoIds: [] }
+  })
+  assert.strictEqual(res.statusCode, 400)
+})
+
+test('POST /api/v1/todos/bulk-complete marks selected todos completed', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `bulkc-${suffix}`, email: `bulkc-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const c1 = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'One' }
+  })
+  const c2 = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Two' }
+  })
+  const id1 = JSON.parse(c1.payload).id
+  const id2 = JSON.parse(c2.payload).id
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-complete',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { todoIds: [id1, id2] }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const body = JSON.parse(res.payload)
+  assert.strictEqual(body.updated, 2)
+  const listRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  const list = JSON.parse(listRes.payload)
+  assert(list.every((todo) => todo.completed))
+})
+
+test('POST /api/v1/todos/bulk-delete deletes selected todos', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `bulkd-${suffix}`, email: `bulkd-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const c1 = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'One' }
+  })
+  const id1 = JSON.parse(c1.payload).id
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-delete',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { todoIds: [id1] }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const body = JSON.parse(res.payload)
+  assert.strictEqual(body.deleted, 1)
+  const getRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${id1}`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(getRes.statusCode, 404)
+})
+
+test('POST /api/v1/todos/bulk-archive archives selected todos', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `bulka-${suffix}`, email: `bulka-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const c1 = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'One' }
+  })
+  const id1 = JSON.parse(c1.payload).id
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-archive',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { todoIds: [id1] }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const body = JSON.parse(res.payload)
+  assert.strictEqual(body.updated, 1)
+  const archivedRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/archived',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  const archived = JSON.parse(archivedRes.payload)
+  assert(archived.some((todo) => todo.id === id1))
+})

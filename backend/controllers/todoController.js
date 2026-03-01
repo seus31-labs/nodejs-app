@@ -188,6 +188,45 @@ async function deleteArchivedTodos(fastify, req, reply) {
   }
 }
 
+async function bulkComplete(fastify, req, reply) {
+  try {
+    const todoIds = req.body.todoIds;
+    if (!Array.isArray(todoIds) || todoIds.length === 0) {
+      return reply.code(400).send({ error: 'todoIds array is required and must be non-empty' });
+    }
+    const updated = await todoService.bulkComplete(fastify, todoIds, req.user.id);
+    reply.code(200).send({ updated });
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Bulk complete failed');
+  }
+}
+
+async function bulkDelete(fastify, req, reply) {
+  try {
+    const todoIds = req.body.todoIds;
+    if (!Array.isArray(todoIds) || todoIds.length === 0) {
+      return reply.code(400).send({ error: 'todoIds array is required and must be non-empty' });
+    }
+    const deleted = await todoService.bulkDelete(fastify, todoIds, req.user.id);
+    reply.code(200).send({ deleted });
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Bulk delete failed');
+  }
+}
+
+async function bulkArchive(fastify, req, reply) {
+  try {
+    const todoIds = req.body.todoIds;
+    if (!Array.isArray(todoIds) || todoIds.length === 0) {
+      return reply.code(400).send({ error: 'todoIds array is required and must be non-empty' });
+    }
+    const updated = await todoService.bulkArchive(fastify, todoIds, req.user.id);
+    reply.code(200).send({ updated });
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Bulk archive failed');
+  }
+}
+
 module.exports = {
   createTodo,
   getTodos,
@@ -201,4 +240,7 @@ module.exports = {
   unarchiveTodo,
   getArchivedTodos,
   deleteArchivedTodos,
+  bulkComplete,
+  bulkDelete,
+  bulkArchive,
 };

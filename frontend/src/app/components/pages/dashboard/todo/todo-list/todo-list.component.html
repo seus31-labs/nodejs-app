@@ -17,7 +17,15 @@
     (cdkDropListDropped)="onDrop($event)"
   >
     @for (todo of todos; track todo.id) {
-      <div cdkDrag [cdkDragDisabled]="dragDisabled">
+      <div class="d-flex align-items-center gap-2 todo-row" cdkDrag [cdkDragDisabled]="dragDisabled">
+        <input
+          type="checkbox"
+          class="form-check-input flex-shrink-0"
+          [checked]="selectedIds.includes(todo.id)"
+          (change)="toggleSelection(todo.id)"
+          [attr.aria-label]="'選択: ' + todo.title"
+        />
+        <div class="flex-grow-1 min-width-0">
         <app-todo-item
           [todo]="todo"
           (toggle)="toggle.emit($event)"
@@ -25,7 +33,14 @@
           (delete)="delete.emit($event)"
           (archive)="archive.emit($event)"
         />
+        </div>
       </div>
     }
   </div>
+  @if (selectedIds.length > 0) {
+    <div class="mt-2 small">
+      <button type="button" class="btn btn-link btn-sm p-0 me-2" (click)="onSelectAll()">全選択</button>
+      <button type="button" class="btn btn-link btn-sm p-0" (click)="selectionChange.emit([])">選択解除</button>
+    </div>
+  }
 }

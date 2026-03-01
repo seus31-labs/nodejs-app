@@ -6,6 +6,7 @@ import { TodoListComponent } from '../todo-list/todo-list.component'
 import { TodoFormComponent } from '../todo-form/todo-form.component'
 import { SearchBarComponent } from '../search-bar/search-bar.component'
 import { SortSelectorComponent } from '../sort-selector/sort-selector.component'
+import { BulkActionBarComponent } from '../bulk-action-bar/bulk-action-bar.component'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 import type { SortBy, SortOrder } from '../../../../../models/sort-options.interface'
@@ -19,6 +20,7 @@ import type { SortBy, SortOrder } from '../../../../../models/sort-options.inter
     TodoFormComponent,
     SearchBarComponent,
     SortSelectorComponent,
+    BulkActionBarComponent,
     CardComponent
   ],
   templateUrl: './todo-page.component.html',
@@ -35,6 +37,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   searchQuery = ''
   sortBy: SortBy = 'createdAt'
   sortOrder: SortOrder = 'asc'
+  selectedIds: number[] = []
 
   private destroy$ = new Subject<void>()
 
@@ -121,6 +124,59 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
         next: () => this.loadTodos(),
         error: (err) => {
           this.error = err?.error?.message ?? err?.message ?? '並び替えに失敗しました'
+        }
+      })
+  }
+
+  onSelectionChange(ids: number[]): void {
+    this.selectedIds = ids
+  }
+
+  onBulkComplete(): void {
+    if (this.selectedIds.length === 0) return
+    this.todoService
+      .bulkComplete(this.selectedIds)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.selectedIds = []
+          this.loadTodos()
+        },
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? '一括完了に失敗しました'
+        }
+      })
+  }
+
+  onBulkDelete(): void {
+    if (this.selectedIds.length === 0) return
+    if (!confirm(`選択した ${this.selectedIds.length} 件の Todo を削除しますか？`)) return
+    this.todoService
+      .bulkDelete(this.selectedIds)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.selectedIds = []
+          this.loadTodos()
+        },
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? '一括削除に失敗しました'
+        }
+      })
+  }
+
+  onBulkArchive(): void {
+    if (this.selectedIds.length === 0) return
+    this.todoService
+      .bulkArchive(this.selectedIds)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.selectedIds = []
+          this.loadTodos()
+        },
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? '一括アーカイブに失敗しました'
         }
       })
   }
