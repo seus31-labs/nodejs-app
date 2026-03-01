@@ -4,7 +4,7 @@
     class="form-select form-select-sm"
     style="width: auto;"
     [value]="sortBy"
-    (change)="onSortByChange($any($event.target).value)"
+    (change)="onSortByChange($event)"
   >
     @for (opt of sortByOptions; track opt.value) {
       <option [value]="opt.value">{{ opt.label }}</option>

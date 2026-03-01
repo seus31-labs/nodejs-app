@@ -22,9 +22,9 @@ export class SortSelectorComponent {
     { value: 'sortOrder', label: '手動' },
   ]
 
-  onSortByChange(value: string): void {
-    const sortBy = value as SortBy
-    this.sortChanged.emit({ sortBy, sortOrder: this.sortOrder })
+  onSortByChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value as SortBy
+    this.sortChanged.emit({ sortBy: value, sortOrder: this.sortOrder })
   }
 
   toggleSortOrder(): void {
