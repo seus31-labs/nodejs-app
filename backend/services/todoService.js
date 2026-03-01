@@ -1,5 +1,7 @@
 'use strict';
 
+const { Op } = require('sequelize');
+
 /**
  * 指定ユーザーの Todo を作成する
  * @param {object} fastify - Fastify インスタンス
@@ -101,6 +103,35 @@ async function toggleComplete(fastify, todoId, userId) {
   return todo;
 }
 
+/**
+ * タイトル・説明文で検索（キーワード + 優先度・完了のフィルタ）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} userId - ユーザー ID
+ * @param {object} params - { query, priority?, completed? }
+ * @returns {Promise<object[]>} Todo 配列
+ */
+async function searchTodos(fastify, userId, params = {}) {
+  const where = { userId };
+  if (typeof params.completed === 'boolean') {
+    where.completed = params.completed;
+  }
+  if (params.priority && ['low', 'medium', 'high'].includes(params.priority)) {
+    where.priority = params.priority;
+  }
+  const q = typeof params.query === 'string' ? params.query.trim() : '';
+  if (q.length > 0) {
+    const escaped = q.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+    const pattern = `%${escaped}%`;
+    where[Op.and] = [
+      { [Op.or]: [{ title: { [Op.like]: pattern } }, { description: { [Op.like]: pattern } }] },
+    ];
+  }
+  return fastify.models.Todo.findAll({
+    where,
+    order: [['createdAt', 'ASC']],
+  });
+}
+
 module.exports = {
   createTodo,
   getTodosByUserId,
@@ -108,4 +139,5 @@ module.exports = {
   updateTodo,
   deleteTodo,
   toggleComplete,
+  searchTodos,
 };

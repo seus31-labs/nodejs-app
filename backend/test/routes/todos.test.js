@@ -23,6 +23,46 @@ test('POST /api/v1/todos without auth returns 401', async (t) => {
   assert.strictEqual(res.statusCode, 401)
 })
 
+test('GET /api/v1/todos/search without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/search',
+    query: { q: 'test' }
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('GET /api/v1/todos/search with auth returns matching todos', async (t) => {
+  const app = await build(t)
+  const suffix = Date.now()
+  const user = { name: `search-${suffix}`, email: `search-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/login',
+    payload: { email: user.email, password: user.password }
+  })
+  const token = JSON.parse(loginRes.payload).token
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: '買い物メモ', description: '牛乳を買う' }
+  })
+  const searchRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/search',
+    headers: { authorization: `Bearer ${token}` },
+    query: { q: '買い物' }
+  })
+  assert.strictEqual(searchRes.statusCode, 200)
+  const todos = JSON.parse(searchRes.payload)
+  assert(Array.isArray(todos))
+  assert(todos.length >= 1)
+  assert(todos.some((todo) => todo.title.includes('買い物') || (todo.description && todo.description.includes('買い物'))))
+})
+
 test('other user cannot access todo (GET) - 404', async (t) => {
   const app = await build(t)
   const suffix = Date.now()

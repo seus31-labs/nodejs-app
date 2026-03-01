@@ -9,6 +9,7 @@ const {
   updateTodo,
   deleteTodo,
   toggleComplete,
+  searchTodos,
 } = require('../../../controllers/todoController');
 
 module.exports = async function (fastify, opts) {
@@ -94,6 +95,20 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => getTodos(fastify, request, reply),
+  });
+  fastify.get('/todos/search', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          q: { type: 'string' },
+          completed: { type: 'string', enum: ['true', 'false'] },
+          priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => searchTodos(fastify, request, reply),
   });
   fastify.get('/todos/:id', {
     schema: {

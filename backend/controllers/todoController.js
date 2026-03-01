@@ -100,6 +100,22 @@ async function toggleComplete(fastify, req, reply) {
   }
 }
 
+async function searchTodos(fastify, req, reply) {
+  try {
+    const userId = req.user.id;
+    const params = {
+      query: req.query.q,
+      priority: req.query.priority,
+      completed:
+        req.query.completed === 'true' ? true : req.query.completed === 'false' ? false : undefined,
+    };
+    const todos = await todoService.searchTodos(fastify, userId, params);
+    reply.code(200).send(todos.map((t) => t.toJSON()));
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Search failed');
+  }
+}
+
 module.exports = {
   createTodo,
   getTodos,
@@ -107,4 +123,5 @@ module.exports = {
   updateTodo,
   deleteTodo,
   toggleComplete,
+  searchTodos,
 };
