@@ -10,6 +10,9 @@ const AppPath = path.join(__dirname, '..', 'app.js')
 // Fill in this config with all the configurations
 // needed for testing the application
 function config () {
+  if (!process.env.JWT_SECRET) {
+    process.env.JWT_SECRET = 'test-secret-do-not-use-in-production'
+  }
   return {}
 }
 

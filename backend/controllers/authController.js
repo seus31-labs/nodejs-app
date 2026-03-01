@@ -1,22 +1,22 @@
 const authService = require('../services/authService');
-const jwt = require('jsonwebtoken');
+
+function handleAuthError(fastify, reply, error, logLabel, clientMessage, statusCode) {
+  fastify.log.error({ err: error, message: error?.message, stack: error?.stack }, logLabel);
+  reply.code(statusCode).send({ error: clientMessage });
+}
 
 async function register(fastify, req, reply) {
   try {
     const registerResponse = await authService.register(fastify, req);
     if (registerResponse === 'ExistsEmail') {
       return reply.code(400).send({ error: 'Email already in use' });
-    } else if (registerResponse === 'ExistsName') {
+    }
+    if (registerResponse === 'ExistsName') {
       return reply.code(400).send({ error: 'Name already in use' });
     }
     reply.code(201).send({ token: registerResponse });
   } catch (error) {
-    fastify.log.error(error, 'User registration failed');
-    const message =
-      process.env.NODE_ENV === 'development' && error?.message
-        ? error.message
-        : 'User registration failed';
-    reply.code(400).send({ error: message });
+    handleAuthError(fastify, reply, error, 'User registration failed', 'User registration failed', 400);
   }
 }
 
@@ -28,12 +28,7 @@ async function login(fastify, req, reply) {
     }
     reply.send({ token: loginResponse });
   } catch (error) {
-    fastify.log.error({ err: error, message: error?.message, stack: error?.stack }, 'Login failed');
-    const message =
-      process.env.NODE_ENV === 'development' && error?.message
-        ? error.message
-        : 'Login failed';
-    reply.code(500).send({ error: message });
+    handleAuthError(fastify, reply, error, 'Login failed', 'Login failed', 500);
   }
 }
 

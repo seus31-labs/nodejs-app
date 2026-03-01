@@ -41,7 +41,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     this.error = null
     const filters: { completed?: boolean; priority?: string } = {}
     if (this.filterCompleted !== null) filters.completed = this.filterCompleted
-    if (this.filterPriority ?? false) filters.priority = this.filterPriority!
+    if (this.filterPriority !== null) filters.priority = this.filterPriority
 
     this.todoService
       .list(filters)
@@ -60,6 +60,29 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
 
   onFiltersChange(): void {
     this.loadTodos()
+  }
+
+  /** 完了フィルタの表示値（テンプレート用） */
+  get completedFilterValue(): string {
+    if (this.filterCompleted === null) return ''
+    return this.filterCompleted ? 'true' : 'false'
+  }
+
+  /** 優先度フィルタの表示値（テンプレート用） */
+  get priorityFilterValue(): string {
+    return this.filterPriority !== null ? this.filterPriority : ''
+  }
+
+  onCompletedFilterChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value
+    this.filterCompleted = value === '' ? null : value === 'true'
+    this.onFiltersChange()
+  }
+
+  onPriorityFilterChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value
+    this.filterPriority = value === '' ? null : value
+    this.onFiltersChange()
   }
 
   onToggle(id: number): void {

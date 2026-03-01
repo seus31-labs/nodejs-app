@@ -8,8 +8,8 @@
             <select
               class="form-select form-select-sm"
               style="width: auto;"
-              [value]="filterCompleted === null ? '' : filterCompleted ? 'true' : 'false'"
-              (change)="filterCompleted = $any($event.target).value === '' ? null : $any($event.target).value === 'true'; onFiltersChange()"
+              [value]="completedFilterValue"
+              (change)="onCompletedFilterChange($event)"
             >
               <option value="">すべて</option>
               <option value="false">未完了</option>
@@ -21,8 +21,8 @@
             <select
               class="form-select form-select-sm"
               style="width: auto;"
-              [value]="filterPriority ?? ''"
-              (change)="filterPriority = $any($event.target).value || null; onFiltersChange()"
+              [value]="priorityFilterValue"
+              (change)="onPriorityFilterChange($event)"
             >
               <option value="">すべて</option>
               <option value="low">low</option>
