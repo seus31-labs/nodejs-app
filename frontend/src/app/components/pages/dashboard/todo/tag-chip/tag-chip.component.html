@@ -1,0 +1,18 @@
+<span
+  class="tag-chip badge rounded-pill me-1"
+  [style.background-color]="tag.color"
+  [class.text-dark]="isLight(tag.color)"
+  [class.text-white]="!isLight(tag.color)"
+>
+  {{ tag.name }}
+  @if (removable) {
+    <button
+      type="button"
+      class="ms-1"
+      [class.btn-close]="true"
+      [class.btn-close-white]="!isLight(tag.color)"
+      (click)="onRemove(); $event.preventDefault()"
+      [attr.aria-label]="'タグ ' + tag.name + ' を削除'"
+    ></button>
+  }
+</span>

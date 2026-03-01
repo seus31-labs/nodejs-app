@@ -38,6 +38,23 @@
               (sortChanged)="onSortChange($event)"
             />
           </div>
+          @if (allTags.length > 0) {
+            <div class="col-12 col-md-auto mt-1 mt-md-0">
+              <span class="me-1 small text-muted">タグ:</span>
+              @for (tag of allTags; track tag.id) {
+                <button
+                  type="button"
+                  class="badge rounded-pill me-1 mb-1"
+                  [style.background-color]="filterTagIds.includes(tag.id) ? tag.color : '#e9ecef'"
+                  [class.text-dark]="filterTagIds.includes(tag.id) ? isLight(tag.color) : true"
+                  [class.text-white]="filterTagIds.includes(tag.id) && !isLight(tag.color)"
+                  (click)="toggleTagFilter(tag.id)"
+                >
+                  {{ tag.name }}
+                </button>
+              }
+            </div>
+          }
         </div>
       </div>
 
@@ -65,6 +82,7 @@
 
       <app-todo-list
         [todos]="todos"
+        [allTags]="allTags"
         [loading]="loading"
         [error]="error"
         [dragDisabled]="sortBy !== 'sortOrder'"
@@ -75,6 +93,8 @@
         (delete)="onDelete($event)"
         (archive)="onArchived($event)"
         (reorder)="onReorder($event)"
+        (tagRemoved)="onTagRemoved($event)"
+        (tagAdded)="onTagAdded($event)"
       />
     </app-card>
   </div>

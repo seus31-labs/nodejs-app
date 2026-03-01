@@ -1,20 +1,26 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap'
 import type { Todo } from '../../../../../models/todo.interface'
+import type { Tag } from '../../../../../models/tag.interface'
+import { TagChipComponent } from '../tag-chip/tag-chip.component'
 
 @Component({
   selector: 'app-todo-item',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, TagChipComponent],
   templateUrl: './todo-item.component.html',
   styleUrls: ['./todo-item.component.scss']
 })
 export class TodoItemComponent {
   @Input({ required: true }) todo!: Todo
+  @Input() allTags: Tag[] = []
   @Output() toggle = new EventEmitter<number>()
   @Output() edit = new EventEmitter<Todo>()
   @Output() delete = new EventEmitter<number>()
   @Output() archive = new EventEmitter<number>()
+  @Output() tagRemoved = new EventEmitter<{ todoId: number; tag: Tag }>()
+  @Output() tagAdded = new EventEmitter<{ todoId: number; tagId: number }>()
 
   onToggle(): void {
     this.toggle.emit(this.todo.id)
@@ -30,6 +36,23 @@ export class TodoItemComponent {
 
   onArchive(): void {
     this.archive.emit(this.todo.id)
+  }
+
+  onTagRemoved(tag: Tag): void {
+    this.tagRemoved.emit({ todoId: this.todo.id, tag })
+  }
+
+  onAddTag(tagId: number): void {
+    this.tagAdded.emit({ todoId: this.todo.id, tagId })
+  }
+
+  get tags(): Tag[] {
+    return this.todo.Tags ?? []
+  }
+
+  get availableTagsToAdd(): Tag[] {
+    const onTodo = new Set((this.todo.Tags ?? []).map((t) => t.id))
+    return this.allTags.filter((t) => !onTodo.has(t.id))
   }
 
   /** 優先度バッジの Bootstrap クラス */

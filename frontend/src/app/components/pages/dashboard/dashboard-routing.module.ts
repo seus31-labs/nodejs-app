@@ -17,6 +17,10 @@ const routes: Routes = [
         path: 'archived',
         loadComponent: () => import('./archived-todos/archived-todos-page.component')
       },
+      {
+        path: 'tags',
+        loadComponent: () => import('./tags/tags-page.component')
+      },
     ]
   }
 ]

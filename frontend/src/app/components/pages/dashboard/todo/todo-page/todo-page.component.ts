@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { Subject, takeUntil } from 'rxjs'
 import { TodoService } from '../../../../../services/todo.service'
+import { TagService } from '../../../../../services/tag.service'
 import { TodoListComponent } from '../todo-list/todo-list.component'
 import { TodoFormComponent } from '../todo-form/todo-form.component'
 import { SearchBarComponent } from '../search-bar/search-bar.component'
@@ -9,6 +10,7 @@ import { SortSelectorComponent } from '../sort-selector/sort-selector.component'
 import { BulkActionBarComponent } from '../bulk-action-bar/bulk-action-bar.component'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
+import type { Tag } from '../../../../../models/tag.interface'
 import type { SortBy, SortOrder } from '../../../../../models/sort-options.interface'
 
 @Component({
@@ -34,17 +36,30 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
 
   filterCompleted: boolean | null = null
   filterPriority: TodoPriority | null = null
+  filterTagIds: number[] = []
   searchQuery = ''
   sortBy: SortBy = 'createdAt'
   sortOrder: SortOrder = 'asc'
   selectedIds: number[] = []
+  allTags: Tag[] = []
 
   private destroy$ = new Subject<void>()
 
-  constructor(private todoService: TodoService) {}
+  constructor(
+    private todoService: TodoService,
+    private tagService: TagService
+  ) {}
 
   ngOnInit(): void {
+    this.loadTags()
     this.loadTodos()
+  }
+
+  loadTags(): void {
+    this.tagService.getTags().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (tags) => { this.allTags = tags },
+      error: () => { this.allTags = [] }
+    })
   }
 
   ngOnDestroy(): void {
@@ -55,9 +70,10 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   loadTodos(): void {
     this.loading = true
     this.error = null
-    const filters: { completed?: boolean; priority?: TodoPriority } = {}
+    const filters: { completed?: boolean; priority?: TodoPriority; tagIds?: number[] } = {}
     if (this.filterCompleted !== null) filters.completed = this.filterCompleted
     if (this.filterPriority !== null) filters.priority = this.filterPriority
+    if (this.filterTagIds.length > 0) filters.tagIds = this.filterTagIds
     const sort = { sortBy: this.sortBy, sortOrder: this.sortOrder }
 
     const q = this.searchQuery.trim()
@@ -117,6 +133,36 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     this.sortOrder = sort.sortOrder
     this.selectedIds = []
     this.loadTodos()
+  }
+
+  toggleTagFilter(tagId: number): void {
+    this.filterTagIds = this.filterTagIds.includes(tagId)
+      ? this.filterTagIds.filter((id) => id !== tagId)
+      : [...this.filterTagIds, tagId]
+    this.selectedIds = []
+    this.loadTodos()
+  }
+
+  isLight(hex: string): boolean {
+    if (!hex || !hex.startsWith('#')) return false
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6
+  }
+
+  onTagRemoved(event: { todoId: number; tag: Tag }): void {
+    this.todoService.removeTagFromTodo(event.todoId, event.tag.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => this.loadTodos(),
+      error: (err) => { this.error = err?.error?.message ?? err?.message ?? 'タグの削除に失敗しました' }
+    })
+  }
+
+  onTagAdded(event: { todoId: number; tagId: number }): void {
+    this.todoService.addTagToTodo(event.todoId, event.tagId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => { this.loadTodos() },
+      error: (err) => { this.error = err?.error?.message ?? err?.message ?? 'タグの追加に失敗しました' }
+    })
   }
 
   onReorder(todoIds: number[]): void {

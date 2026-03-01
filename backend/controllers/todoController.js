@@ -22,6 +22,12 @@ async function createTodo(fastify, req, reply) {
   }
 }
 
+function parseTagIdsQuery(q) {
+  if (q == null || q === '') return undefined;
+  const ids = String(q).split(',').map((s) => parseInt(s.trim(), 10)).filter((n) => Number.isInteger(n) && n > 0);
+  return ids.length > 0 ? ids : undefined;
+}
+
 async function getTodos(fastify, req, reply) {
   try {
     const userId = req.user.id;
@@ -30,6 +36,7 @@ async function getTodos(fastify, req, reply) {
       priority: req.query.priority,
       sortBy: req.query.sortBy,
       sortOrder: req.query.sortOrder,
+      tagIds: parseTagIdsQuery(req.query.tags),
     };
     const todos = await todoService.getTodosByUserId(fastify, userId, options);
     reply.code(200).send(todos.map((t) => t.toJSON()));
@@ -116,6 +123,7 @@ async function searchTodos(fastify, req, reply) {
         req.query.completed === 'true' ? true : req.query.completed === 'false' ? false : undefined,
       sortBy: req.query.sortBy,
       sortOrder: req.query.sortOrder,
+      tagIds: parseTagIdsQuery(req.query.tags),
     };
     const todos = await todoService.searchTodos(fastify, userId, params);
     reply.code(200).send(todos.map((t) => t.toJSON()));
@@ -218,6 +226,36 @@ async function bulkArchive(fastify, req, reply) {
   }
 }
 
+async function addTagToTodo(fastify, req, reply) {
+  try {
+    const todoId = parseTodoId(req.params.todoId);
+    const tagId = parseTodoId(req.body?.tagId);
+    if (todoId === null || tagId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id or tag id' });
+    }
+    const ok = await todoService.addTagToTodo(fastify, todoId, tagId, req.user.id);
+    if (!ok) return reply.code(404).send({ error: 'Not found' });
+    reply.code(204).send();
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Add tag to todo failed');
+  }
+}
+
+async function removeTagFromTodo(fastify, req, reply) {
+  try {
+    const todoId = parseTodoId(req.params.todoId);
+    const tagId = parseTodoId(req.params.tagId);
+    if (todoId === null || tagId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id or tag id' });
+    }
+    const ok = await todoService.removeTagFromTodo(fastify, todoId, tagId, req.user.id);
+    if (!ok) return reply.code(404).send({ error: 'Not found' });
+    reply.code(204).send();
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Remove tag from todo failed');
+  }
+}
+
 module.exports = {
   createTodo,
   getTodos,
@@ -234,4 +272,6 @@ module.exports = {
   bulkComplete,
   bulkDelete,
   bulkArchive,
+  addTagToTodo,
+  removeTagFromTodo,
 };

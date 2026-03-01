@@ -1,6 +1,7 @@
 'use strict';
 
 const { Op } = require('sequelize');
+const tagService = require('./tagService');
 
 const SORT_BY_ALLOWED = ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'];
 const SORT_ORDER_ALLOWED = ['asc', 'desc'];
@@ -35,11 +36,11 @@ async function createTodo(fastify, userId, todoData) {
 }
 
 /**
- * ユーザーの Todo 一覧をフィルタ・ソート付きで取得する
+ * ユーザーの Todo 一覧をフィルタ・ソート付きで取得する（タグ付き）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} userId - ユーザー ID
- * @param {object} options - { completed?, priority?, sortBy?, sortOrder? }
- * @returns {Promise<object[]>} Todo 配列
+ * @param {object} options - { completed?, priority?, sortBy?, sortOrder?, tagIds? }
+ * @returns {Promise<object[]>} Todo 配列（Tags を含む）
  */
 async function getTodosByUserId(fastify, userId, options = {}) {
   const where = { userId, archived: false };
@@ -54,10 +55,22 @@ async function getTodosByUserId(fastify, userId, options = {}) {
     options.sortBy,
     options.sortOrder
   );
-  return fastify.models.Todo.findAll({
+  const tagIds = Array.isArray(options.tagIds)
+    ? options.tagIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0)
+    : [];
+  const include = [{ model: fastify.models.Tag, as: 'Tags', through: { attributes: [] }, required: false }];
+  let todos = await fastify.models.Todo.findAll({
     where,
+    include,
     order,
   });
+  if (tagIds.length > 0) {
+    todos = todos.filter((t) => {
+      const todoTagIds = (t.Tags || []).map((tag) => tag.id);
+      return tagIds.every((id) => todoTagIds.includes(id));
+    });
+  }
+  return todos;
 }
 
 /**
@@ -71,6 +84,7 @@ async function getTodosByUserId(fastify, userId, options = {}) {
 async function getTodoById(fastify, todoId, userId) {
   return fastify.models.Todo.findOne({
     where: { id: todoId, userId, archived: false },
+    include: [{ model: fastify.models.Tag, as: 'Tags', through: { attributes: [] }, required: false }],
   });
 }
 
@@ -164,10 +178,61 @@ async function searchTodos(fastify, userId, params = {}) {
     params.sortBy,
     params.sortOrder
   );
-  return fastify.models.Todo.findAll({
+  const tagIds = Array.isArray(params.tagIds)
+    ? params.tagIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0)
+    : [];
+  const include = [{ model: fastify.models.Tag, as: 'Tags', through: { attributes: [] }, required: false }];
+  let todos = await fastify.models.Todo.findAll({
     where,
+    include,
     order,
   });
+  if (tagIds.length > 0) {
+    todos = todos.filter((t) => {
+      const todoTagIds = (t.Tags || []).map((tag) => tag.id);
+      return tagIds.every((id) => todoTagIds.includes(id));
+    });
+  }
+  return todos;
+}
+
+/**
+ * Todo にタグを付与する（所有者の Todo と Tag のみ、冪等）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} todoId - Todo ID
+ * @param {number} tagId - タグ ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<boolean>} 付与した場合 true、既に付与済みまたは存在しなければ false
+ */
+async function addTagToTodo(fastify, todoId, tagId, userId) {
+  const todo = await getTodoById(fastify, todoId, userId);
+  if (!todo) return false;
+  const tag = await tagService.getTagById(fastify, tagId, userId);
+  if (!tag) return false;
+  const [todoTag] = await fastify.models.TodoTag.findOrCreate({
+    where: { todoId, tagId },
+    defaults: { todoId, tagId },
+  });
+  return !!todoTag;
+}
+
+/**
+ * Todo からタグを外す（所有者のみ）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} todoId - Todo ID
+ * @param {number} tagId - タグ ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<boolean>} 削除した場合 true、存在しなければ false
+ */
+async function removeTagFromTodo(fastify, todoId, tagId, userId) {
+  const todo = await getTodoById(fastify, todoId, userId);
+  if (!todo) return false;
+  const tag = await tagService.getTagById(fastify, tagId, userId);
+  if (!tag) return false;
+  const result = await fastify.models.TodoTag.destroy({
+    where: { todoId, tagId },
+  });
+  return result > 0;
 }
 
 /**
@@ -329,4 +394,6 @@ module.exports = {
   bulkComplete,
   bulkDelete,
   bulkArchive,
+  addTagToTodo,
+  removeTagFromTodo,
 };
