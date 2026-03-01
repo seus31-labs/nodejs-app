@@ -1,0 +1,109 @@
+---
+description: フロントエンド（Angular 18 + TypeScript）の実装ルール
+globs: ["frontend/src/**/*.ts", "frontend/src/**/*.html", "frontend/src/**/*.scss"]
+alwaysApply: false
+---
+
+# Frontend 実装ルール
+
+## Angular コーディング規約
+
+### コンポーネント
+
+```typescript
+// ✅ standalone コンポーネントを推奨
+@Component({
+  selector: 'app-example',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, MatButtonModule],
+  templateUrl: './example.component.html',
+  styleUrls: ['./example.component.scss']
+})
+export class ExampleComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+```
+
+### RxJS
+
+```typescript
+// ✅ takeUntil パターンで確実にアンサブスクライブ
+this.myService.getData()
+  .pipe(takeUntil(this.destroy$))
+  .subscribe(data => { ... });
+
+// ❌ 禁止（メモリリーク）
+this.myService.getData().subscribe(data => { ... });
+```
+
+### HTTP 通信
+
+```typescript
+// ✅ HTTP 通信は必ず services/ の Service に集約
+// コンポーネントから直接 HttpClient を使用しない
+@Injectable({ providedIn: 'root' })
+export class UserService {
+  constructor(private http: HttpClient) {}
+
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>('/api/users');
+  }
+}
+```
+
+### TypeScript 型
+
+```typescript
+// ✅ Interface / Type を必ず定義する
+interface User {
+  id: number;
+  email: string;
+  name: string;
+}
+
+// ❌ any 使用禁止
+const data: any = response; // 禁止
+```
+
+## UI コンポーネント
+
+- **Angular Material 18** を主軸とする
+- **Bootstrap 5** は補助的なレイアウトに使用
+- カスタム CSS は `scss/` または `*.component.scss` に記述
+- グローバルスタイルは `src/styles.scss`、変数は `src/scss/` に集約
+
+## 認証
+
+- JWT は `auth.interceptor.ts` が自動で Authorization ヘッダーに付与
+- 認証保護ルートは `auth.guard.ts` で制御
+- トークンは `localStorage` または `sessionStorage` に保存（実装方針を統一）
+
+## テスト（Karma + Jasmine）
+
+```bash
+# コンテナ内で実行
+docker compose run --rm frontend ng test --watch=false
+docker compose run --rm frontend ng test --code-coverage
+```
+
+## ビルド・開発サーバー
+
+```bash
+# 開発サーバーは docker compose up で自動起動
+docker compose up frontend
+
+# 本番ビルド
+docker compose run --rm frontend ng build --configuration production
+```
+
+## コーディング規約
+
+- Feature-Based Module 構成（機能単位でディレクトリを分割）
+- コンポーネントは単一責任を守り、肥大化させない
+- `OnPush` Change Detection の採用を検討する（パフォーマンス最適化）
+- 環境変数は `src/environments/` の environment ファイルで管理

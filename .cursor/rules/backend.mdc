@@ -1,0 +1,77 @@
+---
+description: バックエンド（Fastify + Sequelize + MySQL）の実装ルール
+globs: ["backend/**/*.js", "backend/**/*.ts"]
+alwaysApply: false
+---
+
+# Backend 実装ルール
+
+## 言語・モジュールシステム
+
+- **CommonJS 必須**（`require` / `module.exports`）
+- ESM (`import`/`export`) は**禁止**
+- Node.js 22 の組み込み API を積極的に使用する
+
+## Fastify
+
+```js
+// ✅ ルートには必ず JSON Schema バリデーションを付与する
+fastify.post('/users', {
+  schema: {
+    body: {
+      type: 'object',
+      required: ['email', 'password'],
+      properties: {
+        email: { type: 'string', format: 'email' },
+        password: { type: 'string', minLength: 8 }
+      }
+    },
+    response: {
+      200: { type: 'object', properties: { id: { type: 'integer' } } }
+    }
+  }
+}, handler)
+
+// ✅ JWT 認証は preHandler フックで一元管理
+fastify.addHook('preHandler', verifyJWT)
+
+// ✅ エラーレスポンス
+reply.code(400).send({ message: 'Invalid input' })
+// または
+throw fastify.httpErrors.badRequest('Invalid input')
+```
+
+## Sequelize
+
+- DB アクセスは必ず Sequelize ORM 経由（生 SQL 禁止）
+- モデルは `models/` に集約
+- マイグレーションは `migrations/` で管理
+
+```bash
+# マイグレーション実行（コンテナ内）
+docker compose run --rm backend npx sequelize-cli db:migrate
+docker compose run --rm backend npx sequelize-cli db:migrate:undo
+```
+
+## セキュリティ
+
+- パスワードは必ず `bcrypt` でハッシュ化（最低コスト 10）
+- JWT は `process.env.JWT_SECRET` で署名・検証
+- `process.env` の参照前に存在チェックを行う
+- SQL インジェクション対策として Sequelize のパラメータバインドを使用
+
+## テスト
+
+```bash
+# コンテナ内で実行（Node.js built-in test runner）
+docker compose run --rm backend npm run test
+# または
+docker compose run --rm backend node --test test/**/*.test.js
+```
+
+## コーディング規約
+
+- ビジネスロジックは `services/` に集約し、Controller は薄く保つ
+- エラーハンドリングは握りつぶさず、呼び出し側に適切に伝える
+- 早期リターン（ガード句）を徹底し、ネストを浅く保つ
+- 環境変数は `dotenv` 経由で読み込み、`.env` はコミット禁止
