@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { environment } from '../../environments/environment'
-import type { Todo, TodoCreateUpdate } from '../models/todo.interface'
+import type { Todo, TodoCreateUpdate, TodoPriority } from '../models/todo.interface'
 import type { SearchParams } from '../models/search-params.interface'
 
 export interface TodoListFilters {
   completed?: boolean
-  priority?: string
+  priority?: TodoPriority
 }
 
 @Injectable({

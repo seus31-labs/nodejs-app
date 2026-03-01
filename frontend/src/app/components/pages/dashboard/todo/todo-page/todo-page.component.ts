@@ -22,7 +22,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   editingTodo: Todo | null = null
 
   filterCompleted: boolean | null = null
-  filterPriority: string | null = null
+  filterPriority: TodoPriority | null = null
   searchQuery = ''
 
   private destroy$ = new Subject<void>()
@@ -41,18 +41,12 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   loadTodos(): void {
     this.loading = true
     this.error = null
-    const filters: { completed?: boolean; priority?: string } = {}
+    const filters: { completed?: boolean; priority?: TodoPriority } = {}
     if (this.filterCompleted !== null) filters.completed = this.filterCompleted
     if (this.filterPriority !== null) filters.priority = this.filterPriority
 
     const q = this.searchQuery.trim()
-    const searchParams = q
-      ? {
-          q,
-          completed: filters.completed,
-          priority: filters.priority as TodoPriority | undefined,
-        }
-      : null
+    const searchParams = q ? { q, ...filters } : null
     const req = searchParams
       ? this.todoService.search(searchParams)
       : this.todoService.list(filters)
@@ -97,7 +91,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
 
   onPriorityFilterChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value
-    this.filterPriority = value === '' ? null : value
+    this.filterPriority = value === '' ? null : (value as TodoPriority)
     this.onFiltersChange()
   }
 
