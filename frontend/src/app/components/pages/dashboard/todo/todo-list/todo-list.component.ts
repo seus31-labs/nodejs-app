@@ -20,7 +20,7 @@ export class TodoListComponent {
   @Output() toggle = new EventEmitter<number>()
   @Output() edit = new EventEmitter<Todo>()
   @Output() delete = new EventEmitter<number>()
-  @Output() archived = new EventEmitter<number>()
+  @Output() archive = new EventEmitter<number>()
   @Output() reorder = new EventEmitter<number[]>()
 
   onDrop(event: CdkDragDrop<Todo[]>): void {

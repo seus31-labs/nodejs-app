@@ -61,13 +61,27 @@ async function getTodosByUserId(fastify, userId, options = {}) {
 }
 
 /**
- * ID とユーザーで Todo を 1 件取得する（他ユーザーの場合は null）
+ * 未アーカイブの Todo を ID とユーザーで 1 件取得する（他ユーザー・アーカイブ済みは null）
+ * 通常の GET/PUT/DELETE/toggle は未アーカイブのみ操作可能とする。
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
  * @param {number} userId - ユーザー ID
  * @returns {Promise<object|null>}
  */
 async function getTodoById(fastify, todoId, userId) {
+  return fastify.models.Todo.findOne({
+    where: { id: todoId, userId, archived: false },
+  });
+}
+
+/**
+ * アーカイブ有無を問わず Todo を 1 件取得する（archive/unarchive 専用）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} todoId - Todo ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<object|null>}
+ */
+async function getTodoByIdIncludingArchived(fastify, todoId, userId) {
   return fastify.models.Todo.findOne({
     where: { id: todoId, userId },
   });
@@ -188,15 +202,16 @@ async function reorderTodos(fastify, userId, todoIds) {
 }
 
 /**
- * Todo をアーカイブする（所有者のみ。完了済みでなくてもアーカイブ可能とする）
+ * Todo をアーカイブする（所有者のみ。完了済みでなくても API 上はアーカイブ可能）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
  * @param {number} userId - ユーザー ID
  * @returns {Promise<object|null>} 更新後の Todo、存在しなければ null
  */
 async function archiveTodo(fastify, todoId, userId) {
-  const todo = await getTodoById(fastify, todoId, userId);
+  const todo = await getTodoByIdIncludingArchived(fastify, todoId, userId);
   if (!todo) return null;
+  if (todo.archived) return todo;
   todo.archived = true;
   todo.archivedAt = new Date();
   await todo.save();
@@ -211,7 +226,7 @@ async function archiveTodo(fastify, todoId, userId) {
  * @returns {Promise<object|null>} 更新後の Todo、存在しなければ null
  */
 async function unarchiveTodo(fastify, todoId, userId) {
-  const todo = await getTodoById(fastify, todoId, userId);
+  const todo = await getTodoByIdIncludingArchived(fastify, todoId, userId);
   if (!todo) return null;
   todo.archived = false;
   todo.archivedAt = null;
