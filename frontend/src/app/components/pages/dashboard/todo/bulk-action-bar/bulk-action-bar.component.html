@@ -1,0 +1,17 @@
+@if (selectedCount > 0) {
+  <div class="bulk-action-bar d-flex align-items-center gap-2 flex-wrap py-2 px-3 bg-light rounded">
+    <span class="fw-medium">{{ selectedCount }} 件選択</span>
+    <button type="button" class="btn btn-sm btn-outline-success" (click)="bulkComplete.emit()">
+      一括完了
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="bulkArchive.emit()">
+      一括アーカイブ
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="bulkDelete.emit()">
+      一括削除
+    </button>
+    <button type="button" class="btn btn-sm btn-link p-0" (click)="clearSelection.emit()">
+      選択解除
+    </button>
+  </div>
+}

@@ -55,11 +55,21 @@
 
       <hr class="my-3" />
 
+      <app-bulk-action-bar
+        [selectedCount]="selectedIds.length"
+        (bulkComplete)="onBulkComplete()"
+        (bulkDelete)="onBulkDelete()"
+        (bulkArchive)="onBulkArchive()"
+        (clearSelection)="selectedIds = []"
+      />
+
       <app-todo-list
         [todos]="todos"
         [loading]="loading"
         [error]="error"
         [dragDisabled]="sortBy !== 'sortOrder'"
+        [selectedIds]="selectedIds"
+        (selectionChange)="onSelectionChange($event)"
         (toggle)="onToggle($event)"
         (edit)="onEdit($event)"
         (delete)="onDelete($event)"

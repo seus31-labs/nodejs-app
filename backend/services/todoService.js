@@ -260,6 +260,59 @@ async function deleteArchivedTodos(fastify, userId) {
   return result;
 }
 
+/**
+ * 指定 ID の Todo を一括で完了にする（所有者のもののみ更新）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number[]} todoIds - Todo ID 配列
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<number>} 更新件数
+ */
+async function bulkComplete(fastify, todoIds, userId) {
+  if (!Array.isArray(todoIds) || todoIds.length === 0) return 0;
+  const safeIds = todoIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0);
+  if (safeIds.length === 0) return 0;
+  const [count] = await fastify.models.Todo.update(
+    { completed: true },
+    { where: { id: { [Op.in]: safeIds }, userId, archived: false } }
+  );
+  return count;
+}
+
+/**
+ * 指定 ID の Todo を一括削除する（所有者のもののみ削除）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number[]} todoIds - Todo ID 配列
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<number>} 削除件数
+ */
+async function bulkDelete(fastify, todoIds, userId) {
+  if (!Array.isArray(todoIds) || todoIds.length === 0) return 0;
+  const safeIds = todoIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0);
+  if (safeIds.length === 0) return 0;
+  return fastify.models.Todo.destroy({
+    where: { id: { [Op.in]: safeIds }, userId, archived: false },
+  });
+}
+
+/**
+ * 指定 ID の Todo を一括アーカイブする（所有者の未アーカイブのみ更新）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number[]} todoIds - Todo ID 配列
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<number>} 更新件数
+ */
+async function bulkArchive(fastify, todoIds, userId) {
+  if (!Array.isArray(todoIds) || todoIds.length === 0) return 0;
+  const safeIds = todoIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0);
+  if (safeIds.length === 0) return 0;
+  const now = new Date();
+  const [count] = await fastify.models.Todo.update(
+    { archived: true, archivedAt: now },
+    { where: { id: { [Op.in]: safeIds }, userId, archived: false } }
+  );
+  return count;
+}
+
 module.exports = {
   createTodo,
   getTodosByUserId,
@@ -273,4 +326,7 @@ module.exports = {
   unarchiveTodo,
   getArchivedTodos,
   deleteArchivedTodos,
+  bulkComplete,
+  bulkDelete,
+  bulkArchive,
 };

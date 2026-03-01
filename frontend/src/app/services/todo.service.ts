@@ -82,4 +82,16 @@ export class TodoService {
   deleteArchivedTodos(): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/todos/archived`)
   }
+
+  bulkComplete(todoIds: number[]): Observable<{ updated: number }> {
+    return this.http.post<{ updated: number }>(`${this.apiUrl}/todos/bulk-complete`, { todoIds })
+  }
+
+  bulkDelete(todoIds: number[]): Observable<{ deleted: number }> {
+    return this.http.post<{ deleted: number }>(`${this.apiUrl}/todos/bulk-delete`, { todoIds })
+  }
+
+  bulkArchive(todoIds: number[]): Observable<{ updated: number }> {
+    return this.http.post<{ updated: number }>(`${this.apiUrl}/todos/bulk-archive`, { todoIds })
+  }
 }

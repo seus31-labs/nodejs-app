@@ -188,6 +188,36 @@ async function deleteArchivedTodos(fastify, req, reply) {
   }
 }
 
+async function bulkComplete(fastify, req, reply) {
+  try {
+    const todoIds = req.body.todoIds;
+    const updated = await todoService.bulkComplete(fastify, todoIds, req.user.id);
+    reply.code(200).send({ updated });
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Bulk complete failed');
+  }
+}
+
+async function bulkDelete(fastify, req, reply) {
+  try {
+    const todoIds = req.body.todoIds;
+    const deleted = await todoService.bulkDelete(fastify, todoIds, req.user.id);
+    reply.code(200).send({ deleted });
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Bulk delete failed');
+  }
+}
+
+async function bulkArchive(fastify, req, reply) {
+  try {
+    const todoIds = req.body.todoIds;
+    const updated = await todoService.bulkArchive(fastify, todoIds, req.user.id);
+    reply.code(200).send({ updated });
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Bulk archive failed');
+  }
+}
+
 module.exports = {
   createTodo,
   getTodos,
@@ -201,4 +231,7 @@ module.exports = {
   unarchiveTodo,
   getArchivedTodos,
   deleteArchivedTodos,
+  bulkComplete,
+  bulkDelete,
+  bulkArchive,
 };
