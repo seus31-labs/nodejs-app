@@ -11,6 +11,10 @@ const {
   toggleComplete,
   searchTodos,
   reorderTodos,
+  archiveTodo,
+  unarchiveTodo,
+  getArchivedTodos,
+  deleteArchivedTodos,
 } = require('../../../controllers/todoController');
 
 module.exports = async function (fastify, opts) {
@@ -132,6 +136,14 @@ module.exports = async function (fastify, opts) {
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => searchTodos(fastify, request, reply),
   });
+  fastify.get('/todos/archived', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getArchivedTodos(fastify, request, reply),
+  });
+  fastify.delete('/todos/archived', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => deleteArchivedTodos(fastify, request, reply),
+  });
   fastify.get('/todos/:id', {
     schema: {
       params: {
@@ -184,5 +196,27 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => toggleComplete(fastify, request, reply),
+  });
+  fastify.patch('/todos/:id/archive', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => archiveTodo(fastify, request, reply),
+  });
+  fastify.patch('/todos/:id/unarchive', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => unarchiveTodo(fastify, request, reply),
   });
 }

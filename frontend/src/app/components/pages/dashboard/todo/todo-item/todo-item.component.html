@@ -17,6 +17,9 @@
     </span>
   </div>
   <div class="btn-group btn-group-sm">
+    @if (todo.completed) {
+      <button type="button" class="btn btn-outline-secondary" (click)="onArchive()" title="アーカイブ">アーカイブ</button>
+    }
     <button type="button" class="btn btn-outline-primary" (click)="onEdit()">編集</button>
     <button type="button" class="btn btn-outline-danger" (click)="onDelete()">削除</button>
   </div>

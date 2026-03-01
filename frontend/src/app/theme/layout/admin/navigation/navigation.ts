@@ -43,6 +43,14 @@ const NavigationItems = [
         url: '/dashboard/todos',
         icon: 'feather icon-check-square',
         classes: 'nav-item'
+      },
+      {
+        id: 'archived',
+        title: 'アーカイブ',
+        type: 'item',
+        url: '/dashboard/archived',
+        icon: 'feather icon-archive',
+        classes: 'nav-item'
       }
     ]
   },

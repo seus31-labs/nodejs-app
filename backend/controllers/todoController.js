@@ -138,6 +138,56 @@ async function reorderTodos(fastify, req, reply) {
   }
 }
 
+async function archiveTodo(fastify, req, reply) {
+  try {
+    const todoId = parseTodoId(req.params.id);
+    if (todoId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id' });
+    }
+    const todo = await todoService.archiveTodo(fastify, todoId, req.user.id);
+    if (!todo) {
+      return reply.code(404).send({ error: 'Not found' });
+    }
+    reply.code(200).send(todo.toJSON());
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Archive failed');
+  }
+}
+
+async function unarchiveTodo(fastify, req, reply) {
+  try {
+    const todoId = parseTodoId(req.params.id);
+    if (todoId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id' });
+    }
+    const todo = await todoService.unarchiveTodo(fastify, todoId, req.user.id);
+    if (!todo) {
+      return reply.code(404).send({ error: 'Not found' });
+    }
+    reply.code(200).send(todo.toJSON());
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Unarchive failed');
+  }
+}
+
+async function getArchivedTodos(fastify, req, reply) {
+  try {
+    const todos = await todoService.getArchivedTodos(fastify, req.user.id);
+    reply.code(200).send(todos.map((t) => t.toJSON()));
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Failed to get archived todos');
+  }
+}
+
+async function deleteArchivedTodos(fastify, req, reply) {
+  try {
+    await todoService.deleteArchivedTodos(fastify, req.user.id);
+    reply.code(204).send();
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Failed to delete archived todos');
+  }
+}
+
 module.exports = {
   createTodo,
   getTodos,
@@ -147,4 +197,8 @@ module.exports = {
   toggleComplete,
   searchTodos,
   reorderTodos,
+  archiveTodo,
+  unarchiveTodo,
+  getArchivedTodos,
+  deleteArchivedTodos,
 };

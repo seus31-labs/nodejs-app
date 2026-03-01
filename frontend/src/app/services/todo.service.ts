@@ -66,4 +66,20 @@ export class TodoService {
   reorderTodos(todoIds: number[]): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/todos/reorder`, { todoIds })
   }
+
+  archiveTodo(id: number): Observable<Todo> {
+    return this.http.patch<Todo>(`${this.apiUrl}/todos/${id}/archive`, {})
+  }
+
+  unarchiveTodo(id: number): Observable<Todo> {
+    return this.http.patch<Todo>(`${this.apiUrl}/todos/${id}/unarchive`, {})
+  }
+
+  getArchivedTodos(): Observable<Todo[]> {
+    return this.http.get<Todo[]>(`${this.apiUrl}/todos/archived`)
+  }
+
+  deleteArchivedTodos(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/todos/archived`)
+  }
 }

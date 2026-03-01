@@ -14,6 +14,7 @@ export class TodoItemComponent {
   @Output() toggle = new EventEmitter<number>()
   @Output() edit = new EventEmitter<Todo>()
   @Output() delete = new EventEmitter<number>()
+  @Output() archived = new EventEmitter<number>()
 
   onToggle(): void {
     this.toggle.emit(this.todo.id)
@@ -25,6 +26,10 @@ export class TodoItemComponent {
 
   onDelete(): void {
     this.delete.emit(this.todo.id)
+  }
+
+  onArchive(): void {
+    this.archived.emit(this.todo.id)
   }
 
   /** 優先度バッジの Bootstrap クラス */
