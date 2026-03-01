@@ -1,0 +1,14 @@
+<button
+  type="button"
+  class="btn btn-link theme-toggle-btn d-flex align-items-center text-decoration-none"
+  (click)="toggle()"
+  [attr.aria-label]="themeService.currentTheme === 'light' ? 'ダークモードに切り替え' : 'ライトモードに切り替え'"
+>
+  @if (themeService.currentTheme === 'light') {
+    <i class="feather icon-moon" aria-hidden="true"></i>
+    <span class="ms-1 d-none d-sm-inline">ダーク</span>
+  } @else {
+    <i class="feather icon-sun" aria-hidden="true"></i>
+    <span class="ms-1 d-none d-sm-inline">ライト</span>
+  }
+</button>
