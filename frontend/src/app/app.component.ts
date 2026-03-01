@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router'
 import { SharedModule } from './theme/shared/shared.module'
+import { ThemeService } from './services/theme.service'
 
 @Component({
   selector: 'app-root',
@@ -15,9 +16,13 @@ import { SharedModule } from './theme/shared/shared.module'
 export class AppComponent implements OnInit {
   title = 'Node App Frontend'
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private themeService: ThemeService
+  ) {}
 
   ngOnInit() {
+    this.themeService.init()
     this.router.events.subscribe((evt) => {
       if (!(evt instanceof NavigationEnd)) {
         return

@@ -1,0 +1,173 @@
+// =======================================
+// ダークモード: body.dark-mode で適用
+// CSS 変数で一括定義し、必要に応じて上書き
+// =======================================
+
+:root {
+  --app-bg: #f4f7fa;
+  --app-text: #888;
+  --app-heading: #111;
+  --app-border: #eaeaea;
+  --app-card-bg: #fff;
+}
+
+body.dark-mode {
+  background: #1a1d23;
+  color: #b0b0b0;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #e8e8e8;
+  }
+
+  // メインコンテンツ
+  .pcoded-main-container,
+  .pcoded-content,
+  .pcoded-inner-content,
+  .main-body,
+  .page-wrapper {
+    background: #1a1d23;
+  }
+
+  // ヘッダー
+  .pcoded-header.navbar,
+  .pcoded-header .m-header {
+    background: #252830 !important;
+    border-color: #333;
+
+    .b-title,
+    .navbar-nav .nav-link,
+    .dropdown .dropdown-toggle {
+      color: #e0e0e0 !important;
+    }
+
+    .theme-toggle-btn {
+      color: #e0e0e0;
+    }
+  }
+
+  // サイドバー
+  .pcoded-navbar {
+    background: #252830 !important;
+
+    .pcoded-inner-navbar .pcoded-mtext,
+    .pcoded-inner-navbar .pcoded-micon,
+    .pcoded-menu-caption {
+      color: #a9b7d0 !important;
+    }
+
+    .pcoded-navbar .pcoded-inner-navbar li.active > a .pcoded-mtext {
+      color: #04a9f5 !important;
+    }
+  }
+
+  // カード
+  .card {
+    background: #252830;
+    border-color: #333;
+
+    .card-header {
+      background: #2d3139;
+      border-color: #333;
+      color: #e8e8e8;
+    }
+
+    .card-body {
+      background: #252830;
+      color: #b0b0b0;
+    }
+  }
+
+  // パンくず・テキスト
+  .breadcrumb-item,
+  .breadcrumb-item a {
+    color: #a0a0a0 !important;
+  }
+
+  .breadcrumb-item.active,
+  .page-header-title {
+    color: #e8e8e8 !important;
+  }
+
+  // フォーム
+  .form-control,
+  .form-select {
+    background: #2d3139;
+    border-color: #444;
+    color: #e0e0e0;
+
+    &::placeholder {
+      color: #888;
+    }
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    background: #2d3139;
+    border-color: #04a9f5;
+    color: #e0e0e0;
+  }
+
+  // リスト・テーブル
+  .list-group-item {
+    background: #252830;
+    border-color: #333;
+    color: #b0b0b0;
+  }
+
+  .table {
+    color: #b0b0b0;
+
+    th, td {
+      border-color: #333;
+    }
+  }
+
+  // アラート・バッジ
+  .alert {
+    background: #2d3139;
+    border-color: #444;
+    color: #b0b0b0;
+  }
+
+  // Bootstrap ドロップダウン
+  .dropdown-menu {
+    background: #252830;
+    border-color: #333;
+  }
+
+  .dropdown-item {
+    color: #b0b0b0;
+
+    &:hover {
+      background: #2d3139;
+      color: #e0e0e0;
+    }
+  }
+
+  // リンク・ボタン
+  .btn-link {
+    color: #7eb8da;
+  }
+
+  .btn-outline-secondary,
+  .btn-outline-success,
+  .btn-outline-danger {
+    border-color: #555;
+    color: #b0b0b0;
+
+    &:hover {
+      background: #2d3139;
+      color: #e0e0e0;
+    }
+  }
+
+  // Todo 一覧など
+  .todo-row,
+  .bg-light {
+    background: #2d3139 !important;
+  }
+
+  .text-muted {
+    color: #888 !important;
+  }
+}
