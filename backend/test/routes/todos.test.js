@@ -1,8 +1,13 @@
 'use strict'
 
+const crypto = require('node:crypto')
 const { test } = require('node:test')
 const assert = require('node:assert')
 const { build } = require('../helper')
+
+function uniqueSuffix() {
+  return `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`
+}
 
 test('GET /api/v1/todos without auth returns 401', async (t) => {
   const app = await build(t)
@@ -33,9 +38,31 @@ test('GET /api/v1/todos/search without auth returns 401', async (t) => {
   assert.strictEqual(res.statusCode, 401)
 })
 
+test('GET /api/v1/todos/search with empty q returns 400', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `u-${suffix}`, email: `u-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const resEmpty = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/search',
+    headers: { authorization: `Bearer ${token}` },
+    query: { q: '' }
+  })
+  assert.strictEqual(resEmpty.statusCode, 400)
+  const resMissing = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/search',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(resMissing.statusCode, 400)
+})
+
 test('GET /api/v1/todos/search with auth returns matching todos', async (t) => {
   const app = await build(t)
-  const suffix = Date.now()
+  const suffix = uniqueSuffix()
   const user = { name: `search-${suffix}`, email: `search-${suffix}@test.local`, password: 'pass123' }
   await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
   const loginRes = await app.inject({
@@ -63,9 +90,67 @@ test('GET /api/v1/todos/search with auth returns matching todos', async (t) => {
   assert(todos.some((todo) => todo.title.includes('買い物') || (todo.description && todo.description.includes('買い物'))))
 })
 
+test('GET /api/v1/todos/search returns empty array when no match', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `nomatch-${suffix}`, email: `nomatch-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'あいうえお', description: 'メモ' }
+  })
+  const searchRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/search',
+    headers: { authorization: `Bearer ${token}` },
+    query: { q: '一致しないキーワードxyz' }
+  })
+  assert.strictEqual(searchRes.statusCode, 200)
+  const todos = JSON.parse(searchRes.payload)
+  assert(Array.isArray(todos))
+  assert.strictEqual(todos.length, 0)
+})
+
+test('GET /api/v1/todos/search with priority filter returns filtered results', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `pf-${suffix}`, email: `pf-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: '重要タスク', priority: 'high' }
+  })
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: '低優先タスク', priority: 'low' }
+  })
+  const searchRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/search',
+    headers: { authorization: `Bearer ${token}` },
+    query: { q: 'タスク', priority: 'high' }
+  })
+  assert.strictEqual(searchRes.statusCode, 200)
+  const todos = JSON.parse(searchRes.payload)
+  assert(Array.isArray(todos))
+  assert.strictEqual(todos.length, 1)
+  assert.strictEqual(todos[0].title, '重要タスク')
+  assert.strictEqual(todos[0].priority, 'high')
+})
+
 test('search returns only own todos (other user todos not included)', async (t) => {
   const app = await build(t)
-  const suffix = Date.now()
+  const suffix = uniqueSuffix()
   const userA = { name: `searchA-${suffix}`, email: `searchA-${suffix}@test.local`, password: 'pass123' }
   const userB = { name: `searchB-${suffix}`, email: `searchB-${suffix}@test.local`, password: 'pass123' }
   await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA })
@@ -102,7 +187,7 @@ test('search returns only own todos (other user todos not included)', async (t) 
 
 test('other user cannot access todo (GET) - 404', async (t) => {
   const app = await build(t)
-  const suffix = Date.now()
+  const suffix = uniqueSuffix()
   const userA = { name: `userA-${suffix}`, email: `a-${suffix}@test.local`, password: 'pass123' }
   const userB = { name: `userB-${suffix}`, email: `b-${suffix}@test.local`, password: 'pass123' }
 
@@ -136,7 +221,7 @@ test('other user cannot access todo (GET) - 404', async (t) => {
 
 test('other user cannot update todo (PUT) - 404', async (t) => {
   const app = await build(t)
-  const suffix = Date.now()
+  const suffix = uniqueSuffix()
   const userA = { name: `userA2-${suffix}`, email: `a2-${suffix}@test.local`, password: 'pass123' }
   const userB = { name: `userB2-${suffix}`, email: `b2-${suffix}@test.local`, password: 'pass123' }
 
@@ -167,7 +252,7 @@ test('other user cannot update todo (PUT) - 404', async (t) => {
 
 test('other user cannot delete todo (DELETE) - 404', async (t) => {
   const app = await build(t)
-  const suffix = Date.now()
+  const suffix = uniqueSuffix()
   const userA = { name: `userA3-${suffix}`, email: `a3-${suffix}@test.local`, password: 'pass123' }
   const userB = { name: `userB3-${suffix}`, email: `b3-${suffix}@test.local`, password: 'pass123' }
 
