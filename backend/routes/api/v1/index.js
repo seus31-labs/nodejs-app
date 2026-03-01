@@ -90,7 +90,7 @@ module.exports = async function (fastify, opts) {
         type: 'object',
         required: ['name'],
         properties: {
-          name: { type: 'string', maxLength: 50 },
+          name: { type: 'string', minLength: 1, maxLength: 50 },
           color: { type: 'string', maxLength: 7 },
         },
       },
@@ -123,7 +123,7 @@ module.exports = async function (fastify, opts) {
       body: {
         type: 'object',
         properties: {
-          name: { type: 'string', maxLength: 50 },
+          name: { type: 'string', minLength: 1, maxLength: 50 },
           color: { type: 'string', maxLength: 7 },
         },
       },

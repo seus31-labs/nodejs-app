@@ -157,3 +157,129 @@ test('GET /api/v1/todos?tags= filters by tag', async (t) => {
   assert(list.length >= 1);
   assert(list.every((todo) => (todo.Tags || []).some((t) => t.id === tag.id)));
 });
+
+test('other user cannot update tag (PUT /tags/:id returns 404)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const userA = { name: `tagA-${suffix}`, email: `tagA-${suffix}@test.local`, password: 'pass123' };
+  const userB = { name: `tagB-${suffix}`, email: `tagB-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA });
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB });
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } });
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } });
+  const tokenA = JSON.parse(loginA.payload).token;
+  const tokenB = JSON.parse(loginB.payload).token;
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { name: 'A tag' },
+  });
+  const tag = JSON.parse(createRes.payload);
+  const res = await app.inject({
+    method: 'PUT',
+    url: `/api/v1/tags/${tag.id}`,
+    headers: { authorization: `Bearer ${tokenB}` },
+    payload: { name: 'hacked' },
+  });
+  assert.strictEqual(res.statusCode, 404);
+});
+
+test('other user cannot delete tag (DELETE /tags/:id returns 404)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const userA = { name: `tagdelA-${suffix}`, email: `tagdelA-${suffix}@test.local`, password: 'pass123' };
+  const userB = { name: `tagdelB-${suffix}`, email: `tagdelB-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA });
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB });
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } });
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } });
+  const tokenA = JSON.parse(loginA.payload).token;
+  const tokenB = JSON.parse(loginB.payload).token;
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { name: 'A tag' },
+  });
+  const tag = JSON.parse(createRes.payload);
+  const res = await app.inject({
+    method: 'DELETE',
+    url: `/api/v1/tags/${tag.id}`,
+    headers: { authorization: `Bearer ${tokenB}` },
+  });
+  assert.strictEqual(res.statusCode, 404);
+});
+
+test('other user cannot add tag to my todo (POST /todos/:id/tags returns 404)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const userA = { name: `todtagA-${suffix}`, email: `todtagA-${suffix}@test.local`, password: 'pass123' };
+  const userB = { name: `todtagB-${suffix}`, email: `todtagB-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA });
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB });
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } });
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } });
+  const tokenA = JSON.parse(loginA.payload).token;
+  const tokenB = JSON.parse(loginB.payload).token;
+  const todoRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { title: 'A todo' },
+  });
+  const todo = JSON.parse(todoRes.payload);
+  const tagRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${tokenB}` },
+    payload: { name: 'B tag' },
+  });
+  const tag = JSON.parse(tagRes.payload);
+  const res = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${todo.id}/tags`,
+    headers: { authorization: `Bearer ${tokenB}` },
+    payload: { tagId: tag.id },
+  });
+  assert.strictEqual(res.statusCode, 404);
+});
+
+test('other user cannot remove tag from my todo (DELETE /todos/:id/tags/:tagId returns 404)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const userA = { name: `todtagdelA-${suffix}`, email: `todtagdelA-${suffix}@test.local`, password: 'pass123' };
+  const userB = { name: `todtagdelB-${suffix}`, email: `todtagdelB-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA });
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB });
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } });
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } });
+  const tokenA = JSON.parse(loginA.payload).token;
+  const tokenB = JSON.parse(loginB.payload).token;
+  const tagARes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { name: 'A tag' },
+  });
+  const tagA = JSON.parse(tagARes.payload);
+  const todoRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { title: 'A todo' },
+  });
+  const todo = JSON.parse(todoRes.payload);
+  await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${todo.id}/tags`,
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { tagId: tagA.id },
+  });
+  const res = await app.inject({
+    method: 'DELETE',
+    url: `/api/v1/todos/${todo.id}/tags/${tagA.id}`,
+    headers: { authorization: `Bearer ${tokenB}` },
+  });
+  assert.strictEqual(res.statusCode, 404);
+});

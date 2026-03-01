@@ -1,6 +1,7 @@
 'use strict';
 
 const { Op } = require('sequelize');
+const { UniqueConstraintError } = require('sequelize');
 
 const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
 
@@ -11,21 +12,21 @@ function normalizeColor(color) {
 }
 
 /**
- * タグを作成する（同一ユーザー内で name 重複時は null、呼び出し側で 409 用）
+ * タグを作成する（findOrCreate で race condition を避け、重複時は null → コントローラで 409）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} userId - ユーザー ID
  * @param {object} data - { name, color? }
- * @returns {Promise<object|null>} 作成された Tag、重複時は null
+ * @returns {Promise<object|null>} 新規作成された Tag のみ返す。既存同名なら null
  */
 async function createTag(fastify, userId, data) {
   const name = typeof data.name === 'string' ? data.name.trim() : '';
   if (!name) return null;
   const color = normalizeColor(data.color);
-  const existing = await fastify.models.Tag.findOne({
+  const [tag, created] = await fastify.models.Tag.findOrCreate({
     where: { userId, name },
+    defaults: { userId, name, color },
   });
-  if (existing) return null;
-  return fastify.models.Tag.create({ userId, name, color });
+  return created ? tag : null;
 }
 
 /**
@@ -55,27 +56,32 @@ async function getTagById(fastify, tagId, userId) {
 }
 
 /**
- * タグを更新する（同一ユーザー内で name 重複時は null）
+ * タグを更新する。UNIQUE 違反時は 409 用に duplicate を返す。
  * @param {object} fastify - Fastify インスタンス
  * @param {number} tagId - タグ ID
  * @param {number} userId - ユーザー ID
  * @param {object} data - { name?, color? }
- * @returns {Promise<object|null>} 更新後の Tag、未存在または重複時は null
+ * @returns {Promise<{ updated: object|null, duplicate: boolean }>}
  */
 async function updateTag(fastify, tagId, userId, data) {
   const tag = await getTagById(fastify, tagId, userId);
-  if (!tag) return null;
+  if (!tag) return { updated: null, duplicate: false };
   const name = data.name != null ? String(data.name).trim() : null;
   if (name !== null) {
     const existing = await fastify.models.Tag.findOne({
       where: { userId, name, id: { [Op.ne]: tagId } },
     });
-    if (existing) return null;
+    if (existing) return { updated: null, duplicate: true };
     tag.name = name;
   }
   if (data.color !== undefined) tag.color = normalizeColor(data.color);
-  await tag.save();
-  return tag;
+  try {
+    await tag.save();
+    return { updated: tag, duplicate: false };
+  } catch (err) {
+    if (err instanceof UniqueConstraintError) return { updated: null, duplicate: true };
+    throw err;
+  }
 }
 
 /**

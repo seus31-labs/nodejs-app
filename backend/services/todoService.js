@@ -1,6 +1,7 @@
 'use strict';
 
 const { Op } = require('sequelize');
+const tagService = require('./tagService');
 
 const SORT_BY_ALLOWED = ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'];
 const SORT_ORDER_ALLOWED = ['asc', 'desc'];
@@ -206,7 +207,6 @@ async function searchTodos(fastify, userId, params = {}) {
 async function addTagToTodo(fastify, todoId, tagId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return false;
-  const tagService = require('./tagService');
   const tag = await tagService.getTagById(fastify, tagId, userId);
   if (!tag) return false;
   const [todoTag] = await fastify.models.TodoTag.findOrCreate({
@@ -227,7 +227,6 @@ async function addTagToTodo(fastify, todoId, tagId, userId) {
 async function removeTagFromTodo(fastify, todoId, tagId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return false;
-  const tagService = require('./tagService');
   const tag = await tagService.getTagById(fastify, tagId, userId);
   if (!tag) return false;
   const result = await fastify.models.TodoTag.destroy({

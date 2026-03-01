@@ -77,7 +77,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     const sort = { sortBy: this.sortBy, sortOrder: this.sortOrder }
 
     const q = this.searchQuery.trim()
-    const searchParams = q ? { q, ...filters, tagIds: filters.tagIds } : null
+    const searchParams = q ? { q, ...filters } : null
     const req = searchParams
       ? this.todoService.search(searchParams, sort)
       : this.todoService.list(filters, sort)
@@ -153,7 +153,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
 
   onTagRemoved(event: { todoId: number; tag: Tag }): void {
     this.todoService.removeTagFromTodo(event.todoId, event.tag.id).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => { this.loadTodos(); this.loadTags() },
+      next: () => this.loadTodos(),
       error: (err) => { this.error = err?.error?.message ?? err?.message ?? 'タグの削除に失敗しました' }
     })
   }
