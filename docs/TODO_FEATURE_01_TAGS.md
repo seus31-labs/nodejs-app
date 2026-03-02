@@ -149,7 +149,7 @@ GET /api/todos?tags=1,2,3  # タグでフィルタ
 - [x] 1.11.1: `backend/test/services/TagService.test.js` 作成
 - [x] 1.11.2: TagService 各メソッドのテスト実装
 - [x] 1.11.3: `backend/test/routes/tags.test.js` 作成
-- [x] 1.11.4: Tag API 各エンドポイントのテスト実装
+- [ ] 1.11.4: Tag API 各エンドポイントのテスト実装（GET/PUT/DELETE /tags/:id 正常系・DELETE /todos/:id/tags/:tagId 正常系は未実装）
 - [x] 1.11.5: Todo-Tag 関連 API のテスト実装
 
 ---
@@ -258,10 +258,10 @@ GET /api/todos?tags=1,2,3  # タグでフィルタ
 
 ### Task 1.26: Frontend テスト
 
-- [x] 1.26.1: TagService ユニットテスト
-- [x] 1.26.2: TagList コンポーネントテスト
-- [x] 1.26.3: TagForm コンポーネントテスト
-- [x] 1.26.4: TagChip コンポーネントテスト
+- [ ] 1.26.1: TagService ユニットテスト
+- [ ] 1.26.2: TagList コンポーネントテスト
+- [ ] 1.26.3: TagForm コンポーネントテスト
+- [ ] 1.26.4: TagChip コンポーネントテスト
 
 ---
 
