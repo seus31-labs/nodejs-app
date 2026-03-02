@@ -185,6 +185,47 @@ test('search returns only own todos (other user todos not included)', async (t) 
   assert(todosB.every((todo) => todo.userId === todosB[0].userId))
 })
 
+test('GET /api/v1/todos/search by tag name returns todos with that tag', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `tagsearch-${suffix}`, email: `tagsearch-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const tagRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'urgent-work', color: '#ff0000' }
+  })
+  assert.strictEqual(tagRes.statusCode, 201)
+  const tag = JSON.parse(tagRes.payload)
+  const todoRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Todo with tag only', description: 'no keyword' }
+  })
+  assert.strictEqual(todoRes.statusCode, 201)
+  const todo = JSON.parse(todoRes.payload)
+  await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${todo.id}/tags`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { tagId: tag.id }
+  })
+  const searchRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/search',
+    headers: { authorization: `Bearer ${token}` },
+    query: { q: 'urgent' }
+  })
+  assert.strictEqual(searchRes.statusCode, 200)
+  const todos = JSON.parse(searchRes.payload)
+  assert(Array.isArray(todos))
+  assert(todos.some((t) => t.id === todo.id), 'search by tag name must return todo that has that tag')
+})
+
 test('other user cannot access todo (GET) - 404', async (t) => {
   const app = await build(t)
   const suffix = uniqueSuffix()

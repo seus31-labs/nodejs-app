@@ -166,13 +166,9 @@ async function searchTodos(fastify, userId, params = {}) {
     where.priority = params.priority;
   }
   const q = typeof params.query === 'string' ? params.query.trim() : '';
-  if (q.length > 0) {
-    const escaped = q.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
-    const pattern = `%${escaped}%`;
-    where[Op.and] = [
-      { [Op.or]: [{ title: { [Op.like]: pattern } }, { description: { [Op.like]: pattern } }] },
-    ];
-  }
+  const escaped = q.length > 0 ? q.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_') : '';
+  const pattern = q.length > 0 ? `%${escaped}%` : '';
+
   const order = buildOrder(
     fastify.sequelize,
     params.sortBy,
@@ -182,6 +178,31 @@ async function searchTodos(fastify, userId, params = {}) {
     ? params.tagIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0)
     : [];
   const include = [{ model: fastify.models.Tag, as: 'Tags', through: { attributes: [] }, required: false }];
+
+  let todoIds = [];
+  if (q.length > 0) {
+    // タイトル・説明での検索
+    const whereText = { ...where, [Op.and]: [{ [Op.or]: [{ title: { [Op.like]: pattern } }, { description: { [Op.like]: pattern } }] }] };
+    const byText = await fastify.models.Todo.findAll({
+      where: whereText,
+      attributes: ['id'],
+    });
+    todoIds = byText.map((t) => t.id);
+    // タグ名での検索（Tag モデル JOIN）
+    const includeTagName = [{ model: fastify.models.Tag, as: 'Tags', where: { userId, name: { [Op.like]: pattern } }, required: true, through: { attributes: [] } }];
+    const byTagName = await fastify.models.Todo.findAll({
+      where,
+      include: includeTagName,
+      attributes: ['id'],
+    });
+    const tagNameIds = byTagName.map((t) => t.id);
+    todoIds = [...new Set([...todoIds, ...tagNameIds])];
+    if (todoIds.length === 0) {
+      return [];
+    }
+    where.id = { [Op.in]: todoIds };
+  }
+
   let todos = await fastify.models.Todo.findAll({
     where,
     include,

@@ -45,7 +45,7 @@ GET /api/todos/search?q=買い物&priority=high&completed=false&tags=1,2
 - [x] 2.2.1: `searchTodos(userId, {query, priority, completed, tags})` 実装（tags は未実装のため省略）
 - [x] 2.2.2: Sequelize の `Op.like` 使用
 - [x] 2.2.3: タイトル・説明文での検索実装
-- [ ] 2.2.4: タグ名での検索実装（Tag モデル JOIN）※タグ機能実装後に対応
+- [x] 2.2.4: タグ名での検索実装（Tag モデル JOIN）※タグ機能実装後に対応
 - [x] 2.2.5: 複数条件の AND 結合実装
 - [x] 2.2.6: 検索結果にタグを include※タグ機能実装後に対応
 
