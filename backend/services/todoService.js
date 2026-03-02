@@ -166,8 +166,6 @@ async function searchTodos(fastify, userId, params = {}) {
     where.priority = params.priority;
   }
   const q = typeof params.query === 'string' ? params.query.trim() : '';
-  const escaped = q.length > 0 ? q.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_') : '';
-  const pattern = q.length > 0 ? `%${escaped}%` : '';
 
   const order = buildOrder(
     fastify.sequelize,
@@ -181,6 +179,8 @@ async function searchTodos(fastify, userId, params = {}) {
 
   let todoIds = [];
   if (q.length > 0) {
+    const escaped = q.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+    const pattern = `%${escaped}%`;
     // タイトル・説明での検索
     const whereText = { ...where, [Op.and]: [{ [Op.or]: [{ title: { [Op.like]: pattern } }, { description: { [Op.like]: pattern } }] }] };
     const byText = await fastify.models.Todo.findAll({
