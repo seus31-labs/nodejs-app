@@ -283,3 +283,137 @@ test('other user cannot remove tag from my todo (DELETE /todos/:id/tags/:tagId r
   });
   assert.strictEqual(res.statusCode, 404);
 });
+
+test('GET /api/v1/tags/:id returns tag (normal)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const user = { name: `tagget-${suffix}`, email: `tagget-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user });
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } });
+  const token = JSON.parse(loginRes.payload).token;
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'get-me', color: '#123456' },
+  });
+  assert.strictEqual(createRes.statusCode, 201);
+  const tag = JSON.parse(createRes.payload);
+  const getRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/tags/${tag.id}`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.strictEqual(getRes.statusCode, 200);
+  const got = JSON.parse(getRes.payload);
+  assert.strictEqual(got.id, tag.id);
+  assert.strictEqual(got.name, 'get-me');
+  assert.strictEqual(got.color, '#123456');
+});
+
+test('GET /api/v1/tags/:id without auth returns 401', async (t) => {
+  const app = await build(t);
+  const res = await app.inject({ method: 'GET', url: '/api/v1/tags/1' });
+  assert.strictEqual(res.statusCode, 401);
+});
+
+test('PUT /api/v1/tags/:id updates tag (normal)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const user = { name: `tagput-${suffix}`, email: `tagput-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user });
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } });
+  const token = JSON.parse(loginRes.payload).token;
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'before', color: '#111111' },
+  });
+  assert.strictEqual(createRes.statusCode, 201);
+  const tag = JSON.parse(createRes.payload);
+  const putRes = await app.inject({
+    method: 'PUT',
+    url: `/api/v1/tags/${tag.id}`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'after', color: '#222222' },
+  });
+  assert.strictEqual(putRes.statusCode, 200);
+  const updated = JSON.parse(putRes.payload);
+  assert.strictEqual(updated.id, tag.id);
+  assert.strictEqual(updated.name, 'after');
+  assert.strictEqual(updated.color, '#222222');
+});
+
+test('DELETE /api/v1/tags/:id deletes tag (normal)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const user = { name: `tagdel-${suffix}`, email: `tagdel-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user });
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } });
+  const token = JSON.parse(loginRes.payload).token;
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'to-delete', color: '#333333' },
+  });
+  assert.strictEqual(createRes.statusCode, 201);
+  const tag = JSON.parse(createRes.payload);
+  const delRes = await app.inject({
+    method: 'DELETE',
+    url: `/api/v1/tags/${tag.id}`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.strictEqual(delRes.statusCode, 204);
+  const getRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/tags/${tag.id}`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.strictEqual(getRes.statusCode, 404);
+});
+
+test('DELETE /api/v1/todos/:todoId/tags/:tagId removes tag from todo (normal)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const user = { name: `todtagrm-${suffix}`, email: `todtagrm-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user });
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } });
+  const token = JSON.parse(loginRes.payload).token;
+  const tagRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'to-remove', color: '#444444' },
+  });
+  const tag = JSON.parse(tagRes.payload);
+  const todoRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Todo with tag' },
+  });
+  const todo = JSON.parse(todoRes.payload);
+  await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${todo.id}/tags`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { tagId: tag.id },
+  });
+  const delRes = await app.inject({
+    method: 'DELETE',
+    url: `/api/v1/todos/${todo.id}/tags/${tag.id}`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.strictEqual(delRes.statusCode, 204);
+  const getRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${todo.id}`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.strictEqual(getRes.statusCode, 200);
+  const todoAfter = JSON.parse(getRes.payload);
+  assert(Array.isArray(todoAfter.Tags));
+  assert(!todoAfter.Tags.some((x) => x.id === tag.id));
+});
