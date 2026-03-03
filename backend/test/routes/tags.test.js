@@ -387,6 +387,7 @@ test('DELETE /api/v1/todos/:todoId/tags/:tagId removes tag from todo (normal)', 
     headers: { authorization: `Bearer ${token}` },
     payload: { name: 'to-remove', color: '#444444' },
   });
+  assert.strictEqual(tagRes.statusCode, 201);
   const tag = JSON.parse(tagRes.payload);
   const todoRes = await app.inject({
     method: 'POST',
@@ -394,6 +395,7 @@ test('DELETE /api/v1/todos/:todoId/tags/:tagId removes tag from todo (normal)', 
     headers: { authorization: `Bearer ${token}` },
     payload: { title: 'Todo with tag' },
   });
+  assert.strictEqual(todoRes.statusCode, 201);
   const todo = JSON.parse(todoRes.payload);
   await app.inject({
     method: 'POST',
