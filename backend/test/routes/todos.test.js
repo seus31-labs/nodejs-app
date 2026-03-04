@@ -394,15 +394,16 @@ test('GET /api/v1/todos/search with completed=true returns only completed todos'
     method: 'POST',
     url: '/api/v1/todos',
     headers: { authorization: `Bearer ${token}` },
-    payload: { title: 'done task', completed: true }
+    payload: { title: 'done task' }
   })
   assert.strictEqual(doneRes.statusCode, 201)
   const doneTodo = JSON.parse(doneRes.payload)
-  await app.inject({
+  const toggleRes = await app.inject({
     method: 'PATCH',
     url: `/api/v1/todos/${doneTodo.id}/toggle`,
     headers: { authorization: `Bearer ${token}` }
   })
+  assert.strictEqual(toggleRes.statusCode, 200)
   const openRes = await app.inject({
     method: 'POST',
     url: '/api/v1/todos',
@@ -446,11 +447,12 @@ test('GET /api/v1/todos/search with completed=false returns only incomplete todo
   })
   assert.strictEqual(doneRes.statusCode, 201)
   const doneTodo = JSON.parse(doneRes.payload)
-  await app.inject({
+  const toggleRes = await app.inject({
     method: 'PATCH',
     url: `/api/v1/todos/${doneTodo.id}/toggle`,
     headers: { authorization: `Bearer ${token}` }
   })
+  assert.strictEqual(toggleRes.statusCode, 200)
   const searchRes = await app.inject({
     method: 'GET',
     url: '/api/v1/todos/search',
@@ -487,10 +489,10 @@ test('GET /api/v1/todos/search with q and completed and priority returns combine
   })
   assert.strictEqual(searchRes.statusCode, 200)
   const todos = JSON.parse(searchRes.payload)
-  assert(todos.length >= 1)
-  assert.strictEqual(todos[0].id, matchTodo.id)
-  assert.strictEqual(todos[0].priority, 'high')
-  assert.strictEqual(todos[0].completed, false)
+  assert(todos.some((t) => t.id === matchTodo.id))
+  const found = todos.find((t) => t.id === matchTodo.id)
+  assert.strictEqual(found.priority, 'high')
+  assert.strictEqual(found.completed, false)
 })
 
 test('other user cannot access todo (GET) - 404', async (t) => {
