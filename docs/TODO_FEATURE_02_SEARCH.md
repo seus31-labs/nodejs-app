@@ -64,7 +64,7 @@ GET /api/todos/search?q=買い物&priority=high&completed=false&tags=1,2
 ### Task 2.5: Backend テスト
 
 - [x] 2.5.1: 検索 API 認証・検索結果のテスト実装
-- [ ] 2.5.2: 検索 API のテスト実装（各条件パターン）
+- [x] 2.5.2: 検索 API のテスト実装（各条件パターン）
 
 ---
 
