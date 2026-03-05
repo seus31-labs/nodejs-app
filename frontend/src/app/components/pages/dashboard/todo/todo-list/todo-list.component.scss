@@ -3,12 +3,23 @@
   padding: 0;
   margin: 0;
 
+  /* ドラッグ中のスタイル（3.12.1） */
+  .todo-row.cdk-drag-dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+  }
   .cdk-drag-preview {
-    opacity: 0.9;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 1;
+    cursor: grabbing;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    background: var(--bs-body-bg, #fff);
   }
   .cdk-drag-placeholder {
-    opacity: 0.3;
+    opacity: 0.35;
+    background: var(--bs-light, #f8f9fa);
+    border: 2px dashed var(--bs-border-color, #dee2e6);
+    border-radius: 4px;
   }
   .cdk-drag-animating {
     transition: transform 200ms ease;
