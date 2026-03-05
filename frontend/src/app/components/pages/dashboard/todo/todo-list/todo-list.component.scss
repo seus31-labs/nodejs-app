@@ -6,14 +6,6 @@
   /* ドラッグ中のスタイル（3.12.1） */
   .todo-row.cdk-drag-dragging {
     opacity: 0.4;
-    cursor: grabbing;
-  }
-  .cdk-drag-preview {
-    opacity: 1;
-    cursor: grabbing;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    background: var(--bs-body-bg, #fff);
   }
   .cdk-drag-placeholder {
     opacity: 0.35;

@@ -19,3 +19,12 @@
 
 @import 'scss/custom';
 @import 'scss/dark-mode';
+
+/* Angular CDK ドラッグプレビュー（body 直下に描画されるためグローバルで指定） */
+.cdk-drag-preview {
+  opacity: 1;
+  cursor: grabbing;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background: var(--bs-body-bg, #fff);
+}
