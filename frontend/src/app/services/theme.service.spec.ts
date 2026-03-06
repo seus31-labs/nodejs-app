@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing'
+import { skip } from 'rxjs/operators'
 import { ThemeService } from './theme.service'
 
 describe('ThemeService', () => {
@@ -46,7 +47,8 @@ describe('ThemeService', () => {
   })
 
   it('should emit theme changes', (done) => {
-    service.themeChanges.subscribe((theme) => {
+    // BehaviorSubject は購読時に現在値(light)を直ちに emit するため、setTheme 後の変化のみ検証する
+    service.themeChanges.pipe(skip(1)).subscribe((theme) => {
       expect(theme).toBe('dark')
       done()
     })

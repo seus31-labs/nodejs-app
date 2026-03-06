@@ -1,5 +1,12 @@
 FROM node:22.12-bookworm-slim
 
+# ng test を Docker 内で実行するために Chromium を導入（ルール: テストは必ず Docker 内で実行）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    chromium \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+ENV CHROME_BIN=/usr/bin/chromium
+
 WORKDIR /app
 
 RUN npm config set registry https://registry.npmmirror.com
