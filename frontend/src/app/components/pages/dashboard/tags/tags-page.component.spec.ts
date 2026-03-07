@@ -94,4 +94,9 @@ describe('TagsPageComponent (1.26.2, 1.26.3)', () => {
   it('isLight should return false for dark hex', () => {
     expect(component.isLight('#000000')).toBe(false)
   })
+
+  it('isLight should return false for invalid hex', () => {
+    expect(component.isLight('')).toBe(false)
+    expect(component.isLight('red')).toBe(false)
+  })
 })

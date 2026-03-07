@@ -50,7 +50,7 @@ describe('TagService (1.26.1)', () => {
   it('should call PUT /tags/:id with body for update', () => {
     const id = 3
     const body: UpdateTagDto = { name: 'updated' }
-    service.update(id, body).subscribe()
+    service.update(id, body).subscribe((tag) => expect(tag.name).toBe('updated'))
     const req = httpMock.expectOne((r) => r.url === `${apiUrl}/tags/${id}` && r.method === 'PUT')
     expect(req.request.body).toEqual(body)
     req.flush({ id, userId: 1, name: 'updated', color: '#000', createdAt: '', updatedAt: '' })
