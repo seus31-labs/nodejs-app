@@ -1,0 +1,50 @@
+<h2 mat-dialog-title>詳細検索</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="d-flex flex-column gap-3">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>キーワード</mat-label>
+      <input matInput formControlName="q" placeholder="タイトル・説明で検索" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>完了状態</mat-label>
+      <mat-select formControlName="completed">
+        @for (opt of completedOptions; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>優先度</mat-label>
+      <mat-select formControlName="priority">
+        @for (opt of priorityOptions; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    @if (allTags.length > 0) {
+      <div class="tag-filters">
+        <span class="mat-body-2 mb-1 d-block">タグ</span>
+        <div class="d-flex flex-wrap gap-1">
+          @for (tag of allTags; track tag.id) {
+            <button
+              type="button"
+              class="badge rounded-pill"
+              [class.bg-secondary]="!tagIdsFormValue.includes(tag.id)"
+              [style.background-color]="tagIdsFormValue.includes(tag.id) ? tag.color : null"
+              [class.text-dark]="tagIdsFormValue.includes(tag.id) ? isLight(tag.color) : true"
+              [class.text-white]="tagIdsFormValue.includes(tag.id) && !isLight(tag.color)"
+              (click)="toggleTag(tag.id)"
+            >
+              {{ tag.name }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="clear()">クリア</button>
+  <button mat-button (click)="cancel()">キャンセル</button>
+  <button mat-flat-button color="primary" (click)="apply()">検索する</button>
+</mat-dialog-actions>

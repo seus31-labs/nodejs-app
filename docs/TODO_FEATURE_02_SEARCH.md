@@ -91,16 +91,16 @@ GET /api/todos/search?q=買い物&priority=high&completed=false&tags=1,2
 
 ### Task 2.9: AdvancedSearchDialog コンポーネント作成
 
-- [ ] 2.9.1: `ng generate component components/advanced-search-dialog` 実行
-- [ ] 2.9.2: Angular Material Dialog 使用
-- [ ] 2.9.3: 詳細検索フォーム実装（優先度、完了状態、タグ）
-- [ ] 2.9.4: Reactive Forms 実装
-- [ ] 2.9.5: @Output() searchParams: EventEmitter<SearchParams> 実装
+- [x] 2.9.1: `ng generate component components/advanced-search-dialog` 実行
+- [x] 2.9.2: Angular Material Dialog 使用
+- [x] 2.9.3: 詳細検索フォーム実装（優先度、完了状態、タグ）
+- [x] 2.9.4: Reactive Forms 実装
+- [x] 2.9.5: @Output() searchParams: EventEmitter<SearchParams> 実装（MatDialog close で SearchParams 返却）
 
 ### Task 2.10: TodoPage に検索機能統合
 
 - [x] 2.10.1: SearchBar コンポーネント追加
-- [ ] 2.10.2: 詳細検索ボタン追加（AdvancedSearchDialog はオプションのため未実装）
+- [x] 2.10.2: 詳細検索ボタン追加（AdvancedSearchDialog 連携）
 - [x] 2.10.3: 検索実行処理実装（検索時は search、空時は list）
 - [x] 2.10.4: 検索結果表示（既存 TodoList で表示）
 - [x] 2.10.5: 検索中のローディング表示（既存 loading で対応）

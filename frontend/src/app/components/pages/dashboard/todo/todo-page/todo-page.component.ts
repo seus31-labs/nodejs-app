@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { Subject, takeUntil } from 'rxjs'
+import { MatDialog } from '@angular/material/dialog'
 import { TodoService } from '../../../../../services/todo.service'
 import { TagService } from '../../../../../services/tag.service'
 import { TodoListComponent } from '../todo-list/todo-list.component'
@@ -9,9 +10,14 @@ import { SearchBarComponent } from '../search-bar/search-bar.component'
 import { SortSelectorComponent } from '../sort-selector/sort-selector.component'
 import { BulkActionBarComponent } from '../bulk-action-bar/bulk-action-bar.component'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
+import {
+  AdvancedSearchDialogComponent,
+  type AdvancedSearchDialogData
+} from '../advanced-search-dialog/advanced-search-dialog.component'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import type { SortBy, SortOrder } from '../../../../../models/sort-options.interface'
+import type { SearchParams } from '../../../../../models/search-params.interface'
 
 @Component({
   selector: 'app-todo-page',
@@ -47,7 +53,8 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private todoService: TodoService,
-    private tagService: TagService
+    private tagService: TagService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -98,6 +105,31 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     this.searchQuery = term
     this.selectedIds = []
     this.loadTodos()
+  }
+
+  openAdvancedSearch(): void {
+    const data: AdvancedSearchDialogData = {
+      currentParams: {
+        q: this.searchQuery,
+        completed: this.filterCompleted ?? undefined,
+        priority: this.filterPriority ?? undefined,
+        tagIds: this.filterTagIds.length > 0 ? [...this.filterTagIds] : undefined
+      },
+      allTags: this.allTags
+    }
+    const ref = this.dialog.open(AdvancedSearchDialogComponent, {
+      width: '400px',
+      data
+    })
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((params: SearchParams | undefined) => {
+      if (params == null) return
+      this.searchQuery = params.q ?? ''
+      this.filterCompleted = params.completed ?? null
+      this.filterPriority = (params.priority ?? null) as TodoPriority | null
+      this.filterTagIds = params.tagIds ?? []
+      this.selectedIds = []
+      this.loadTodos()
+    })
   }
 
   onFiltersChange(): void {

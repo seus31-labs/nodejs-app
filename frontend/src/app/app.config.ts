@@ -6,6 +6,7 @@ import { BrowserModule } from '@angular/platform-browser'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { SharedModule } from './theme/shared/shared.module'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { MatDialogModule } from '@angular/material/dialog'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NavigationItem } from './theme/layout/admin/navigation/navigation'
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
@@ -19,6 +20,7 @@ export const appConfig: ApplicationConfig = {
       ReactiveFormsModule,
       SharedModule,
       BrowserAnimationsModule,
+      MatDialogModule,
       NgbModule
     ),
     NavigationItem,
