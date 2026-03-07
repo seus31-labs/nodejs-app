@@ -101,4 +101,30 @@ describe('TodoService', () => {
       req.flush(null)
     })
   })
+
+  describe('bulk (15.17)', () => {
+    it('should call POST /todos/bulk-complete with todoIds in body', () => {
+      const todoIds = [1, 2, 3]
+      service.bulkComplete(todoIds).subscribe((res) => expect(res.updated).toBe(2))
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/bulk-complete` && r.method === 'POST')
+      expect(req.request.body).toEqual({ todoIds })
+      req.flush({ updated: 2 })
+    })
+
+    it('should call POST /todos/bulk-delete with todoIds in body', () => {
+      const todoIds = [5, 6]
+      service.bulkDelete(todoIds).subscribe((res) => expect(res.deleted).toBe(2))
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/bulk-delete` && r.method === 'POST')
+      expect(req.request.body).toEqual({ todoIds })
+      req.flush({ deleted: 2 })
+    })
+
+    it('should call POST /todos/bulk-archive with todoIds in body', () => {
+      const todoIds = [10]
+      service.bulkArchive(todoIds).subscribe((res) => expect(res.updated).toBe(1))
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/bulk-archive` && r.method === 'POST')
+      expect(req.request.body).toEqual({ todoIds })
+      req.flush({ updated: 1 })
+    })
+  })
 })
