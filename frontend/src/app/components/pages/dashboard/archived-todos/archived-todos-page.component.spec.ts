@@ -89,6 +89,13 @@ describe('ArchivedTodosPageComponent (10.12.2)', () => {
     expect(todoService.deleteArchivedTodos).not.toHaveBeenCalled()
   })
 
+  it('should set error when deleteArchivedTodos fails', () => {
+    spyOn(window, 'confirm').and.returnValue(true)
+    todoService.deleteArchivedTodos.and.returnValue(throwError(() => ({ message: 'delete error' })))
+    component.onDeleteAll()
+    expect(component.error).toBe('delete error')
+  })
+
   it('formatArchivedAt should return empty string for null', () => {
     expect(component.formatArchivedAt(null)).toBe('')
   })

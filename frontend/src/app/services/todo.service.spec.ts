@@ -98,7 +98,6 @@ describe('TodoService', () => {
     it('should call DELETE /todos/archived for deleteArchivedTodos', () => {
       service.deleteArchivedTodos().subscribe()
       const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/archived` && r.method === 'DELETE')
-      expect(req.request.url).toBe(`${apiUrl}/todos/archived`)
       req.flush(null)
     })
   })
