@@ -32,12 +32,17 @@ describe('BulkActionBarComponent (15.17)', () => {
     expect(bar.textContent).toContain('3 件選択')
   })
 
+  function getButtonByText(text: string): HTMLElement | undefined {
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLElement[]
+    return buttons.find((b) => b.textContent?.trim() === text)
+  }
+
   it('should emit bulkComplete when 一括完了 is clicked', () => {
     component.selectedCount = 1
     fixture.detectChanges()
     let emitted = false
     component.bulkComplete.subscribe(() => (emitted = true))
-    fixture.nativeElement.querySelector('.btn-outline-success').click()
+    getButtonByText('一括完了')?.click()
     expect(emitted).toBe(true)
   })
 
@@ -46,7 +51,7 @@ describe('BulkActionBarComponent (15.17)', () => {
     fixture.detectChanges()
     let emitted = false
     component.bulkArchive.subscribe(() => (emitted = true))
-    fixture.nativeElement.querySelector('.btn-outline-secondary').click()
+    getButtonByText('一括アーカイブ')?.click()
     expect(emitted).toBe(true)
   })
 
@@ -55,7 +60,7 @@ describe('BulkActionBarComponent (15.17)', () => {
     fixture.detectChanges()
     let emitted = false
     component.bulkDelete.subscribe(() => (emitted = true))
-    fixture.nativeElement.querySelector('.btn-outline-danger').click()
+    getButtonByText('一括削除')?.click()
     expect(emitted).toBe(true)
   })
 
@@ -64,9 +69,9 @@ describe('BulkActionBarComponent (15.17)', () => {
     fixture.detectChanges()
     let emitted = false
     component.clearSelection.subscribe(() => (emitted = true))
-    const buttons = fixture.nativeElement.querySelectorAll('button')
-    const clearBtn = Array.from(buttons).find((b: HTMLElement) => b.textContent?.trim() === '選択解除')
-    ;(clearBtn as HTMLElement).click()
+    const clearBtn = getButtonByText('選択解除')
+    expect(clearBtn).withContext('選択解除ボタンが見つかりません').toBeTruthy()
+    clearBtn!.click()
     expect(emitted).toBe(true)
   })
 })
