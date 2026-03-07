@@ -119,9 +119,9 @@ PUT /api/todos/reorder
 
 ### Task 3.13: Frontend テスト
 
-- [ ] 3.13.1: TodoService ソート機能のテスト
-- [ ] 3.13.2: SortSelector コンポーネントテスト
-- [ ] 3.13.3: ドラッグ&ドロップのテスト
+- [x] 3.13.1: TodoService ソート機能のテスト
+- [x] 3.13.2: SortSelector コンポーネントテスト
+- [x] 3.13.3: ドラッグ&ドロップのテスト
 
 ---
 
