@@ -258,10 +258,10 @@ GET /api/todos?tags=1,2,3  # タグでフィルタ
 
 ### Task 1.26: Frontend テスト
 
-- [ ] 1.26.1: TagService ユニットテスト
-- [ ] 1.26.2: TagList コンポーネントテスト
-- [ ] 1.26.3: TagForm コンポーネントテスト
-- [ ] 1.26.4: TagChip コンポーネントテスト
+- [x] 1.26.1: TagService ユニットテスト
+- [x] 1.26.2: TagList コンポーネントテスト
+- [x] 1.26.3: TagForm コンポーネントテスト
+- [x] 1.26.4: TagChip コンポーネントテスト
 
 ---
 
