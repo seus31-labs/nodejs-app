@@ -8,9 +8,7 @@ describe('ThemeToggleComponent (16.8)', () => {
   let themeService: ThemeService
 
   beforeEach(async () => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.removeItem('app-theme')
-    }
+    window.localStorage.removeItem('app-theme')
     await TestBed.configureTestingModule({
       imports: [ThemeToggleComponent],
       providers: [ThemeService],
@@ -20,6 +18,10 @@ describe('ThemeToggleComponent (16.8)', () => {
     fixture = TestBed.createComponent(ThemeToggleComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+  })
+
+  afterEach(() => {
+    window.localStorage.removeItem('app-theme')
   })
 
   it('should create', () => {
