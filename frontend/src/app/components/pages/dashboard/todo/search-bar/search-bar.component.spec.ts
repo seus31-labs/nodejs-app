@@ -34,7 +34,7 @@ describe('SearchBarComponent (2.13.2)', () => {
     component.query.setValue('x')
     component.onClear()
     expect(component.query.value).toBe('')
-    expect(emitted).toContain('')
+    expect(emitted).toEqual([''])
   })
 
   it('should not throw on destroy', () => {

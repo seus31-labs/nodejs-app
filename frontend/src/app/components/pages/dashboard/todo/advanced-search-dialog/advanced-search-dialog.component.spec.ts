@@ -47,13 +47,14 @@ describe('AdvancedSearchDialogComponent (2.13.3)', () => {
   })
 
   it('should init form from data.currentParams', async () => {
+    // overrideProvider は親 beforeEach で既に createComponent 済みのため使用不可。異なる MAT_DIALOG_DATA を渡すため再構成する。
     TestBed.resetTestingModule()
-    dialogRef = jasmine.createSpyObj('MatDialogRef', ['close'])
+    const ref = jasmine.createSpyObj('MatDialogRef', ['close'])
     await TestBed.configureTestingModule({
       imports: [AdvancedSearchDialogComponent],
       providers: [
         provideNoopAnimations(),
-        { provide: MatDialogRef, useValue: dialogRef },
+        { provide: MatDialogRef, useValue: ref },
         {
           provide: MAT_DIALOG_DATA,
           useValue: {
@@ -107,6 +108,7 @@ describe('AdvancedSearchDialogComponent (2.13.3)', () => {
   })
 
   it('should toggle tag in tagIds', async () => {
+    // overrideProvider は親 beforeEach で既に createComponent 済みのため使用不可。allTags を渡すため再構成する。
     TestBed.resetTestingModule()
     const ref = jasmine.createSpyObj('MatDialogRef', ['close'])
     await TestBed.configureTestingModule({
