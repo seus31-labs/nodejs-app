@@ -92,8 +92,8 @@ DELETE /api/todos/archived (一括削除)
 - [x] 10.11.1: アーカイブ済み Todo のスタイル
 
 ### Task 10.12: Frontend テスト
-- [ ] 10.12.1: TodoService アーカイブ機能のテスト
-- [ ] 10.12.2: ArchivedTodosPage のテスト
+- [x] 10.12.1: TodoService アーカイブ機能のテスト
+- [x] 10.12.2: ArchivedTodosPage のテスト
 
 ---
 
