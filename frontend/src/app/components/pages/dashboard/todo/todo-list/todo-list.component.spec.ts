@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { CdkDragDrop } from '@angular/cdk/drag-drop'
 import { TodoListComponent } from './todo-list.component'
-import { TodoItemComponent } from '../todo-item/todo-item.component'
 import type { Todo } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 

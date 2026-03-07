@@ -1,12 +1,13 @@
 import { TestBed } from '@angular/core/testing'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { environment } from '../../environments/environment'
 import { TodoService } from './todo.service'
 import type { SortOptions } from '../models/sort-options.interface'
 
 describe('TodoService', () => {
   let service: TodoService
   let httpMock: HttpTestingController
-  const apiUrl = 'http://localhost:3999/api/v1'
+  const apiUrl = environment.apiUrl
 
   beforeEach(() => {
     TestBed.configureTestingModule({
