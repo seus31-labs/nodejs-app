@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common'
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms'
 import {
   MAT_DIALOG_DATA,
-  MatDialogModule,
   MatDialogRef,
   MatDialogTitle,
   MatDialogContent,
@@ -14,7 +13,6 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
 import { MatButtonModule } from '@angular/material/button'
-import { MatCheckboxModule } from '@angular/material/checkbox'
 import type { SearchParams } from '../../../../../models/search-params.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import type { TodoPriority } from '../../../../../models/todo.interface'
@@ -34,7 +32,6 @@ export interface AdvancedSearchDialogData {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatDialogModule,
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
@@ -42,8 +39,7 @@ export interface AdvancedSearchDialogData {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule,
-    MatCheckboxModule
+    MatButtonModule
   ],
   templateUrl: './advanced-search-dialog.component.html',
   styleUrl: './advanced-search-dialog.component.scss'
