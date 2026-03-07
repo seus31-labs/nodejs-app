@@ -3,6 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { environment } from '../../environments/environment'
 import { TodoService } from './todo.service'
 import type { SortOptions } from '../models/sort-options.interface'
+import type { SearchParams } from '../models/search-params.interface'
 
 describe('TodoService', () => {
   let service: TodoService
@@ -99,6 +100,37 @@ describe('TodoService', () => {
       service.deleteArchivedTodos().subscribe()
       const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/archived` && r.method === 'DELETE')
       req.flush(null)
+    })
+  })
+
+  describe('search (2.13.1)', () => {
+    it('should call GET /todos/search with q and return todos', () => {
+      const params: SearchParams = { q: '買い物' }
+      service.search(params).subscribe((list) => expect(list.length).toBe(1))
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/search` && r.method === 'GET')
+      expect(req.request.params.get('q')).toBe('買い物')
+      req.flush([{ id: 1, userId: 1, title: '買い物', description: null, completed: false, priority: 'medium', dueDate: null, sortOrder: 0, archived: false, archivedAt: null, createdAt: '', updatedAt: '' }])
+    })
+
+    it('should send completed, priority, tags and sort params when provided', () => {
+      const params: SearchParams = { q: 'x', completed: false, priority: 'high', tagIds: [1, 2] }
+      const sort: SortOptions = { sortBy: 'dueDate', sortOrder: 'desc' }
+      service.search(params, sort).subscribe()
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/search` && r.method === 'GET')
+      expect(req.request.params.get('q')).toBe('x')
+      expect(req.request.params.get('completed')).toBe('false')
+      expect(req.request.params.get('priority')).toBe('high')
+      expect(req.request.params.get('tags')).toBe('1,2')
+      expect(req.request.params.get('sortBy')).toBe('dueDate')
+      expect(req.request.params.get('sortOrder')).toBe('desc')
+      req.flush([])
+    })
+
+    it('should trim q before sending', () => {
+      service.search({ q: '  keyword  ' }).subscribe()
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/search` && r.method === 'GET')
+      expect(req.request.params.get('q')).toBe('keyword')
+      req.flush([])
     })
   })
 

@@ -119,9 +119,9 @@ GET /api/todos/search?q=買い物&priority=high&completed=false&tags=1,2
 
 ### Task 2.13: Frontend テスト
 
-- [ ] 2.13.1: TodoService.searchTodos のテスト
-- [ ] 2.13.2: SearchBar コンポーネントテスト
-- [ ] 2.13.3: AdvancedSearchDialog コンポーネントテスト
+- [x] 2.13.1: TodoService.search のテスト
+- [x] 2.13.2: SearchBar コンポーネントテスト
+- [x] 2.13.3: AdvancedSearchDialog コンポーネントテスト
 
 ---
 
