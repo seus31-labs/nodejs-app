@@ -71,4 +71,35 @@ describe('TodoService', () => {
       req.flush(null)
     })
   })
+
+  describe('archive (10.12.1)', () => {
+    it('should call PATCH /todos/:id/archive for archiveTodo', () => {
+      const id = 5
+      service.archiveTodo(id).subscribe()
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/${id}/archive` && r.method === 'PATCH')
+      expect(req.request.body).toEqual({})
+      req.flush({ id, archived: true })
+    })
+
+    it('should call PATCH /todos/:id/unarchive for unarchiveTodo', () => {
+      const id = 3
+      service.unarchiveTodo(id).subscribe()
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/${id}/unarchive` && r.method === 'PATCH')
+      expect(req.request.body).toEqual({})
+      req.flush({ id, archived: false })
+    })
+
+    it('should call GET /todos/archived for getArchivedTodos', () => {
+      service.getArchivedTodos().subscribe((list) => expect(list).toEqual([]))
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/archived` && r.method === 'GET')
+      req.flush([])
+    })
+
+    it('should call DELETE /todos/archived for deleteArchivedTodos', () => {
+      service.deleteArchivedTodos().subscribe()
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/archived` && r.method === 'DELETE')
+      expect(req.request.url).toBe(`${apiUrl}/todos/archived`)
+      req.flush(null)
+    })
+  })
 })
