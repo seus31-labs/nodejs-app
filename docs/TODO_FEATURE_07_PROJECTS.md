@@ -105,9 +105,9 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.8: Project ルート作成
 
-- [ ] 7.8.1: `backend/routes/api/projects.js` 作成
-- [ ] 7.8.2: 各エンドポイントの JSON Schema 定義
-- [ ] 7.8.3: JWT 認証 preHandler 適用
+- [x] 7.8.1: Project ルート定義（`backend/routes/api/v1/index.js` に追加）
+- [x] 7.8.2: 各エンドポイントの JSON Schema 定義
+- [x] 7.8.3: JWT 認証 preHandler 適用
 
 ### Task 7.9: Backend テスト
 

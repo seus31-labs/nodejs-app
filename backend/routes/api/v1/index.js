@@ -28,6 +28,16 @@ const {
   updateTag,
   deleteTag,
 } = require('../../../controllers/tagController');
+const {
+  createProject,
+  getProjects,
+  getProjectById,
+  updateProject,
+  deleteProject,
+  getProjectTodos,
+  getProjectProgress,
+  archiveProject,
+} = require('../../../controllers/projectController');
 
 module.exports = async function (fastify, opts) {
   /**
@@ -141,6 +151,82 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => deleteTag(fastify, request, reply),
+  });
+
+  /**
+   * projects CRUD API routes (JWT 必須)
+   */
+  const projectIdParam = {
+    params: {
+      type: 'object',
+      required: ['id'],
+      properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+    },
+  };
+  fastify.post('/projects', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['name'],
+        properties: {
+          name: { type: 'string', minLength: 1, maxLength: 100 },
+          description: { type: 'string' },
+          color: { type: 'string', maxLength: 7 },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => createProject(fastify, request, reply),
+  });
+  fastify.get('/projects', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: { includeArchived: { type: 'string', enum: ['true', 'false'] } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getProjects(fastify, request, reply),
+  });
+  fastify.get('/projects/:id', {
+    schema: { ...projectIdParam },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getProjectById(fastify, request, reply),
+  });
+  fastify.put('/projects/:id', {
+    schema: {
+      ...projectIdParam,
+      body: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', minLength: 1, maxLength: 100 },
+          description: { type: 'string' },
+          color: { type: 'string', maxLength: 7 },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => updateProject(fastify, request, reply),
+  });
+  fastify.delete('/projects/:id', {
+    schema: { ...projectIdParam },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => deleteProject(fastify, request, reply),
+  });
+  fastify.get('/projects/:id/todos', {
+    schema: { ...projectIdParam },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getProjectTodos(fastify, request, reply),
+  });
+  fastify.get('/projects/:id/progress', {
+    schema: { ...projectIdParam },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getProjectProgress(fastify, request, reply),
+  });
+  fastify.patch('/projects/:id/archive', {
+    schema: { ...projectIdParam },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => archiveProject(fastify, request, reply),
   });
 
   /**
