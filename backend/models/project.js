@@ -50,7 +50,7 @@ module.exports = (sequelize) => {
       underscored: true,
       validate: {
         colorFormat() {
-          if (this.color && !HEX_COLOR.test(this.color)) {
+          if (!HEX_COLOR.test(this.color)) {
             throw new Error('color must be a valid hex (e.g. #808080)');
           }
         },
