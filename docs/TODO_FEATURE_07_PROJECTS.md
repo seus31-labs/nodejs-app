@@ -99,9 +99,9 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.7: ProjectController 作成
 
-- [ ] 7.7.1: `backend/controllers/ProjectController.js` 作成
-- [ ] 7.7.2: 各ハンドラ実装
-- [ ] 7.7.3: エラーハンドリング
+- [x] 7.7.1: `backend/controllers/ProjectController.js` 作成
+- [x] 7.7.2: 各ハンドラ実装
+- [x] 7.7.3: エラーハンドリング
 
 ### Task 7.8: Project ルート作成
 
