@@ -93,9 +93,9 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.6: TodoService にプロジェクト機能追加
 
-- [ ] 7.6.1: `getTodosByProjectId(projectId, userId)` 実装
-- [ ] 7.6.2: `getTodosByUserId` にプロジェクトフィルタ追加
-- [ ] 7.6.3: Todo 取得時にプロジェクトを include
+- [x] 7.6.1: `getTodosByProjectId(projectId, userId)` 実装
+- [x] 7.6.2: `getTodosByUserId` にプロジェクトフィルタ追加
+- [x] 7.6.3: Todo 取得時にプロジェクトを include
 
 ### Task 7.7: ProjectController 作成
 
