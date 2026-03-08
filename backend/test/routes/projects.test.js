@@ -128,6 +128,33 @@ test('GET /api/v1/projects/:id for other user returns 404', async (t) => {
   assert.strictEqual(res.statusCode, 404);
 });
 
+test('other user cannot update project (PUT /projects/:id returns 404)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const userA = { name: `projputA-${suffix}`, email: `projputA-${suffix}@test.local`, password: 'pass123' };
+  const userB = { name: `projputB-${suffix}`, email: `projputB-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA });
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB });
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } });
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } });
+  const tokenA = JSON.parse(loginA.payload).token;
+  const tokenB = JSON.parse(loginB.payload).token;
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/projects',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { name: 'A project' },
+  });
+  const project = JSON.parse(createRes.payload);
+  const res = await app.inject({
+    method: 'PUT',
+    url: `/api/v1/projects/${project.id}`,
+    headers: { authorization: `Bearer ${tokenB}` },
+    payload: { name: 'Hacked' },
+  });
+  assert.strictEqual(res.statusCode, 404);
+});
+
 test('PUT /api/v1/projects/:id updates project', async (t) => {
   const app = await build(t);
   const suffix = uniqueSuffix();
@@ -153,6 +180,35 @@ test('PUT /api/v1/projects/:id updates project', async (t) => {
   assert.strictEqual(updated.name, 'Updated');
   assert.strictEqual(updated.description, 'Desc');
   assert.strictEqual(updated.color, '#00ff00');
+});
+
+test('PUT /api/v1/projects/:id duplicate name returns 409', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const user = { name: `proj409-${suffix}`, email: `proj409-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user });
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } });
+  const token = JSON.parse(loginRes.payload).token;
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/projects',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'Alpha' },
+  });
+  const betaRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/projects',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'Beta' },
+  });
+  const beta = JSON.parse(betaRes.payload);
+  const res = await app.inject({
+    method: 'PUT',
+    url: `/api/v1/projects/${beta.id}`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'Alpha' },
+  });
+  assert.strictEqual(res.statusCode, 409);
 });
 
 test('DELETE /api/v1/projects/:id deletes project', async (t) => {
@@ -181,6 +237,32 @@ test('DELETE /api/v1/projects/:id deletes project', async (t) => {
     headers: { authorization: `Bearer ${token}` },
   });
   assert.strictEqual(getRes.statusCode, 404);
+});
+
+test('other user cannot delete project (DELETE /projects/:id returns 404)', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const userA = { name: `projdelA-${suffix}`, email: `projdelA-${suffix}@test.local`, password: 'pass123' };
+  const userB = { name: `projdelB-${suffix}`, email: `projdelB-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA });
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB });
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } });
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } });
+  const tokenA = JSON.parse(loginA.payload).token;
+  const tokenB = JSON.parse(loginB.payload).token;
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/projects',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { name: 'A project' },
+  });
+  const project = JSON.parse(createRes.payload);
+  const res = await app.inject({
+    method: 'DELETE',
+    url: `/api/v1/projects/${project.id}`,
+    headers: { authorization: `Bearer ${tokenB}` },
+  });
+  assert.strictEqual(res.statusCode, 404);
 });
 
 test('GET /api/v1/projects/:id/todos returns todos and 404 when project missing', async (t) => {
