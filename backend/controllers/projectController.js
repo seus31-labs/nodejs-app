@@ -1,5 +1,6 @@
 'use strict';
 
+const { UniqueConstraintError } = require('sequelize');
 const projectService = require('../services/projectService');
 const todoService = require('../services/todoService');
 
@@ -22,6 +23,9 @@ async function createProject(fastify, req, reply) {
     }
     reply.code(201).send(project.toJSON());
   } catch (error) {
+    if (error instanceof UniqueConstraintError) {
+      return reply.code(409).send({ error: 'Project with this name already exists' });
+    }
     handleProjectError(fastify, reply, error, 'Project creation failed');
   }
 }
@@ -57,6 +61,9 @@ async function updateProject(fastify, req, reply) {
     if (!project) return reply.code(404).send({ error: 'Not found' });
     reply.code(200).send(project.toJSON());
   } catch (error) {
+    if (error instanceof UniqueConstraintError) {
+      return reply.code(409).send({ error: 'Project with this name already exists' });
+    }
     handleProjectError(fastify, reply, error, 'Project update failed');
   }
 }
@@ -77,6 +84,8 @@ async function getProjectTodos(fastify, req, reply) {
   try {
     const projectId = parseProjectId(req.params.id);
     if (projectId === null) return reply.code(400).send({ error: 'Invalid project id' });
+    const project = await projectService.getProjectById(fastify, projectId, req.user.id);
+    if (!project) return reply.code(404).send({ error: 'Not found' });
     const todos = await todoService.getTodosByProjectId(fastify, projectId, req.user.id);
     reply.code(200).send(todos.map((t) => t.toJSON()));
   } catch (error) {
@@ -88,6 +97,8 @@ async function getProjectProgress(fastify, req, reply) {
   try {
     const projectId = parseProjectId(req.params.id);
     if (projectId === null) return reply.code(400).send({ error: 'Invalid project id' });
+    const project = await projectService.getProjectById(fastify, projectId, req.user.id);
+    if (!project) return reply.code(404).send({ error: 'Not found' });
     const progress = await projectService.getProjectProgress(fastify, projectId, req.user.id);
     reply.code(200).send(progress);
   } catch (error) {
