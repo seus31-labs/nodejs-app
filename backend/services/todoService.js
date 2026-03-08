@@ -96,7 +96,7 @@ async function getTodosByUserId(fastify, userId, options = {}) {
 async function getTodosByProjectId(fastify, projectId, userId) {
   const project = await projectService.getProjectById(fastify, projectId, userId);
   if (!project) return [];
-  const order = buildOrder(fastify.sequelize, null, null);
+  const order = [['createdAt', 'ASC']];
   return fastify.models.Todo.findAll({
     where: { projectId, userId, archived: false },
     include: buildTodoInclude(fastify),
