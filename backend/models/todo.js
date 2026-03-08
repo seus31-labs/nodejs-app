@@ -62,6 +62,14 @@ module.exports = (sequelize) => {
         allowNull: true,
         field: 'archived_at',
       },
+      projectId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: 'project_id',
+        references: { model: 'projects', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
     },
     {
       tableName: 'todos',
@@ -72,6 +80,7 @@ module.exports = (sequelize) => {
 
   Todo.associate = function (models) {
     Todo.belongsTo(models.User, { foreignKey: 'userId' });
+    Todo.belongsTo(models.Project, { foreignKey: 'projectId' });
     Todo.belongsToMany(models.Tag, { through: models.TodoTag, foreignKey: 'todoId', otherKey: 'tagId' });
   };
 

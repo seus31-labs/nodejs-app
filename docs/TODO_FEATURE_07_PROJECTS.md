@@ -55,30 +55,30 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.1: Project モデル作成
 
-- [ ] 7.1.1: マイグレーション生成 `create-projects`
-- [ ] 7.1.2: projects テーブル定義
-- [ ] 7.1.3: インデックス追加
-- [ ] 7.1.4: 外部キー制約追加
-- [ ] 7.1.5: `backend/models/Project.js` 作成
-- [ ] 7.1.6: Project モデル定義
-- [ ] 7.1.7: User との関連付け
+- [x] 7.1.1: マイグレーション生成 `create-projects`
+- [x] 7.1.2: projects テーブル定義
+- [x] 7.1.3: インデックス追加
+- [x] 7.1.4: 外部キー制約追加
+- [x] 7.1.5: `backend/models/Project.js` 作成
+- [x] 7.1.6: Project モデル定義
+- [x] 7.1.7: User との関連付け
 
 ### Task 7.2: todos テーブルに projectId 追加
 
-- [ ] 7.2.1: マイグレーション生成 `add-project-id-to-todos`
-- [ ] 7.2.2: projectId カラム追加
-- [ ] 7.2.3: インデックス追加
-- [ ] 7.2.4: 外部キー制約追加
-- [ ] 7.2.5: マイグレーション実行
+- [x] 7.2.1: マイグレーション生成 `add-project-id-to-todos`
+- [x] 7.2.2: projectId カラム追加
+- [x] 7.2.3: インデックス追加
+- [x] 7.2.4: 外部キー制約追加
+- [x] 7.2.5: マイグレーション実行
 
 ### Task 7.3: Todo モデル更新
 
-- [ ] 7.3.1: projectId フィールド追加
-- [ ] 7.3.2: Project との関連付け（belongsTo）
+- [x] 7.3.1: projectId フィールド追加
+- [x] 7.3.2: Project との関連付け（belongsTo）
 
 ### Task 7.4: Project モデルに関連付け追加
 
-- [ ] 7.4.1: hasMany(Todo) 追加
+- [x] 7.4.1: hasMany(Todo) 追加
 
 ### Task 7.5: ProjectService 作成
 
