@@ -2,9 +2,18 @@
 
 const { Op } = require('sequelize');
 const tagService = require('./tagService');
+const projectService = require('./projectService');
 
 const SORT_BY_ALLOWED = ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'];
 const SORT_ORDER_ALLOWED = ['asc', 'desc'];
+
+/** Todo 取得時の共通 include（Tags + Project） */
+function buildTodoInclude(fastify) {
+  return [
+    { model: fastify.models.Tag, as: 'Tags', through: { attributes: [] }, required: false },
+    { model: fastify.models.Project, as: 'Project', required: false },
+  ];
+}
 
 function buildOrder(sequelize, sortBy, sortOrder) {
   const dir = SORT_ORDER_ALLOWED.includes(sortOrder) ? sortOrder : 'asc';
@@ -36,11 +45,11 @@ async function createTodo(fastify, userId, todoData) {
 }
 
 /**
- * ユーザーの Todo 一覧をフィルタ・ソート付きで取得する（タグ付き）
+ * ユーザーの Todo 一覧をフィルタ・ソート付きで取得する（タグ・プロジェクト付き）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} userId - ユーザー ID
- * @param {object} options - { completed?, priority?, sortBy?, sortOrder?, tagIds? }
- * @returns {Promise<object[]>} Todo 配列（Tags を含む）
+ * @param {object} options - { completed?, priority?, sortBy?, sortOrder?, tagIds?, projectId? }
+ * @returns {Promise<object[]>} Todo 配列（Tags, Project を含む）
  */
 async function getTodosByUserId(fastify, userId, options = {}) {
   const where = { userId, archived: false };
@@ -50,6 +59,10 @@ async function getTodosByUserId(fastify, userId, options = {}) {
   if (options.priority && ['low', 'medium', 'high'].includes(options.priority)) {
     where.priority = options.priority;
   }
+  const projectId = options.projectId != null ? Number(options.projectId) : null;
+  if (Number.isInteger(projectId) && projectId > 0) {
+    where.projectId = projectId;
+  }
   const order = buildOrder(
     fastify.sequelize,
     options.sortBy,
@@ -58,7 +71,7 @@ async function getTodosByUserId(fastify, userId, options = {}) {
   const tagIds = Array.isArray(options.tagIds)
     ? options.tagIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0)
     : [];
-  const include = [{ model: fastify.models.Tag, as: 'Tags', through: { attributes: [] }, required: false }];
+  const include = buildTodoInclude(fastify);
   let todos = await fastify.models.Todo.findAll({
     where,
     include,
@@ -74,6 +87,24 @@ async function getTodosByUserId(fastify, userId, options = {}) {
 }
 
 /**
+ * 指定プロジェクトに属する Todo 一覧を取得する（所有者のプロジェクトのみ）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} projectId - プロジェクト ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<object[]>} Todo 配列（Tags, Project を含む）。プロジェクトが存在しないか他ユーザーなら []
+ */
+async function getTodosByProjectId(fastify, projectId, userId) {
+  const project = await projectService.getProjectById(fastify, projectId, userId);
+  if (!project) return [];
+  const order = buildOrder(fastify.sequelize, null, null);
+  return fastify.models.Todo.findAll({
+    where: { projectId, userId, archived: false },
+    include: buildTodoInclude(fastify),
+    order,
+  });
+}
+
+/**
  * 未アーカイブの Todo を ID とユーザーで 1 件取得する（他ユーザー・アーカイブ済みは null）
  * 通常の GET/PUT/DELETE/toggle は未アーカイブのみ操作可能とする。
  * @param {object} fastify - Fastify インスタンス
@@ -84,7 +115,7 @@ async function getTodosByUserId(fastify, userId, options = {}) {
 async function getTodoById(fastify, todoId, userId) {
   return fastify.models.Todo.findOne({
     where: { id: todoId, userId, archived: false },
-    include: [{ model: fastify.models.Tag, as: 'Tags', through: { attributes: [] }, required: false }],
+    include: buildTodoInclude(fastify),
   });
 }
 
@@ -175,7 +206,7 @@ async function searchTodos(fastify, userId, params = {}) {
   const tagIds = Array.isArray(params.tagIds)
     ? params.tagIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0)
     : [];
-  const include = [{ model: fastify.models.Tag, as: 'Tags', through: { attributes: [] }, required: false }];
+  const include = buildTodoInclude(fastify);
 
   let todoIds = [];
   if (q.length > 0) {
@@ -329,6 +360,7 @@ async function unarchiveTodo(fastify, todoId, userId) {
 async function getArchivedTodos(fastify, userId) {
   return fastify.models.Todo.findAll({
     where: { userId, archived: true },
+    include: buildTodoInclude(fastify),
     order: [['archivedAt', 'DESC']],
   });
 }
@@ -402,6 +434,7 @@ async function bulkArchive(fastify, todoIds, userId) {
 module.exports = {
   createTodo,
   getTodosByUserId,
+  getTodosByProjectId,
   getTodoById,
   updateTodo,
   deleteTodo,
