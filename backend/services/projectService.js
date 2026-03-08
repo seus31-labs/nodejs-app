@@ -1,6 +1,6 @@
 'use strict';
 
-const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
+const { HEX_COLOR } = require('../utils/color');
 
 function normalizeColor(color) {
   if (color == null || color === '') return '#808080';
@@ -70,7 +70,8 @@ async function updateProject(fastify, projectId, userId, updateData) {
   const project = await getProjectById(fastify, projectId, userId);
   if (!project) return null;
   if (updateData.name !== undefined) {
-    project.name = typeof updateData.name === 'string' ? updateData.name.trim() : project.name;
+    const trimmed = typeof updateData.name === 'string' ? updateData.name.trim() : '';
+    if (trimmed) project.name = trimmed;
   }
   if (updateData.description !== undefined) {
     project.description =
@@ -122,13 +123,19 @@ async function archiveProject(fastify, projectId, userId) {
 async function getProjectProgress(fastify, projectId, userId) {
   const project = await getProjectById(fastify, projectId, userId);
   if (!project) return { total: 0, completed: 0 };
-  const todos = await fastify.models.Todo.findAll({
+  const { fn, col, literal } = fastify.sequelize;
+  const result = await fastify.models.Todo.findOne({
     where: { projectId, userId, archived: false },
-    attributes: ['id', 'completed'],
+    attributes: [
+      [fn('COUNT', col('id')), 'total'],
+      [fn('SUM', literal('CASE WHEN completed = 1 THEN 1 ELSE 0 END')), 'completed'],
+    ],
+    raw: true,
   });
-  const total = todos.length;
-  const completed = todos.filter((t) => t.completed).length;
-  return { total, completed };
+  return {
+    total: Number(result?.total ?? 0),
+    completed: Number(result?.completed ?? 0),
+  };
 }
 
 module.exports = {

@@ -1,8 +1,7 @@
 'use strict';
 
 const { DataTypes } = require('sequelize');
-
-const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
+const { HEX_COLOR } = require('../utils/color');
 
 /**
  * Project モデル
