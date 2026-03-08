@@ -82,14 +82,14 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.5: ProjectService 作成
 
-- [ ] 7.5.1: `backend/services/ProjectService.js` 作成
-- [ ] 7.5.2: `createProject(userId, projectData)` 実装
-- [ ] 7.5.3: `getProjectsByUserId(userId, includeArchived)` 実装
-- [ ] 7.5.4: `getProjectById(projectId, userId)` 実装
-- [ ] 7.5.5: `updateProject(projectId, userId, updateData)` 実装
-- [ ] 7.5.6: `deleteProject(projectId, userId)` 実装（Todo の処理）
-- [ ] 7.5.7: `archiveProject(projectId, userId)` 実装
-- [ ] 7.5.8: `getProjectProgress(projectId, userId)` 実装
+- [x] 7.5.1: `backend/services/ProjectService.js` 作成
+- [x] 7.5.2: `createProject(userId, projectData)` 実装
+- [x] 7.5.3: `getProjectsByUserId(userId, includeArchived)` 実装
+- [x] 7.5.4: `getProjectById(projectId, userId)` 実装
+- [x] 7.5.5: `updateProject(projectId, userId, updateData)` 実装
+- [x] 7.5.6: `deleteProject(projectId, userId)` 実装（Todo の処理）
+- [x] 7.5.7: `archiveProject(projectId, userId)` 実装
+- [x] 7.5.8: `getProjectProgress(projectId, userId)` 実装
 
 ### Task 7.6: TodoService にプロジェクト機能追加
 
