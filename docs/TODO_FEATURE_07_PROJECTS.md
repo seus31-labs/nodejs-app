@@ -129,10 +129,10 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.12: ProjectService 作成
 
-- [ ] 7.12.1: `frontend/src/app/services/project.service.ts` 作成
-- [ ] 7.12.2: CRUD メソッド実装
-- [ ] 7.12.3: `getProjectProgress(id: number)` 実装
-- [ ] 7.12.4: `archiveProject(id: number)` 実装
+- [x] 7.12.1: `frontend/src/app/services/project.service.ts` 作成
+- [x] 7.12.2: CRUD メソッド実装
+- [x] 7.12.3: `getProjectProgress(id: number)` 実装
+- [x] 7.12.4: `archiveProject(id: number)` 実装
 
 ### Task 7.13: ProjectList コンポーネント作成
 
