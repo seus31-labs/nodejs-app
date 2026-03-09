@@ -1,0 +1,88 @@
+<div class="row">
+  <div class="col-12">
+    @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">読み込み中...</span>
+        </div>
+      </div>
+    } @else if (error) {
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+      <a routerLink="/dashboard/projects" class="btn btn-outline-secondary">プロジェクト一覧に戻る</a>
+    } @else if (project) {
+      <app-card [cardTitle]="project.name" [options]="false">
+        <div class="mb-3">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span
+              class="project-color-badge"
+              [style.background-color]="project.color"
+            ></span>
+            <span class="text-muted small">{{ project.color }}</span>
+            @if (project.archived) {
+              <span class="badge bg-secondary">アーカイブ</span>
+            }
+          </div>
+          @if (project.description) {
+            <p class="text-muted mb-2">{{ project.description }}</p>
+          }
+        </div>
+
+        <div class="mb-4">
+          <div class="d-flex justify-content-between mb-1 small">
+            <span class="fw-semibold">進捗</span>
+            <span>{{ progress.completed }}/{{ progress.total }} ({{ progressPercent }}%)</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              [style.width.%]="progressPercent"
+              [style.background-color]="project.color"
+              [attr.aria-valuenow]="progressPercent"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+        </div>
+
+        <h6 class="fw-semibold mb-2">未完了 ({{ pendingTodos.length }})</h6>
+        @if (pendingTodos.length === 0) {
+          <p class="text-muted small mb-3">未完了の Todo はありません。</p>
+        } @else {
+          <ul class="list-group list-group-flush mb-3">
+            @for (todo of pendingTodos; track todo.id) {
+              <li class="list-group-item d-flex align-items-center gap-2 px-0">
+                <i class="feather icon-circle text-muted"></i>
+                <div class="flex-grow-1">
+                  <span>{{ todo.title }}</span>
+                  <span class="badge ms-1" [ngClass]="priorityClass(todo.priority)">{{ todo.priority }}</span>
+                  @if (todo.dueDate) {
+                    <span class="ms-2 small text-muted">{{ todo.dueDate }}</span>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        }
+
+        <h6 class="fw-semibold mb-2">完了済み ({{ completedTodos.length }})</h6>
+        @if (completedTodos.length === 0) {
+          <p class="text-muted small mb-3">完了済みの Todo はありません。</p>
+        } @else {
+          <ul class="list-group list-group-flush mb-3">
+            @for (todo of completedTodos; track todo.id) {
+              <li class="list-group-item d-flex align-items-center gap-2 px-0 text-muted">
+                <i class="feather icon-check-circle text-success"></i>
+                <span class="text-decoration-line-through">{{ todo.title }}</span>
+              </li>
+            }
+          </ul>
+        }
+
+        <a routerLink="/dashboard/projects" class="btn btn-outline-secondary btn-sm">
+          <i class="feather icon-arrow-left me-1"></i>一覧に戻る
+        </a>
+      </app-card>
+    }
+  </div>
+</div>
