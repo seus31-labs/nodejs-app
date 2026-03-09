@@ -111,8 +111,8 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.9: Backend テスト
 
-- [ ] 7.9.1: ProjectService のテスト
-- [ ] 7.9.2: Project API のテスト
+- [x] 7.9.1: ProjectService のテスト（API 経由で検証）
+- [x] 7.9.2: Project API のテスト
 
 ---
 
