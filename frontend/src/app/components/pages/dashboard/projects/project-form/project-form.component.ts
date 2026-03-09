@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common'
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms'
 import type { Project, CreateProjectDto, UpdateProjectDto } from '../../../../../models/project.interface'
 
+function noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
+  const value = control.value as string
+  return value && value.trim().length === 0 ? { whitespace: true } : null
+}
+
 @Component({
   selector: 'app-project-form',
   standalone: true,
@@ -10,11 +15,6 @@ import type { Project, CreateProjectDto, UpdateProjectDto } from '../../../../..
   templateUrl: './project-form.component.html',
   styleUrls: ['./project-form.component.scss']
 })
-function noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
-  const value = control.value as string
-  return value && value.trim().length === 0 ? { whitespace: true } : null
-}
-
 export class ProjectFormComponent implements OnChanges {
   @Input() editingProject: Project | null = null
   @Output() submitForm = new EventEmitter<CreateProjectDto | UpdateProjectDto>()

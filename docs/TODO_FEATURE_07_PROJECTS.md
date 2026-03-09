@@ -166,9 +166,9 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.18: ProjectsPage 作成
 
-- [ ] 7.18.1: `ng generate component pages/projects-page` 実行
-- [ ] 7.18.2: ProjectList と ProjectForm 統合
-- [ ] 7.18.3: ルーティング追加
+- [x] 7.18.1: `ng generate component pages/projects-page` 実行
+- [x] 7.18.2: ProjectList と ProjectForm 統合
+- [x] 7.18.3: ルーティング追加
 
 ### Task 7.19: ナビゲーション更新
 
