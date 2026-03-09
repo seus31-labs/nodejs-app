@@ -45,6 +45,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   filterCompleted: boolean | null = null
   filterPriority: TodoPriority | null = null
   filterTagIds: number[] = []
+  filterProjectId: number | null = null
   searchQuery = ''
   sortBy: SortBy = 'createdAt'
   sortOrder: SortOrder = 'asc'
@@ -89,10 +90,11 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   loadTodos(): void {
     this.loading = true
     this.error = null
-    const filters: { completed?: boolean; priority?: TodoPriority; tagIds?: number[] } = {}
+    const filters: { completed?: boolean; priority?: TodoPriority; tagIds?: number[]; projectId?: number | null } = {}
     if (this.filterCompleted !== null) filters.completed = this.filterCompleted
     if (this.filterPriority !== null) filters.priority = this.filterPriority
     if (this.filterTagIds.length > 0) filters.tagIds = this.filterTagIds
+    if (this.filterProjectId !== null) filters.projectId = this.filterProjectId
     const sort = { sortBy: this.sortBy, sortOrder: this.sortOrder }
 
     const q = this.searchQuery.trim()
@@ -170,6 +172,16 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     const value = (event.target as HTMLSelectElement).value
     this.filterPriority = value === '' ? null : (value as TodoPriority)
     this.onFiltersChange()
+  }
+
+  onProjectFilterChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value
+    this.filterProjectId = value === '' ? null : Number(value)
+    this.onFiltersChange()
+  }
+
+  get projectFilterValue(): string {
+    return this.filterProjectId !== null ? String(this.filterProjectId) : ''
   }
 
   onSortChange(sort: { sortBy: SortBy; sortOrder: SortOrder }): void {

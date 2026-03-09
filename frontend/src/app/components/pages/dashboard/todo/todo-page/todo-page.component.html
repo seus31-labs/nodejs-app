@@ -36,6 +36,22 @@
               <option value="high">high</option>
             </select>
           </div>
+          @if (allProjects.length > 0) {
+            <div class="col-auto">
+              <label class="form-label mb-0 me-1">プロジェクト</label>
+              <select
+                class="form-select form-select-sm"
+                style="width: auto;"
+                [value]="projectFilterValue"
+                (change)="onProjectFilterChange($event)"
+              >
+                <option value="">すべて</option>
+                @for (project of allProjects; track project.id) {
+                  <option [value]="project.id">{{ project.name }}</option>
+                }
+              </select>
+            </div>
+          }
           <div class="col-auto">
             <app-sort-selector
               [sortBy]="sortBy"

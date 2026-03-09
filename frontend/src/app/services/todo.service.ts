@@ -10,6 +10,7 @@ export interface TodoListFilters {
   completed?: boolean
   priority?: TodoPriority
   tagIds?: number[]
+  projectId?: number | null
 }
 
 @Injectable({
@@ -29,6 +30,7 @@ export class TodoService {
     if (filters?.completed !== undefined) params['completed'] = String(filters.completed)
     if (filters?.priority) params['priority'] = filters.priority
     if (filters?.tagIds?.length) params['tags'] = filters.tagIds.join(',')
+    if (filters?.projectId != null) params['projectId'] = String(filters.projectId)
     if (sort?.sortBy) params['sortBy'] = sort.sortBy
     if (sort?.sortOrder) params['sortOrder'] = sort.sortOrder
     return this.http.get<Todo[]>(`${this.apiUrl}/todos`, { params })
