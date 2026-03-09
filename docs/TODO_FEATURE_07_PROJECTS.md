@@ -149,10 +149,10 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.15: ProjectDetail ページ作成
 
-- [ ] 7.15.1: `ng generate component pages/project-detail-page` 実行
-- [ ] 7.15.2: プロジェクト詳細表示
-- [ ] 7.15.3: プロジェクト内の Todo 一覧表示
-- [ ] 7.15.4: ルーティング追加
+- [x] 7.15.1: `ng generate component pages/project-detail-page` 実行
+- [x] 7.15.2: プロジェクト詳細表示
+- [x] 7.15.3: プロジェクト内の Todo 一覧表示
+- [x] 7.15.4: ルーティング追加
 
 ### Task 7.16: TodoForm にプロジェクト選択追加
 
