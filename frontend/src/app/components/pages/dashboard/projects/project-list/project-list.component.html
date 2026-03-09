@@ -31,17 +31,19 @@
             @if (project.description) {
               <p class="card-text text-muted small mb-2 project-desc">{{ project.description }}</p>
             }
+            @let progress = getProgress(project.id);
+            @let percent = getProgressPercent(project.id);
             <div class="mb-1 d-flex justify-content-between small text-muted">
               <span>進捗</span>
-              <span>{{ getProgress(project.id).completed }}/{{ getProgress(project.id).total }} ({{ getProgressPercent(project.id) }}%)</span>
+              <span>{{ progress.completed }}/{{ progress.total }} ({{ percent }}%)</span>
             </div>
             <div class="progress" style="height: 6px;">
               <div
                 class="progress-bar"
                 role="progressbar"
-                [style.width.%]="getProgressPercent(project.id)"
+                [style.width.%]="percent"
                 [style.background-color]="project.color"
-                [attr.aria-valuenow]="getProgressPercent(project.id)"
+                [attr.aria-valuenow]="percent"
                 aria-valuemin="0"
                 aria-valuemax="100"
               ></div>
