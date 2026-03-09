@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { Subject, forkJoin, takeUntil } from 'rxjs'
+import { Subject, Observable, forkJoin, takeUntil } from 'rxjs'
 import { ProjectService } from '../../../../../services/project.service'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
 import { ProjectListComponent } from '../project-list/project-list.component'
@@ -54,7 +54,7 @@ export default class ProjectsPageComponent implements OnInit, OnDestroy {
       this.progressMap = {}
       return
     }
-    const requests: Record<string, ReturnType<ProjectService['getProjectProgress']>> = {}
+    const requests: Record<string, Observable<ProjectProgress>> = {}
     projects.forEach((p) => {
       requests[String(p.id)] = this.projectService.getProjectProgress(p.id)
     })
