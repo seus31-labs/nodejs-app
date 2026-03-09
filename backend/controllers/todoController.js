@@ -37,6 +37,7 @@ async function getTodos(fastify, req, reply) {
       sortBy: req.query.sortBy,
       sortOrder: req.query.sortOrder,
       tagIds: parseTagIdsQuery(req.query.tags),
+      projectId: req.query.projectId,
     };
     const todos = await todoService.getTodosByUserId(fastify, userId, options);
     reply.code(200).send(todos.map((t) => t.toJSON()));

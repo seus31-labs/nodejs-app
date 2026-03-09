@@ -161,8 +161,8 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.17: TodoList にプロジェクトフィルタ追加
 
-- [ ] 7.17.1: プロジェクトフィルタ UI 追加
-- [ ] 7.17.2: フィルタ適用時に API 呼び出し
+- [x] 7.17.1: プロジェクトフィルタ UI 追加
+- [x] 7.17.2: フィルタ適用時に API 呼び出し
 
 ### Task 7.18: ProjectsPage 作成
 
