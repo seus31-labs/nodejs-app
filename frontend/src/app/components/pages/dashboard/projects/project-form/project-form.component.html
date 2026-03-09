@@ -1,0 +1,46 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="project-form">
+  <div class="mb-2">
+    <label for="project-name" class="form-label">プロジェクト名 <span class="text-danger">*</span></label>
+    <input
+      id="project-name"
+      type="text"
+      class="form-control"
+      formControlName="name"
+      placeholder="プロジェクト名を入力"
+      maxlength="100"
+    />
+    @if (form.get('name')?.invalid && form.get('name')?.touched) {
+      <div class="invalid-feedback d-block">プロジェクト名を入力してください。</div>
+    }
+  </div>
+  <div class="mb-2">
+    <label for="project-description" class="form-label">説明</label>
+    <textarea
+      id="project-description"
+      class="form-control"
+      formControlName="description"
+      rows="2"
+      placeholder="説明（任意）"
+    ></textarea>
+  </div>
+  <div class="mb-3">
+    <label for="project-color" class="form-label">カラー</label>
+    <div class="d-flex align-items-center gap-2">
+      <input
+        id="project-color"
+        type="color"
+        class="form-control form-control-color"
+        formControlName="color"
+      />
+      <span class="small text-muted">{{ form.get('color')?.value }}</span>
+    </div>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+      {{ editingProject ? '更新' : '作成' }}
+    </button>
+    @if (editingProject) {
+      <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">キャンセル</button>
+    }
+  </div>
+</form>
