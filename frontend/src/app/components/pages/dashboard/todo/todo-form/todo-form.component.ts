@@ -63,7 +63,7 @@ export class TodoFormComponent implements OnChanges {
       description: v.description?.trim() || null,
       priority: v.priority || 'medium',
       dueDate: v.dueDate || null,
-      projectId: projectId || null
+      projectId,
     }
     this.submitForm.emit(payload)
   }
