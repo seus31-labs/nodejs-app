@@ -30,17 +30,18 @@ function buildOrder(sequelize, sortBy, sortOrder) {
  * 指定ユーザーの Todo を作成する
  * @param {object} fastify - Fastify インスタンス
  * @param {number} userId - ユーザー ID
- * @param {object} todoData - { title, description?, priority?, dueDate? }
+ * @param {object} todoData - { title, description?, priority?, dueDate?, projectId? }
  * @returns {Promise<object>} 作成された Todo
  */
 async function createTodo(fastify, userId, todoData) {
-  const { title, description, priority, dueDate } = todoData;
+  const { title, description, priority, dueDate, projectId } = todoData;
   return fastify.models.Todo.create({
     userId,
     title,
     description: description ?? null,
     priority: priority ?? 'medium',
     dueDate: dueDate ?? null,
+    projectId: projectId ?? null,
   });
 }
 
@@ -143,8 +144,8 @@ async function getTodoByIdIncludingArchived(fastify, todoId, userId) {
 async function updateTodo(fastify, todoId, userId, updateData) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return null;
-  const { title, description, priority, dueDate } = updateData;
-  const allowed = { title, description, priority, dueDate };
+  const { title, description, priority, dueDate, projectId } = updateData;
+  const allowed = { title, description, priority, dueDate, projectId };
   Object.keys(allowed).forEach((k) => {
     if (allowed[k] !== undefined) todo.set(k, allowed[k]);
   });

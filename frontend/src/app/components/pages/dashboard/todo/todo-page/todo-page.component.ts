@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { Subject, takeUntil } from 'rxjs'
 import { MatDialog } from '@angular/material/dialog'
-import { TodoService } from '../../../../../services/todo.service'
+import { TodoService, type TodoListFilters } from '../../../../../services/todo.service'
 import { TagService } from '../../../../../services/tag.service'
 import { ProjectService } from '../../../../../services/project.service'
 import { TodoListComponent } from '../todo-list/todo-list.component'
@@ -90,7 +90,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   loadTodos(): void {
     this.loading = true
     this.error = null
-    const filters: { completed?: boolean; priority?: TodoPriority; tagIds?: number[]; projectId?: number | null } = {}
+    const filters: TodoListFilters = {}
     if (this.filterCompleted !== null) filters.completed = this.filterCompleted
     if (this.filterPriority !== null) filters.priority = this.filterPriority
     if (this.filterTagIds.length > 0) filters.tagIds = this.filterTagIds
