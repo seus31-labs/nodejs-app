@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core
 import { CommonModule } from '@angular/common'
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms'
 import type { Todo, TodoCreateUpdate } from '../../../../../models/todo.interface'
+import type { Project } from '../../../../../models/project.interface'
 
 function noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
   const value = control.value as string
@@ -17,6 +18,7 @@ function noWhitespaceValidator(control: AbstractControl): ValidationErrors | nul
 })
 export class TodoFormComponent implements OnChanges {
   @Input() editingTodo: Todo | null = null
+  @Input() projects: Project[] = []
   @Output() submitForm = new EventEmitter<TodoCreateUpdate>()
   @Output() cancel = new EventEmitter<void>()
 
@@ -27,7 +29,8 @@ export class TodoFormComponent implements OnChanges {
       title: ['', [Validators.required, Validators.maxLength(255), noWhitespaceValidator]],
       description: [''],
       priority: ['medium' as const],
-      dueDate: ['']
+      dueDate: [''],
+      projectId: [null as number | null]
     })
   }
 
@@ -37,14 +40,16 @@ export class TodoFormComponent implements OnChanges {
         title: this.editingTodo.title,
         description: this.editingTodo.description ?? '',
         priority: this.editingTodo.priority,
-        dueDate: this.editingTodo.dueDate ?? ''
+        dueDate: this.editingTodo.dueDate ?? '',
+        projectId: this.editingTodo.projectId ?? null
       })
     } else {
       this.form.reset({
         title: '',
         description: '',
         priority: 'medium',
-        dueDate: ''
+        dueDate: '',
+        projectId: null
       })
     }
   }
@@ -52,11 +57,13 @@ export class TodoFormComponent implements OnChanges {
   onSubmit(): void {
     if (this.form.invalid) return
     const v = this.form.value
+    const projectId = v.projectId != null ? Number(v.projectId) : null
     const payload: TodoCreateUpdate = {
       title: v.title.trim(),
       description: v.description?.trim() || null,
       priority: v.priority || 'medium',
-      dueDate: v.dueDate || null
+      dueDate: v.dueDate || null,
+      projectId,
     }
     this.submitForm.emit(payload)
   }
