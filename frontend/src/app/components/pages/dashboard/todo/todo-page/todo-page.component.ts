@@ -4,6 +4,7 @@ import { Subject, takeUntil } from 'rxjs'
 import { MatDialog } from '@angular/material/dialog'
 import { TodoService } from '../../../../../services/todo.service'
 import { TagService } from '../../../../../services/tag.service'
+import { ProjectService } from '../../../../../services/project.service'
 import { TodoListComponent } from '../todo-list/todo-list.component'
 import { TodoFormComponent } from '../todo-form/todo-form.component'
 import { SearchBarComponent } from '../search-bar/search-bar.component'
@@ -16,6 +17,7 @@ import {
 } from '../advanced-search-dialog/advanced-search-dialog.component'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
+import type { Project } from '../../../../../models/project.interface'
 import type { SortBy, SortOrder } from '../../../../../models/sort-options.interface'
 import type { SearchParams } from '../../../../../models/search-params.interface'
 
@@ -48,17 +50,20 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   sortOrder: SortOrder = 'asc'
   selectedIds: number[] = []
   allTags: Tag[] = []
+  allProjects: Project[] = []
 
   private destroy$ = new Subject<void>()
 
   constructor(
     private todoService: TodoService,
     private tagService: TagService,
+    private projectService: ProjectService,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
     this.loadTags()
+    this.loadProjects()
     this.loadTodos()
   }
 
@@ -66,6 +71,13 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     this.tagService.getTags().pipe(takeUntil(this.destroy$)).subscribe({
       next: (tags) => { this.allTags = tags },
       error: () => { this.allTags = [] }
+    })
+  }
+
+  loadProjects(): void {
+    this.projectService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (projects) => { this.allProjects = projects },
+      error: () => { this.allProjects = [] }
     })
   }
 

@@ -42,6 +42,17 @@
       />
     </div>
   </div>
+  @if (projects.length > 0) {
+    <div class="mb-2">
+      <label for="todo-project" class="form-label">プロジェクト</label>
+      <select id="todo-project" class="form-select" formControlName="projectId">
+        <option [ngValue]="null">なし</option>
+        @for (project of projects; track project.id) {
+          <option [ngValue]="project.id">{{ project.name }}</option>
+        }
+      </select>
+    </div>
+  }
   <div class="d-flex gap-2">
     <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
       {{ editingTodo ? '更新' : '作成' }}

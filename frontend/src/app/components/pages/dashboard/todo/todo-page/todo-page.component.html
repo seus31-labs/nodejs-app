@@ -66,11 +66,13 @@
       @if (editingTodo) {
         <app-todo-form
           [editingTodo]="editingTodo"
+          [projects]="allProjects"
           (submitForm)="onSubmitForm($event)"
           (cancel)="onCancelEdit()"
         />
       } @else {
         <app-todo-form
+          [projects]="allProjects"
           (submitForm)="onSubmitForm($event)"
         />
       }
