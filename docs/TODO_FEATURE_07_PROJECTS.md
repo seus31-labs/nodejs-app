@@ -120,12 +120,12 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.10: Project インターフェース定義
 
-- [ ] 7.10.1: `frontend/src/app/models/project.interface.ts` 作成
-- [ ] 7.10.2: Project, CreateProjectDto, UpdateProjectDto 定義
+- [x] 7.10.1: `frontend/src/app/models/project.interface.ts` 作成
+- [x] 7.10.2: Project, CreateProjectDto, UpdateProjectDto 定義
 
 ### Task 7.11: Todo インターフェース更新
 
-- [ ] 7.11.1: Todo インターフェースに projectId, project 追加
+- [x] 7.11.1: Todo インターフェースに projectId, project 追加
 
 ### Task 7.12: ProjectService 作成
 
