@@ -1,0 +1,84 @@
+@if (error) {
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+}
+@if (loading) {
+  <div class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">読み込み中...</span>
+    </div>
+  </div>
+} @else if (projects.length === 0) {
+  <p class="text-muted py-3">プロジェクトがありません。</p>
+} @else {
+  <div class="row g-3">
+    @for (project of projects; track project.id) {
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card project-card h-100" [class.border-secondary]="project.archived">
+          <div class="card-header d-flex align-items-center gap-2 py-2">
+            <span
+              class="project-color-dot"
+              [style.background-color]="project.color"
+            ></span>
+            <a
+              class="fw-semibold text-decoration-none text-body flex-grow-1 text-truncate"
+              [routerLink]="['/dashboard/projects', project.id]"
+            >{{ project.name }}</a>
+            @if (project.archived) {
+              <span class="badge bg-secondary">アーカイブ</span>
+            }
+          </div>
+          <div class="card-body py-2">
+            @if (project.description) {
+              <p class="card-text text-muted small mb-2 project-desc">{{ project.description }}</p>
+            }
+            @let progress = getProgress(project.id);
+            @let percent = getProgressPercent(project.id);
+            <div class="mb-1 d-flex justify-content-between small text-muted">
+              <span>進捗</span>
+              <span>{{ progress.completed }}/{{ progress.total }} ({{ percent }}%)</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                [style.width.%]="percent"
+                [style.background-color]="project.color"
+                [attr.aria-valuenow]="percent"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+          <div class="card-footer bg-transparent border-0 py-2 d-flex justify-content-end gap-1">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="edit.emit(project)"
+              title="編集"
+            >
+              <i class="feather icon-edit-2"></i>
+            </button>
+            @if (!project.archived) {
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-warning"
+                (click)="archive.emit(project)"
+                title="アーカイブ"
+              >
+                <i class="feather icon-archive"></i>
+              </button>
+            }
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="delete.emit(project)"
+              title="削除"
+            >
+              <i class="feather icon-trash-2"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
