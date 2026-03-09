@@ -136,10 +136,10 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.13: ProjectList コンポーネント作成
 
-- [ ] 7.13.1: `ng generate component components/project-list` 実行
-- [ ] 7.13.2: プロジェクト一覧表示実装
-- [ ] 7.13.3: プロジェクトカード形式で表示
-- [ ] 7.13.4: 進捗バー表示
+- [x] 7.13.1: `ng generate component components/project-list` 実行
+- [x] 7.13.2: プロジェクト一覧表示実装
+- [x] 7.13.3: プロジェクトカード形式で表示
+- [x] 7.13.4: 進捗バー表示
 
 ### Task 7.14: ProjectForm コンポーネント作成
 
