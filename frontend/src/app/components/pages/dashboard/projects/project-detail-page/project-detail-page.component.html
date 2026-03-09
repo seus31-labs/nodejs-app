@@ -45,12 +45,15 @@
           </div>
         </div>
 
-        <h6 class="fw-semibold mb-2">未完了 ({{ pendingTodos.length }})</h6>
-        @if (pendingTodos.length === 0) {
+        @let pending = pendingTodos;
+        @let completed = completedTodos;
+
+        <h6 class="fw-semibold mb-2">未完了 ({{ pending.length }})</h6>
+        @if (pending.length === 0) {
           <p class="text-muted small mb-3">未完了の Todo はありません。</p>
         } @else {
           <ul class="list-group list-group-flush mb-3">
-            @for (todo of pendingTodos; track todo.id) {
+            @for (todo of pending; track todo.id) {
               <li class="list-group-item d-flex align-items-center gap-2 px-0">
                 <i class="feather icon-circle text-muted"></i>
                 <div class="flex-grow-1">
@@ -65,12 +68,12 @@
           </ul>
         }
 
-        <h6 class="fw-semibold mb-2">完了済み ({{ completedTodos.length }})</h6>
-        @if (completedTodos.length === 0) {
+        <h6 class="fw-semibold mb-2">完了済み ({{ completed.length }})</h6>
+        @if (completed.length === 0) {
           <p class="text-muted small mb-3">完了済みの Todo はありません。</p>
         } @else {
           <ul class="list-group list-group-flush mb-3">
-            @for (todo of completedTodos; track todo.id) {
+            @for (todo of completed; track todo.id) {
               <li class="list-group-item d-flex align-items-center gap-2 px-0 text-muted">
                 <i class="feather icon-check-circle text-success"></i>
                 <span class="text-decoration-line-through">{{ todo.title }}</span>

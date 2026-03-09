@@ -30,7 +30,7 @@ export default class ProjectDetailPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'))
-    if (isNaN(id)) {
+    if (!Number.isInteger(id) || id <= 0) {
       this.router.navigate(['/dashboard/projects'])
       return
     }
