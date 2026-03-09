@@ -143,9 +143,9 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.14: ProjectForm コンポーネント作成
 
-- [ ] 7.14.1: `ng generate component components/project-form` 実行
-- [ ] 7.14.2: Reactive Forms 実装
-- [ ] 7.14.3: カラーピッカー実装
+- [x] 7.14.1: `ng generate component components/project-form` 実行
+- [x] 7.14.2: Reactive Forms 実装
+- [x] 7.14.3: カラーピッカー実装
 
 ### Task 7.15: ProjectDetail ページ作成
 
