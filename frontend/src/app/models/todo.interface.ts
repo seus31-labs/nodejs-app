@@ -1,3 +1,4 @@
+import type { Project } from './project.interface'
 import type { Tag } from './tag.interface'
 
 /**
@@ -17,11 +18,13 @@ export interface Todo {
   priority: TodoPriority
   dueDate: string | null
   sortOrder: number
+  projectId: number | null
   archived: boolean
   archivedAt: string | null
   createdAt: string
   updatedAt: string
   Tags?: Tag[]
+  Project?: Project
 }
 
 /**
@@ -32,4 +35,5 @@ export interface TodoCreateUpdate {
   description?: string | null
   priority?: TodoPriority
   dueDate?: string | null
+  projectId?: number | null
 }
