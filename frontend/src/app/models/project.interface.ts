@@ -14,7 +14,7 @@ export interface Project {
 
 export interface CreateProjectDto {
   name: string
-  description?: string
+  description?: string | null
   color?: string
 }
 
