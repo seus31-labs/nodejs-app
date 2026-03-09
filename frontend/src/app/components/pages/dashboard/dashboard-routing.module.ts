@@ -22,6 +22,10 @@ const routes: Routes = [
         loadComponent: () => import('./tags/tags-page.component')
       },
       {
+        path: 'projects',
+        loadComponent: () => import('./projects/projects-page/projects-page.component')
+      },
+      {
         path: 'projects/:id',
         loadComponent: () => import('./projects/project-detail-page/project-detail-page.component')
       },
