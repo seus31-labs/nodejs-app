@@ -227,6 +227,20 @@ async function bulkArchive(fastify, req, reply) {
   }
 }
 
+async function bulkAddTag(fastify, req, reply) {
+  try {
+    const todoIds = req.body.todoIds;
+    const tagId = req.body.tagId != null ? Number(req.body.tagId) : null;
+    if (tagId == null || !Number.isInteger(tagId) || tagId <= 0) {
+      return reply.code(400).send({ error: 'Invalid tag id' });
+    }
+    const added = await todoService.bulkAddTag(fastify, todoIds, tagId, req.user.id);
+    reply.code(200).send({ added });
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Bulk add tag failed');
+  }
+}
+
 async function addTagToTodo(fastify, req, reply) {
   try {
     const todoId = parseTodoId(req.params.todoId);
@@ -273,6 +287,7 @@ module.exports = {
   bulkComplete,
   bulkDelete,
   bulkArchive,
+  bulkAddTag,
   addTagToTodo,
   removeTagFromTodo,
 };

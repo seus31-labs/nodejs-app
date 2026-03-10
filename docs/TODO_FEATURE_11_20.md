@@ -108,24 +108,24 @@
 - 既存テーブルのみ使用
 
 ### Backend タスク（8タスク）
-- [ ] 15.1: TodoService に一括操作メソッド追加
-- [ ] 15.2: `bulkComplete(todoIds, userId)` 実装
-- [ ] 15.3: `bulkDelete(todoIds, userId)` 実装
-- [ ] 15.4: `bulkAddTag(todoIds, tagId, userId)` 実装
-- [ ] 15.5: `bulkArchive(todoIds, userId)` 実装
-- [ ] 15.6: TodoController に一括操作ハンドラ追加
-- [ ] 15.7: POST /api/todos/bulk-* ルート定義
-- [ ] 15.8: Backend テスト
+- [x] 15.1: TodoService に一括操作メソッド追加
+- [x] 15.2: `bulkComplete(todoIds, userId)` 実装
+- [x] 15.3: `bulkDelete(todoIds, userId)` 実装
+- [x] 15.4: `bulkAddTag(todoIds, tagId, userId)` 実装
+- [x] 15.5: `bulkArchive(todoIds, userId)` 実装
+- [x] 15.6: TodoController に一括操作ハンドラ追加
+- [x] 15.7: POST /api/todos/bulk-* ルート定義
+- [x] 15.8: Backend テスト
 
 ### Frontend タスク（10タスク）
-- [ ] 15.9: TodoService に一括操作メソッド追加
-- [ ] 15.10: TodoList に複数選択機能追加（チェックボックス）
-- [ ] 15.11: BulkActionBar コンポーネント作成
-- [ ] 15.12: 一括完了ボタン実装
-- [ ] 15.13: 一括削除ボタン実装（確認ダイアログ）
+- [x] 15.9: TodoService に一括操作メソッド追加
+- [x] 15.10: TodoList に複数選択機能追加（チェックボックス）
+- [x] 15.11: BulkActionBar コンポーネント作成
+- [x] 15.12: 一括完了ボタン実装
+- [x] 15.13: 一括削除ボタン実装（確認ダイアログ）
 - [ ] 15.14: 一括タグ付けボタン実装
-- [ ] 15.15: 一括アーカイブボタン実装
-- [ ] 15.16: スタイリング
+- [x] 15.15: 一括アーカイブボタン実装
+- [x] 15.16: スタイリング
 - [x] 15.17: Frontend テスト
 
 ---

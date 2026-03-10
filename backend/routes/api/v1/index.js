@@ -18,6 +18,7 @@ const {
   bulkComplete,
   bulkDelete,
   bulkArchive,
+  bulkAddTag,
   addTagToTodo,
   removeTagFromTodo,
 } = require('../../../controllers/todoController');
@@ -429,6 +430,25 @@ module.exports = async function (fastify, opts) {
     schema: { body: bulkBodySchema },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => bulkArchive(fastify, request, reply),
+  });
+  fastify.post('/todos/bulk-add-tag', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['todoIds', 'tagId'],
+        properties: {
+          todoIds: {
+            type: 'array',
+            items: { type: 'integer' },
+            minItems: 1,
+            maxItems: 100,
+          },
+          tagId: { type: 'integer' },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => bulkAddTag(fastify, request, reply),
   });
   fastify.post('/todos/:todoId/tags', {
     schema: {

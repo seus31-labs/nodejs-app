@@ -432,6 +432,44 @@ async function bulkArchive(fastify, todoIds, userId) {
   return count;
 }
 
+/**
+ * 指定 ID の Todo に同一タグを一括付与する（所有者の Todo のみ、既に付与済みはスキップ）
+ * N+1 を避け、タグ確認・所有 Todo 一括取得・既付与一括取得・一括挿入の 4 クエリで完結する。
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number[]} todoIds - Todo ID 配列
+ * @param {number} tagId - タグ ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<number>} 新規にタグを付与した Todo 数
+ */
+async function bulkAddTag(fastify, todoIds, tagId, userId) {
+  if (!Array.isArray(todoIds) || todoIds.length === 0) return 0;
+  const safeTodoIds = todoIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0);
+  if (safeTodoIds.length === 0) return 0;
+
+  const tag = await tagService.getTagById(fastify, tagId, userId);
+  if (!tag) return 0;
+
+  const ownedTodos = await fastify.models.Todo.findAll({
+    where: { id: { [Op.in]: safeTodoIds }, userId },
+    attributes: ['id'],
+  });
+  if (ownedTodos.length === 0) return 0;
+  const ownedIds = ownedTodos.map((t) => t.id);
+
+  const existing = await fastify.models.TodoTag.findAll({
+    where: { todoId: { [Op.in]: ownedIds }, tagId },
+    attributes: ['todoId'],
+  });
+  const alreadyTagged = new Set(existing.map((r) => r.todoId));
+  const newIds = ownedIds.filter((id) => !alreadyTagged.has(id));
+  if (newIds.length === 0) return 0;
+
+  await fastify.models.TodoTag.bulkCreate(newIds.map((todoId) => ({ todoId, tagId })), {
+    ignoreDuplicates: true,
+  });
+  return newIds.length;
+}
+
 module.exports = {
   createTodo,
   getTodosByUserId,
@@ -449,6 +487,7 @@ module.exports = {
   bulkComplete,
   bulkDelete,
   bulkArchive,
+  bulkAddTag,
   addTagToTodo,
   removeTagFromTodo,
 };
