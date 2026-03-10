@@ -331,6 +331,55 @@ test('POST /api/v1/templates/:id/create-todo with overrides applies overrides', 
   assert.strictEqual(todo.priority, 'high');
 });
 
+test('POST /api/v1/templates/:id/create-todo with tagIds associates tags', async (t) => {
+  const app = await build(t);
+  const suffix = uniqueSuffix();
+  const user = { name: `tmpltag-${suffix}`, email: `tmpltag-${suffix}@test.local`, password: 'pass123' };
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user });
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } });
+  const token = JSON.parse(loginRes.payload).token;
+  const tag1Res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'tag-for-tmpl-1', color: '#ff0000' },
+  });
+  const tag2Res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'tag-for-tmpl-2', color: '#00ff00' },
+  });
+  const tag1 = JSON.parse(tag1Res.payload);
+  const tag2 = JSON.parse(tag2Res.payload);
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/templates',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'Template with tags', title: 'Todo with tags', tagIds: [tag1.id, tag2.id] },
+  });
+  const template = JSON.parse(createRes.payload);
+  const todoRes = await app.inject({
+    method: 'POST',
+    url: `/api/v1/templates/${template.id}/create-todo`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: {},
+  });
+  assert.strictEqual(todoRes.statusCode, 201);
+  const todo = JSON.parse(todoRes.payload);
+  assert(todo.id != null);
+  const getRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${todo.id}`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.strictEqual(getRes.statusCode, 200);
+  const todoWithTags = JSON.parse(getRes.payload);
+  assert(Array.isArray(todoWithTags.Tags));
+  assert(todoWithTags.Tags.some((tag) => tag.id === tag1.id));
+  assert(todoWithTags.Tags.some((tag) => tag.id === tag2.id));
+});
+
 test('POST /api/v1/templates/:id/create-todo for other user returns 404', async (t) => {
   const app = await build(t);
   const suffix = uniqueSuffix();
