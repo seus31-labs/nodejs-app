@@ -111,7 +111,7 @@
 - [ ] 15.1: TodoService に一括操作メソッド追加
 - [ ] 15.2: `bulkComplete(todoIds, userId)` 実装
 - [ ] 15.3: `bulkDelete(todoIds, userId)` 実装
-- [ ] 15.4: `bulkAddTag(todoIds, tagId, userId)` 実装
+- [x] 15.4: `bulkAddTag(todoIds, tagId, userId)` 実装
 - [ ] 15.5: `bulkArchive(todoIds, userId)` 実装
 - [ ] 15.6: TodoController に一括操作ハンドラ追加
 - [ ] 15.7: POST /api/todos/bulk-* ルート定義

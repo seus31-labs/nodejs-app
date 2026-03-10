@@ -1293,3 +1293,170 @@ test('bulk-archive with other user todo ids returns updated 0 and does not archi
   assert.strictEqual(getA.statusCode, 200)
   assert.strictEqual(JSON.parse(getA.payload).archived, false)
 })
+
+test('POST /api/v1/todos/bulk-add-tag without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-add-tag',
+    payload: { todoIds: [1], tagId: 1 }
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('POST /api/v1/todos/bulk-add-tag with empty todoIds returns 400', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `bulktag-${suffix}`, email: `bulktag-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-add-tag',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { todoIds: [], tagId: 1 }
+  })
+  assert.strictEqual(res.statusCode, 400)
+})
+
+test('POST /api/v1/todos/bulk-add-tag adds tag to selected todos and returns added count', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `bulktag2-${suffix}`, email: `bulktag2-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const tagRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'bulk-tag', color: '#ff0000' }
+  })
+  const tag = JSON.parse(tagRes.payload)
+  const todo1Res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Todo 1' }
+  })
+  const todo2Res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Todo 2' }
+  })
+  const todo1 = JSON.parse(todo1Res.payload)
+  const todo2 = JSON.parse(todo2Res.payload)
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-add-tag',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { todoIds: [todo1.id, todo2.id], tagId: tag.id }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const body = JSON.parse(res.payload)
+  assert.strictEqual(body.added, 2)
+  const get1 = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${todo1.id}`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  const get2 = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${todo2.id}`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(get1.statusCode, 200)
+  assert.strictEqual(get2.statusCode, 200)
+  assert(JSON.parse(get1.payload).Tags.some((tg) => tg.id === tag.id))
+  assert(JSON.parse(get2.payload).Tags.some((tg) => tg.id === tag.id))
+})
+
+test('POST /api/v1/todos/bulk-add-tag when tag already on some todos returns only newly added count', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `bulktag3-${suffix}`, email: `bulktag3-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const tagRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { name: 'existing-tag', color: '#00ff00' }
+  })
+  const tag = JSON.parse(tagRes.payload)
+  const todo1Res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Todo with tag' }
+  })
+  const todo2Res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Todo without tag' }
+  })
+  const todo1 = JSON.parse(todo1Res.payload)
+  const todo2 = JSON.parse(todo2Res.payload)
+  await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${todo1.id}/tags`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { tagId: tag.id }
+  })
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-add-tag',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { todoIds: [todo1.id, todo2.id], tagId: tag.id }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const body = JSON.parse(res.payload)
+  assert.strictEqual(body.added, 1)
+})
+
+test('bulk-add-tag with other user todo ids returns added 0 and does not add tag to other user todo', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const userA = { name: `bulktagA-${suffix}`, email: `bulktagA-${suffix}@test.local`, password: 'pass123' }
+  const userB = { name: `bulktagB-${suffix}`, email: `bulktagB-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userA })
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: userB })
+  const loginA = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userA.email, password: userA.password } })
+  const loginB = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: userB.email, password: userB.password } })
+  const tokenA = JSON.parse(loginA.payload).token
+  const tokenB = JSON.parse(loginB.payload).token
+  const todoARes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${tokenA}` },
+    payload: { title: 'A todo' }
+  })
+  const tagBRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tags',
+    headers: { authorization: `Bearer ${tokenB}` },
+    payload: { name: 'B tag' }
+  })
+  const todoA = JSON.parse(todoARes.payload)
+  const tagB = JSON.parse(tagBRes.payload)
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/bulk-add-tag',
+    headers: { authorization: `Bearer ${tokenB}` },
+    payload: { todoIds: [todoA.id], tagId: tagB.id }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const body = JSON.parse(res.payload)
+  assert.strictEqual(body.added, 0)
+  const getA = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${todoA.id}`,
+    headers: { authorization: `Bearer ${tokenA}` }
+  })
+  assert.strictEqual(getA.statusCode, 200)
+  assert.strictEqual((JSON.parse(getA.payload).Tags || []).length, 0)
+})

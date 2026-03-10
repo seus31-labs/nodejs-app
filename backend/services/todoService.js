@@ -432,6 +432,33 @@ async function bulkArchive(fastify, todoIds, userId) {
   return count;
 }
 
+/**
+ * 指定 ID の Todo に同一タグを一括付与する（所有者の Todo のみ、既に付与済みはスキップ）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number[]} todoIds - Todo ID 配列
+ * @param {number} tagId - タグ ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<number>} 新規にタグを付与した Todo 数
+ */
+async function bulkAddTag(fastify, todoIds, tagId, userId) {
+  if (!Array.isArray(todoIds) || todoIds.length === 0) return 0;
+  const safeTodoIds = todoIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0);
+  if (safeTodoIds.length === 0) return 0;
+  const tag = await tagService.getTagById(fastify, tagId, userId);
+  if (!tag) return 0;
+  let added = 0;
+  for (const todoId of safeTodoIds) {
+    const todo = await getTodoById(fastify, todoId, userId);
+    if (!todo) continue;
+    const [, created] = await fastify.models.TodoTag.findOrCreate({
+      where: { todoId, tagId },
+      defaults: { todoId, tagId },
+    });
+    if (created) added += 1;
+  }
+  return added;
+}
+
 module.exports = {
   createTodo,
   getTodosByUserId,
@@ -449,6 +476,7 @@ module.exports = {
   bulkComplete,
   bulkDelete,
   bulkArchive,
+  bulkAddTag,
   addTagToTodo,
   removeTagFromTodo,
 };
