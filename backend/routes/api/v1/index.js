@@ -38,6 +38,14 @@ const {
   getProjectProgress,
   archiveProject,
 } = require('../../../controllers/projectController');
+const {
+  getTemplates,
+  getTemplateById,
+  createTemplate,
+  updateTemplate,
+  deleteTemplate,
+  createTodoFromTemplate,
+} = require('../../../controllers/templateController');
 
 module.exports = async function (fastify, opts) {
   /**
@@ -227,6 +235,93 @@ module.exports = async function (fastify, opts) {
     schema: { ...projectIdParam },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => archiveProject(fastify, request, reply),
+  });
+
+  /**
+   * templates CRUD API routes (JWT 必須)
+   */
+  fastify.get('/templates', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getTemplates(fastify, request, reply),
+  });
+  fastify.post('/templates', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['name', 'title'],
+        properties: {
+          name: { type: 'string', minLength: 1, maxLength: 100 },
+          title: { type: 'string', minLength: 1, maxLength: 255 },
+          description: { type: 'string' },
+          priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+          tagIds: { type: 'array', items: { type: 'integer' } },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => createTemplate(fastify, request, reply),
+  });
+  fastify.get('/templates/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getTemplateById(fastify, request, reply),
+  });
+  fastify.put('/templates/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', minLength: 1, maxLength: 100 },
+          title: { type: 'string', minLength: 1, maxLength: 255 },
+          description: { type: 'string' },
+          priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+          tagIds: { type: 'array', items: { type: 'integer' } },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => updateTemplate(fastify, request, reply),
+  });
+  fastify.delete('/templates/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => deleteTemplate(fastify, request, reply),
+  });
+  fastify.post('/templates/:id/create-todo', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        properties: {
+          title: { type: 'string', maxLength: 255 },
+          description: { type: 'string' },
+          priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => createTodoFromTemplate(fastify, request, reply),
   });
 
   /**
