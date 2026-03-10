@@ -53,6 +53,14 @@ const NavigationItems = [
         classes: 'nav-item'
       },
       {
+        id: 'projects',
+        title: 'プロジェクト',
+        type: 'item',
+        url: '/dashboard/projects',
+        icon: 'feather icon-folder',
+        classes: 'nav-item'
+      },
+      {
         id: 'tags',
         title: 'タグ管理',
         type: 'item',
