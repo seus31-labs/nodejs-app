@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import type { Template } from '../../../../../models/template.interface'
+import type { TodoPriority } from '../../../../../models/todo.interface'
 
 @Component({
   selector: 'app-template-list',
@@ -17,8 +18,8 @@ export class TemplateListComponent {
   @Output() delete = new EventEmitter<Template>()
   @Output() useTemplate = new EventEmitter<Template>()
 
-  getPriorityLabel(priority: string): string {
-    const labels: Record<string, string> = {
+  getPriorityLabel(priority: TodoPriority): string {
+    const labels: Record<TodoPriority, string> = {
       low: '低',
       medium: '中',
       high: '高',
@@ -26,8 +27,8 @@ export class TemplateListComponent {
     return labels[priority] ?? priority
   }
 
-  getPriorityBadgeClass(priority: string): string {
-    const classes: Record<string, string> = {
+  getPriorityBadgeClass(priority: TodoPriority): string {
+    const classes: Record<TodoPriority, string> = {
       low: 'bg-secondary',
       medium: 'bg-info',
       high: 'bg-danger',
