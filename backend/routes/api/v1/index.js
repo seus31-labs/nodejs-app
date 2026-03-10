@@ -250,8 +250,8 @@ module.exports = async function (fastify, opts) {
         type: 'object',
         required: ['name', 'title'],
         properties: {
-          name: { type: 'string', maxLength: 100 },
-          title: { type: 'string', maxLength: 255 },
+          name: { type: 'string', minLength: 1, maxLength: 100 },
+          title: { type: 'string', minLength: 1, maxLength: 255 },
           description: { type: 'string' },
           priority: { type: 'string', enum: ['low', 'medium', 'high'] },
           tagIds: { type: 'array', items: { type: 'integer' } },
@@ -282,8 +282,8 @@ module.exports = async function (fastify, opts) {
       body: {
         type: 'object',
         properties: {
-          name: { type: 'string', maxLength: 100 },
-          title: { type: 'string', maxLength: 255 },
+          name: { type: 'string', minLength: 1, maxLength: 100 },
+          title: { type: 'string', minLength: 1, maxLength: 255 },
           description: { type: 'string' },
           priority: { type: 'string', enum: ['low', 'medium', 'high'] },
           tagIds: { type: 'array', items: { type: 'integer' } },
