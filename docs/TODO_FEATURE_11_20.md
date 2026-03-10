@@ -92,7 +92,7 @@
 - [x] 14.5: Backend テスト
 
 ### Frontend タスク（12タスク）
-- [ ] 14.6: Template インターフェース定義
+- [x] 14.6: Template インターフェース定義
 - [ ] 14.7: TemplateService 作成
 - [ ] 14.8: TemplateList コンポーネント作成
 - [ ] 14.9: TemplateForm コンポーネント作成
