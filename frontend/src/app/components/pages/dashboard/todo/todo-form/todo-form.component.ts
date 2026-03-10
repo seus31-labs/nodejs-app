@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common'
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms'
 import type { Todo, TodoCreateUpdate } from '../../../../../models/todo.interface'
 import type { Project } from '../../../../../models/project.interface'
+import type { Template } from '../../../../../models/template.interface'
 
 function noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
   const value = control.value as string
@@ -19,6 +20,7 @@ function noWhitespaceValidator(control: AbstractControl): ValidationErrors | nul
 export class TodoFormComponent implements OnChanges {
   @Input() editingTodo: Todo | null = null
   @Input() projects: Project[] = []
+  @Input() templates: Template[] = []
   @Output() submitForm = new EventEmitter<TodoCreateUpdate>()
   @Output() cancel = new EventEmitter<void>()
 
@@ -70,5 +72,19 @@ export class TodoFormComponent implements OnChanges {
 
   onCancel(): void {
     this.cancel.emit()
+  }
+
+  onTemplateSelect(event: Event): void {
+    const el = event.target as HTMLSelectElement
+    const id = el.value ? Number(el.value) : null
+    if (id == null) return
+    const template = this.templates.find((t) => t.id === id)
+    if (!template) return
+    this.form.patchValue({
+      title: template.title,
+      description: template.description ?? '',
+      priority: template.priority,
+    })
+    el.value = ''
   }
 }

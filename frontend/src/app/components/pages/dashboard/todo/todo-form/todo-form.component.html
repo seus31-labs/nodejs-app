@@ -1,4 +1,19 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="todo-form">
+  @if (templates.length > 0 && !editingTodo) {
+    <div class="mb-2">
+      <label for="todo-template" class="form-label">テンプレートから入力（任意）</label>
+      <select
+        id="todo-template"
+        class="form-select"
+        (change)="onTemplateSelect($event)"
+      >
+        <option value="">選択してください</option>
+        @for (t of templates; track t.id) {
+          <option [value]="t.id">{{ t.name }} — {{ t.title }}</option>
+        }
+      </select>
+    </div>
+  }
   <div class="mb-2">
     <label for="todo-title" class="form-label">タイトル <span class="text-danger">*</span></label>
     <input

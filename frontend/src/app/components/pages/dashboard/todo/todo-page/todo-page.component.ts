@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { TodoService, type TodoListFilters } from '../../../../../services/todo.service'
 import { TagService } from '../../../../../services/tag.service'
 import { ProjectService } from '../../../../../services/project.service'
+import { TemplateService } from '../../../../../services/template.service'
 import { TodoListComponent } from '../todo-list/todo-list.component'
 import { TodoFormComponent } from '../todo-form/todo-form.component'
 import { SearchBarComponent } from '../search-bar/search-bar.component'
@@ -18,6 +19,7 @@ import {
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import type { Project } from '../../../../../models/project.interface'
+import type { Template } from '../../../../../models/template.interface'
 import type { SortBy, SortOrder } from '../../../../../models/sort-options.interface'
 import type { SearchParams } from '../../../../../models/search-params.interface'
 
@@ -52,6 +54,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   selectedIds: number[] = []
   allTags: Tag[] = []
   allProjects: Project[] = []
+  allTemplates: Template[] = []
 
   private destroy$ = new Subject<void>()
 
@@ -59,12 +62,14 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     private todoService: TodoService,
     private tagService: TagService,
     private projectService: ProjectService,
+    private templateService: TemplateService,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
     this.loadTags()
     this.loadProjects()
+    this.loadTemplates()
     this.loadTodos()
   }
 
@@ -79,6 +84,13 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     this.projectService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
       next: (projects) => { this.allProjects = projects },
       error: () => { this.allProjects = [] }
+    })
+  }
+
+  loadTemplates(): void {
+    this.templateService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (templates) => { this.allTemplates = templates },
+      error: () => { this.allTemplates = [] }
     })
   }
 
