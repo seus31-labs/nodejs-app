@@ -85,7 +85,7 @@
 - 新規テーブル: `todo_templates` (id, userId, name, title, description, priority, tags, createdAt)
 
 ### Backend タスク（12タスク）
-- [ ] 14.1: TodoTemplate モデル作成
+- [x] 14.1: TodoTemplate モデル作成
 - [ ] 14.2: TemplateService 作成（CRUD、テンプレートから Todo 作成）
 - [ ] 14.3: TemplateController 作成
 - [ ] 14.4: Template ルート作成
