@@ -1,0 +1,79 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="template-form">
+  <div class="mb-2">
+    <label for="template-name" class="form-label">テンプレート名 <span class="text-danger">*</span></label>
+    <input
+      id="template-name"
+      type="text"
+      class="form-control"
+      formControlName="name"
+      placeholder="テンプレート名を入力"
+      maxlength="100"
+    />
+    @if (form.get('name')?.invalid && form.get('name')?.touched) {
+      <div class="invalid-feedback d-block">テンプレート名を入力してください。</div>
+    }
+  </div>
+  <div class="mb-2">
+    <label for="template-title" class="form-label">Todo タイトル <span class="text-danger">*</span></label>
+    <input
+      id="template-title"
+      type="text"
+      class="form-control"
+      formControlName="title"
+      placeholder="このテンプレートで作成する Todo のデフォルトタイトル"
+      maxlength="255"
+    />
+    @if (form.get('title')?.invalid && form.get('title')?.touched) {
+      <div class="invalid-feedback d-block">Todo タイトルを入力してください。</div>
+    }
+  </div>
+  <div class="mb-2">
+    <label for="template-description" class="form-label">説明</label>
+    <textarea
+      id="template-description"
+      class="form-control"
+      formControlName="description"
+      rows="2"
+      placeholder="説明（任意）"
+    ></textarea>
+  </div>
+  <div class="mb-2">
+    <label for="template-priority" class="form-label">優先度</label>
+    <select id="template-priority" class="form-select" formControlName="priority">
+      @for (opt of priorityOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+  </div>
+  @if (availableTags.length > 0) {
+    <div class="mb-3">
+      <span class="form-label d-block">タグ（任意）</span>
+      <div class="d-flex flex-wrap gap-2">
+        @for (tag of availableTags; track tag.id) {
+          <label class="form-check-label d-inline-flex align-items-center gap-1 border rounded px-2 py-1 template-tag-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [checked]="isTagSelected(tag.id)"
+              (change)="onTagToggle(tag.id)"
+            />
+            <span
+              class="badge rounded-pill"
+              [style.background-color]="tag.color"
+              [class.text-dark]="isLight(tag.color)"
+              [class.text-white]="!isLight(tag.color)"
+            >{{ tag.name }}</span>
+          </label>
+        }
+      </div>
+    </div>
+  }
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+      {{ editingTemplate ? '更新' : '作成' }}
+    </button>
+    @if (editingTemplate) {
+      <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">キャンセル</button>
+    }
+  </div>
+</form>
