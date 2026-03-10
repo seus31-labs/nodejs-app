@@ -83,12 +83,14 @@
         <app-todo-form
           [editingTodo]="editingTodo"
           [projects]="allProjects"
+          [templates]="allTemplates"
           (submitForm)="onSubmitForm($event)"
           (cancel)="onCancelEdit()"
         />
       } @else {
         <app-todo-form
           [projects]="allProjects"
+          [templates]="allTemplates"
           (submitForm)="onSubmitForm($event)"
         />
       }

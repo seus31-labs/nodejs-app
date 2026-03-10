@@ -96,7 +96,7 @@
 - [x] 14.7: TemplateService 作成
 - [x] 14.8: TemplateList コンポーネント作成
 - [x] 14.9: TemplateForm コンポーネント作成
-- [ ] 14.10: TodoForm にテンプレート選択追加
+- [x] 14.10: TodoForm にテンプレート選択追加
 - [ ] 14.11: TemplatesPage 作成
 - [ ] 14.12: Frontend テスト
 
