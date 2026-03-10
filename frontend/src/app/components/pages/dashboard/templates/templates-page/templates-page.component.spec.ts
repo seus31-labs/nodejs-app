@@ -112,6 +112,13 @@ describe('TemplatesPageComponent (14.12)', () => {
     expect(component.error).toBe('Create failed')
   })
 
+  it('should set error on update failure', () => {
+    component.editingTemplate = mockTemplate
+    templateService.update.and.returnValue(throwError(() => ({ error: { error: 'Update failed' } })))
+    component.onSubmitForm({ name: 'X', title: 'Y' })
+    expect(component.error).toBe('Update failed')
+  })
+
   it('should call delete and reload when confirm is true', () => {
     spyOn(window, 'confirm').and.returnValue(true)
     templateService.delete.and.returnValue(of(undefined))
@@ -126,6 +133,13 @@ describe('TemplatesPageComponent (14.12)', () => {
     spyOn(window, 'confirm').and.returnValue(false)
     component.onDelete(mockTemplate)
     expect(templateService.delete).not.toHaveBeenCalled()
+  })
+
+  it('should set error on delete failure', () => {
+    spyOn(window, 'confirm').and.returnValue(true)
+    templateService.delete.and.returnValue(throwError(() => ({ error: { error: 'Delete failed' } })))
+    component.onDelete(mockTemplate)
+    expect(component.error).toBe('Delete failed')
   })
 
   it('should clear editingTemplate when deleting the one being edited', () => {
