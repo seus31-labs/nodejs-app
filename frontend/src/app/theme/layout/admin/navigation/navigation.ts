@@ -61,6 +61,14 @@ const NavigationItems = [
         classes: 'nav-item'
       },
       {
+        id: 'templates',
+        title: 'テンプレート',
+        type: 'item',
+        url: '/dashboard/templates',
+        icon: 'feather icon-file-text',
+        classes: 'nav-item'
+      },
+      {
         id: 'tags',
         title: 'タグ管理',
         type: 'item',

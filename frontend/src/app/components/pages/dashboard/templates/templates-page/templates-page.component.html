@@ -1,0 +1,35 @@
+<div class="row">
+  <div class="col-12">
+    <app-card cardTitle="テンプレート管理">
+      @if (error) {
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+      }
+
+      <div class="mb-4">
+        @if (editingTemplate) {
+          <app-template-form
+            [editingTemplate]="editingTemplate"
+            [availableTags]="allTags"
+            (submitForm)="onSubmitForm($event)"
+            (cancel)="onCancelEdit()"
+          />
+        } @else {
+          <app-template-form
+            [availableTags]="allTags"
+            (submitForm)="onSubmitForm($event)"
+          />
+        }
+      </div>
+
+      <hr class="my-3" />
+
+      <app-template-list
+        [templates]="templates"
+        [loading]="loading"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+        (useTemplate)="onUseTemplate($event)"
+      />
+    </app-card>
+  </div>
+</div>
