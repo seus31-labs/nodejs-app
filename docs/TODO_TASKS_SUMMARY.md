@@ -132,8 +132,9 @@ docker compose run --rm frontend ng test --watch=false
 
 ```markdown
 - [x] 1.1.1: マイグレーション生成 `create-tags`
-- [ ] 1.1.2: tags テーブル定義
+- [x] 1.1.2: tags テーブル定義
 ```
+（実際の進捗は各 `docs/TODO_FEATURE_〇〇.md` を参照）
 
 ---
 
