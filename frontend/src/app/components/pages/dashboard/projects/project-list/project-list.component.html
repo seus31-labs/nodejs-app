@@ -13,7 +13,11 @@
   <div class="row g-3">
     @for (project of projects; track project.id) {
       <div class="col-12 col-sm-6 col-lg-4">
-        <div class="card project-card h-100" [class.border-secondary]="project.archived">
+        <div
+          class="card project-card h-100"
+          [class.project-card--archived]="project.archived"
+          [style.border-left-color]="project.color"
+        >
           <div class="card-header d-flex align-items-center gap-2 py-2">
             <span
               class="project-color-dot"
