@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { RouterTestingModule } from '@angular/router/testing'
+import { provideRouter } from '@angular/router'
 import { ProjectListComponent } from './project-list.component'
 import type { Project, ProjectProgress } from '../../../../../models/project.interface'
 
@@ -20,7 +20,8 @@ describe('ProjectListComponent (7.21)', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProjectListComponent, RouterTestingModule],
+      imports: [ProjectListComponent],
+      providers: [provideRouter([])],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ProjectListComponent)
