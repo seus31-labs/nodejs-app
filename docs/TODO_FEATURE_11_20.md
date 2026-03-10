@@ -89,7 +89,7 @@
 - [x] 14.2: TemplateService 作成（CRUD、テンプレートから Todo 作成）
 - [x] 14.3: TemplateController 作成
 - [x] 14.4: Template ルート作成
-- [ ] 14.5: Backend テスト
+- [x] 14.5: Backend テスト
 
 ### Frontend タスク（12タスク）
 - [ ] 14.6: Template インターフェース定義
