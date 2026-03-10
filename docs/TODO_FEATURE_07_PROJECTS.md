@@ -182,8 +182,8 @@ PATCH /api/projects/:id/archive
 
 ### Task 7.21: Frontend テスト
 
-- [ ] 7.21.1: ProjectService のテスト
-- [ ] 7.21.2: 各コンポーネントのテスト
+- [x] 7.21.1: ProjectService のテスト
+- [x] 7.21.2: 各コンポーネントのテスト
 
 ---
 
