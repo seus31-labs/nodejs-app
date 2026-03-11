@@ -3,7 +3,7 @@
     <app-card cardTitle="Todo リスト（{{ todos.length }} 件）">
       <div class="mb-3">
         <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-          <app-search-bar (searchTerm)="onSearch($event)" />
+          <app-search-bar #searchBar (searchTerm)="onSearch($event)" />
           <button type="button" class="btn btn-outline-secondary btn-sm" (click)="openAdvancedSearch()">
             詳細検索
           </button>
