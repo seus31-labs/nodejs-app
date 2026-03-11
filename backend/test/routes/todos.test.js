@@ -1460,3 +1460,120 @@ test('bulk-add-tag with other user todo ids returns added 0 and does not add tag
   assert.strictEqual(getA.statusCode, 200)
   assert.strictEqual((JSON.parse(getA.payload).Tags || []).length, 0)
 })
+
+// --- Export / Import (17.9) ---
+test('GET /api/v1/todos/export without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/export'
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('GET /api/v1/todos/export with auth returns JSON with todos array', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `ex-${suffix}`, email: `ex-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Export todo' }
+  })
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/export',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const body = JSON.parse(res.payload)
+  assert.ok(Array.isArray(body.todos))
+  assert.ok(body.todos.length >= 1)
+  assert.ok(body.todos.some((row) => row.title === 'Export todo'))
+})
+
+test('GET /api/v1/todos/export?format=csv with auth returns CSV', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `csv-${suffix}`, email: `csv-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/export',
+    headers: { authorization: `Bearer ${token}` },
+    query: { format: 'csv' }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  assert.ok(res.payload.includes('title,description,completed,priority,dueDate,tagIds,projectId'))
+})
+
+test('POST /api/v1/todos/import without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/import',
+    payload: { format: 'json', data: { todos: [] } }
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('POST /api/v1/todos/import with json format creates todos', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `im-${suffix}`, email: `im-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/import',
+    headers: { authorization: `Bearer ${token}` },
+    payload: {
+      format: 'json',
+      data: {
+        todos: [
+          { title: 'Imported one' },
+          { title: 'Imported two', priority: 'high', completed: true }
+        ]
+      }
+    }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const body = JSON.parse(res.payload)
+  assert.strictEqual(body.created, 2)
+  assert.strictEqual(body.failed, 0)
+  const listRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  const list = JSON.parse(listRes.payload)
+  assert.ok(list.some((todo) => todo.title === 'Imported one'))
+  assert.ok(list.some((todo) => todo.title === 'Imported two' && todo.completed === true))
+})
+
+test('POST /api/v1/todos/import with csv format creates todos', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `imcsv-${suffix}`, email: `imcsv-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const csv = 'title,description,completed,priority,dueDate\nA task,,false,medium,\nB task,desc,true,high,'
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/import',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { format: 'csv', data: csv }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const body = JSON.parse(res.payload)
+  assert.strictEqual(body.created, 2)
+  assert.strictEqual(body.failed, 0)
+})
