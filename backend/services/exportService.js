@@ -26,10 +26,8 @@ async function getTodosForExport(fastify, userId) {
     const plain = t.toJSON();
     plain.tagIds = (t.Tags || []).map((tag) => tag.id);
     delete plain.Tags;
-    if (plain.Project) {
-      plain.projectId = plain.Project?.id ?? null;
-      delete plain.Project;
-    }
+    plain.projectId = plain.Project?.id ?? null;
+    delete plain.Project;
     return plain;
   });
 }
