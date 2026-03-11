@@ -4,6 +4,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
   MatDialogContent,
+  MatDialogActions,
   MatDialogClose
 } from '@angular/material/dialog'
 import { MatButtonModule } from '@angular/material/button'
@@ -16,6 +17,7 @@ import { KeyboardShortcutService, type ShortcutHelpEntry } from '../../../../../
     CommonModule,
     MatDialogTitle,
     MatDialogContent,
+    MatDialogActions,
     MatDialogClose,
     MatButtonModule
   ],
