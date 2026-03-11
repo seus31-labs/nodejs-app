@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>一括タグ付け</h2>
+<mat-dialog-content>
+  @if (loading) {
+    <p class="text-muted">タグを読み込み中...</p>
+  } @else if (tags.length === 0) {
+    <p class="text-muted">タグがありません。タグ管理でタグを作成してください。</p>
+  } @else {
+    <p class="mat-body-2 mb-2">付与するタグを選択してください。</p>
+    <div class="d-flex flex-wrap gap-2">
+      @for (tag of tags; track tag.id) {
+        <button
+          type="button"
+          class="badge rounded-pill border tag-choice"
+          [class.selected]="isSelected(tag)"
+          [style.background-color]="isSelected(tag) ? tag.color : 'transparent'"
+          [style.border-color]="tag.color"
+          [style.color]="isSelected(tag) ? (isLight(tag.color) ? '#000' : '#fff') : undefined"
+          (click)="selectTag(tag)"
+        >
+          {{ tag.name }}
+        </button>
+      }
+    </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>キャンセル</button>
+  <button
+    mat-flat-button
+    color="primary"
+    [disabled]="loading || tags.length === 0 || selectedTagId == null"
+    (click)="apply()"
+  >
+    付与する
+  </button>
+</mat-dialog-actions>
