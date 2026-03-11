@@ -156,15 +156,15 @@
 - 既存テーブルのみ使用
 
 ### Backend タスク（10タスク）
-- [ ] 17.1: ExportService 作成
-- [ ] 17.2: `exportTodosAsJSON(userId)` 実装
-- [ ] 17.3: `exportTodosAsCSV(userId)` 実装
-- [ ] 17.4: ImportService 作成
-- [ ] 17.5: `importTodosFromJSON(userId, data)` 実装
-- [ ] 17.6: `importTodosFromCSV(userId, data)` 実装
-- [ ] 17.7: ExportController, ImportController 作成
-- [ ] 17.8: GET /api/todos/export, POST /api/todos/import ルート定義
-- [ ] 17.9: Backend テスト
+- [x] 17.1: ExportService 作成
+- [x] 17.2: `exportTodosAsJSON(userId)` 実装
+- [x] 17.3: `exportTodosAsCSV(userId)` 実装
+- [x] 17.4: ImportService 作成
+- [x] 17.5: `importTodosFromJSON(userId, data)` 実装
+- [x] 17.6: `importTodosFromCSV(userId, data)` 実装
+- [x] 17.7: ExportController, ImportController 作成
+- [x] 17.8: GET /api/todos/export, POST /api/todos/import ルート定義
+- [x] 17.9: Backend テスト
 
 ### Frontend タスク（10タスク）
 - [ ] 17.10: ExportService 作成

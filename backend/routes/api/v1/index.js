@@ -47,6 +47,8 @@ const {
   deleteTemplate,
   createTodoFromTemplate,
 } = require('../../../controllers/templateController');
+const { exportTodos } = require('../../../controllers/exportController');
+const { importTodos } = require('../../../controllers/importController');
 
 module.exports = async function (fastify, opts) {
   /**
@@ -449,6 +451,32 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => bulkAddTag(fastify, request, reply),
+  });
+  fastify.get('/todos/export', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          format: { type: 'string', enum: ['json', 'csv'] },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => exportTodos(fastify, request, reply),
+  });
+  fastify.post('/todos/import', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['format', 'data'],
+        properties: {
+          format: { type: 'string', enum: ['json', 'csv'] },
+          data: {},
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => importTodos(fastify, request, reply),
   });
   fastify.post('/todos/:todoId/tags', {
     schema: {
