@@ -18,7 +18,6 @@ import {
 } from '../advanced-search-dialog/advanced-search-dialog.component'
 import { ImportDialogComponent } from '../import-dialog/import-dialog.component'
 import { ExportService } from '../../../../../services/export.service'
-import { ImportService } from '../../../../../services/import.service'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import type { Project } from '../../../../../models/project.interface'
