@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core'
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { ReactiveFormsModule, FormControl } from '@angular/forms'
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs'
@@ -12,6 +12,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs'
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
   @Output() searchTerm = new EventEmitter<string>()
+  @ViewChild('searchInput') searchInputRef?: ElementRef<HTMLInputElement>
 
   query = new FormControl('', { nonNullable: true })
   private destroy$ = new Subject<void>()
@@ -30,5 +31,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   onClear(): void {
     this.query.setValue('')
     this.searchTerm.emit('')
+  }
+
+  focus(): void {
+    this.searchInputRef?.nativeElement?.focus()
   }
 }

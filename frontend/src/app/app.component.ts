@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router'
+import { MatDialog } from '@angular/material/dialog'
 import { SharedModule } from './theme/shared/shared.module'
 import { ThemeService } from './services/theme.service'
+import { KeyboardShortcutService } from './services/keyboard-shortcut.service'
+import { ShortcutHelpDialogComponent } from './components/pages/dashboard/todo/shortcut-help-dialog/shortcut-help-dialog.component'
 
 @Component({
   selector: 'app-root',
@@ -13,12 +16,14 @@ import { ThemeService } from './services/theme.service'
   ],
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Node App Frontend'
 
   constructor(
     private router: Router,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private shortcutService: KeyboardShortcutService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -29,5 +34,12 @@ export class AppComponent implements OnInit {
       }
       window.scrollTo(0, 0)
     })
+    this.shortcutService.register('Shift+?', () => {
+      this.dialog.open(ShortcutHelpDialogComponent, { width: '400px' })
+    }, 'ショートカット一覧を表示')
+  }
+
+  ngOnDestroy() {
+    this.shortcutService.unregister('Shift+?')
   }
 }

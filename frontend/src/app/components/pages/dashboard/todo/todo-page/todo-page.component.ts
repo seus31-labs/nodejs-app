@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { Subject, takeUntil } from 'rxjs'
 import { MatDialog } from '@angular/material/dialog'
@@ -18,6 +18,7 @@ import {
 } from '../advanced-search-dialog/advanced-search-dialog.component'
 import { ImportDialogComponent } from '../import-dialog/import-dialog.component'
 import { ExportService } from '../../../../../services/export.service'
+import { KeyboardShortcutService } from '../../../../../services/keyboard-shortcut.service'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import type { Project } from '../../../../../models/project.interface'
@@ -58,6 +59,8 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   allProjects: Project[] = []
   allTemplates: Template[] = []
 
+  @ViewChild('searchBar') searchBar?: SearchBarComponent
+
   private destroy$ = new Subject<void>()
 
   constructor(
@@ -66,6 +69,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     private projectService: ProjectService,
     private templateService: TemplateService,
     private exportService: ExportService,
+    private shortcutService: KeyboardShortcutService,
     private dialog: MatDialog
   ) {}
 
@@ -74,6 +78,16 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     this.loadProjects()
     this.loadTemplates()
     this.loadTodos()
+    this.shortcutService.register('Ctrl+N', () => this.showToNewTodoForm(), '新規 Todo フォームを表示')
+    this.shortcutService.register('Ctrl+F', () => this.focusSearch(), '検索バーにフォーカス')
+  }
+
+  showToNewTodoForm(): void {
+    this.editingTodo = null
+  }
+
+  focusSearch(): void {
+    this.searchBar?.focus()
   }
 
   loadTags(): void {
@@ -98,6 +112,8 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.shortcutService.unregister('ctrl+n')
+    this.shortcutService.unregister('ctrl+f')
     this.destroy$.next()
     this.destroy$.complete()
   }
