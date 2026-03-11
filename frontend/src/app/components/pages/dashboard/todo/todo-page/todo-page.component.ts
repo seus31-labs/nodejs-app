@@ -298,6 +298,22 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       })
   }
 
+  onBulkAddTag(tagId: number): void {
+    if (this.selectedIds.length === 0) return
+    this.todoService
+      .bulkAddTag(this.selectedIds, tagId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.selectedIds = []
+          this.loadTodos()
+        },
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? '一括タグ付けに失敗しました'
+        }
+      })
+  }
+
   onArchived(id: number): void {
     this.todoService
       .archiveTodo(id)

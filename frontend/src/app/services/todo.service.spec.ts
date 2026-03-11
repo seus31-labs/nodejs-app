@@ -158,5 +158,16 @@ describe('TodoService', () => {
       expect(req.request.body).toEqual({ todoIds })
       req.flush({ updated: 1 })
     })
+
+    it('should call POST /todos/bulk-add-tag with todoIds and tagId in body (15.14)', () => {
+      const todoIds = [1, 2, 3]
+      const tagId = 5
+      service.bulkAddTag(todoIds, tagId).subscribe((res) => expect(res.added).toBe(2))
+      const req = httpMock.expectOne(
+        (r) => r.url === `${apiUrl}/todos/bulk-add-tag` && r.method === 'POST'
+      )
+      expect(req.request.body).toEqual({ todoIds, tagId })
+      req.flush({ added: 2 })
+    })
   })
 })

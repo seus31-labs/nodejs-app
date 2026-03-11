@@ -100,6 +100,13 @@ export class TodoService {
     return this.http.post<{ updated: number }>(`${this.apiUrl}/todos/bulk-archive`, { todoIds })
   }
 
+  bulkAddTag(todoIds: number[], tagId: number): Observable<{ added: number }> {
+    return this.http.post<{ added: number }>(`${this.apiUrl}/todos/bulk-add-tag`, {
+      todoIds,
+      tagId
+    })
+  }
+
   addTagToTodo(todoId: number, tagId: number): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/todos/${todoId}/tags`, { tagId })
   }

@@ -1,0 +1,9 @@
+.tag-choice {
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.4em 0.75em;
+
+  &.selected {
+    font-weight: 600;
+  }
+}

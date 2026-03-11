@@ -1,13 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { MatDialog } from '@angular/material/dialog'
+import { of } from 'rxjs'
 import { BulkActionBarComponent } from './bulk-action-bar.component'
 
 describe('BulkActionBarComponent (15.17)', () => {
   let component: BulkActionBarComponent
   let fixture: ComponentFixture<BulkActionBarComponent>
+  let dialogMock: jasmine.SpyObj<MatDialog>
 
   beforeEach(async () => {
+    dialogMock = jasmine.createSpyObj('MatDialog', ['open'])
     await TestBed.configureTestingModule({
       imports: [BulkActionBarComponent],
+      providers: [{ provide: MatDialog, useValue: dialogMock }],
     }).compileComponents()
 
     fixture = TestBed.createComponent(BulkActionBarComponent)
@@ -73,5 +78,18 @@ describe('BulkActionBarComponent (15.17)', () => {
     expect(clearBtn).withContext('選択解除ボタンが見つかりません').toBeTruthy()
     clearBtn!.click()
     expect(emitted).toBe(true)
+  })
+
+  it('should open bulk-add-tag dialog and emit bulkAddTag with tagId when user selects tag (15.14)', () => {
+    const tagId = 7
+    const ref = { afterClosed: () => of(tagId) }
+    dialogMock.open.and.returnValue(ref as never)
+    component.selectedCount = 2
+    fixture.detectChanges()
+    let emittedTagId: number | undefined
+    component.bulkAddTag.subscribe((id) => (emittedTagId = id))
+    getButtonByText('一括タグ付け')?.click()
+    expect(dialogMock.open).toHaveBeenCalled()
+    expect(emittedTagId).toBe(tagId)
   })
 })
