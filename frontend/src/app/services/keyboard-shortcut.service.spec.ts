@@ -29,4 +29,26 @@ describe('KeyboardShortcutService (19.11)', () => {
     service.unregister('Ctrl+N')
     expect(service.getHelpEntries().length).toBe(0)
   })
+
+  it('should call handler on matching keydown event', () => {
+    const fn = jasmine.createSpy('handler')
+    service.register('Ctrl+N', fn, 'New todo')
+    const event = new KeyboardEvent('keydown', { key: 'n', ctrlKey: true, bubbles: true })
+    spyOn(event, 'preventDefault')
+    document.dispatchEvent(event)
+    expect(fn).toHaveBeenCalled()
+    expect(event.preventDefault).toHaveBeenCalled()
+  })
+
+  it('should not call handler when input is focused', () => {
+    const fn = jasmine.createSpy('handler')
+    service.register('Ctrl+N', fn, 'New todo')
+    const input = document.createElement('input')
+    document.body.appendChild(input)
+    input.focus()
+    const event = new KeyboardEvent('keydown', { key: 'n', ctrlKey: true, bubbles: true })
+    input.dispatchEvent(event)
+    expect(fn).not.toHaveBeenCalled()
+    document.body.removeChild(input)
+  })
 })

@@ -38,7 +38,7 @@ export class KeyboardShortcutService implements OnDestroy {
 
   private normalizeKey(e: KeyboardEvent): string {
     const parts: string[] = []
-    if (e.ctrlKey || e.metaKey) parts.push(e.metaKey && !e.ctrlKey ? 'meta' : 'ctrl')
+    if (e.ctrlKey || e.metaKey) parts.push('ctrl')
     if (e.shiftKey) parts.push('shift')
     if (e.altKey) parts.push('alt')
     const key = e.key?.toLowerCase() ?? ''
@@ -60,7 +60,9 @@ export class KeyboardShortcutService implements OnDestroy {
     const normalized = keys.toLowerCase().trim().replace(/\s+/g, '')
     this.handlers.set(normalized, handler)
     if (description != null) {
-      const norm = (s: string) => s.toLowerCase().trim().replace(/\s+/g, ""); this.helpEntries = this.helpEntries.filter((h) => norm(h.keys) !== normalized)
+      this.helpEntries = this.helpEntries.filter(
+        (h) => h.keys.toLowerCase().trim().replace(/\s+/g, '') !== normalized
+      )
       this.helpEntries.push({ keys: keys.trim(), description })
     }
   }

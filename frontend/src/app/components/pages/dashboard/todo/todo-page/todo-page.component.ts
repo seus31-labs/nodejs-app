@@ -78,11 +78,11 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     this.loadProjects()
     this.loadTemplates()
     this.loadTodos()
-    this.shortcutService.register('Ctrl+N', () => this.focusNewTodo(), '新規 Todo フォームを表示')
+    this.shortcutService.register('Ctrl+N', () => this.showToNewTodoForm(), '新規 Todo フォームを表示')
     this.shortcutService.register('Ctrl+F', () => this.focusSearch(), '検索バーにフォーカス')
   }
 
-  focusNewTodo(): void {
+  showToNewTodoForm(): void {
     this.editingTodo = null
   }
 
