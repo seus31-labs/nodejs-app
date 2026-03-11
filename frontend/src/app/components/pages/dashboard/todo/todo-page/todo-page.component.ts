@@ -16,6 +16,8 @@ import {
   AdvancedSearchDialogComponent,
   type AdvancedSearchDialogData
 } from '../advanced-search-dialog/advanced-search-dialog.component'
+import { ImportDialogComponent } from '../import-dialog/import-dialog.component'
+import { ExportService } from '../../../../../services/export.service'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import type { Project } from '../../../../../models/project.interface'
@@ -63,6 +65,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     private tagService: TagService,
     private projectService: ProjectService,
     private templateService: TemplateService,
+    private exportService: ExportService,
     private dialog: MatDialog
   ) {}
 
@@ -131,6 +134,37 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     this.searchQuery = term
     this.selectedIds = []
     this.loadTodos()
+  }
+
+  exportAsJson(): void {
+    this.exportService
+      .getExportBlob('json')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob) => this.exportService.triggerDownload(blob, 'todos.json'),
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? 'エクスポートに失敗しました。'
+        }
+      })
+  }
+
+  exportAsCsv(): void {
+    this.exportService
+      .getExportBlob('csv')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob) => this.exportService.triggerDownload(blob, 'todos.csv'),
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? 'エクスポートに失敗しました。'
+        }
+      })
+  }
+
+  openImportDialog(): void {
+    const ref = this.dialog.open(ImportDialogComponent, { width: '420px' })
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((reload?: boolean) => {
+      if (reload) this.loadTodos()
+    })
   }
 
   openAdvancedSearch(): void {

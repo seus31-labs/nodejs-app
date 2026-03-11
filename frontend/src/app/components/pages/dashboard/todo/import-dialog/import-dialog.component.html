@@ -1,0 +1,45 @@
+<h2 mat-dialog-title>Todo インポート</h2>
+<mat-dialog-content>
+  <p class="mat-body-2 mb-2">JSON または CSV ファイルを選択してください。（本システムのエクスポート形式に対応）</p>
+  <div class="mb-3">
+    <input
+      type="file"
+      accept=".json,.csv"
+      class="form-control form-control-sm"
+      (change)="onFileSelected($event)"
+      [disabled]="importing"
+    />
+    @if (selectedFile) {
+      <p class="small text-muted mt-1 mb-0">{{ selectedFile.name }}</p>
+    }
+  </div>
+  @if (importing) {
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <mat-spinner diameter="24"></mat-spinner>
+      <span class="small">インポート中...</span>
+    </div>
+  }
+  @if (error) {
+    <p class="text-danger small mb-2">{{ error }}</p>
+  }
+  @if (result && !importing) {
+    <div class="alert alert-success small mb-0">
+      <strong>完了</strong>: 成功 {{ result.created }} 件、スキップ・失敗 {{ result.failed }} 件
+    </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>閉じる</button>
+  @if (result == null) {
+    <button
+      mat-flat-button
+      color="primary"
+      [disabled]="!selectedFile || importing"
+      (click)="runImport()"
+    >
+      インポート実行
+    </button>
+  } @else {
+    <button mat-flat-button color="primary" (click)="close()">閉じる</button>
+  }
+</mat-dialog-actions>
