@@ -48,7 +48,11 @@ export class TodoService {
     if (sort?.sortBy) params['sortBy'] = sort.sortBy
     if (sort?.sortOrder) params['sortOrder'] = sort.sortOrder
     return this.http.get<Todo[]>(`${this.apiUrl}/todos`, { params }).pipe(
-      tap((todos) => this.offlineStorage.saveTodos(todos))
+      tap((todos) => {
+        this.offlineStorage.saveTodos(todos).catch(() => {
+          // キャッシュ保存失敗はメイン機能に影響させない（silent fail）
+        })
+      })
     )
   }
 
