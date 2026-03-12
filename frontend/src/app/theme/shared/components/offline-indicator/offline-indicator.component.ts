@@ -1,9 +1,10 @@
 import { Component } from '@angular/core'
 import { AsyncPipe } from '@angular/common'
 import { NetworkStatusService } from '../../../../services/network-status.service'
+import { SyncService } from '../../../../services/sync.service'
 
 /**
- * オフライン時に表示するインジケーター（20.10）。
+ * オフライン時・同期中の表示（20.10, 20.11）。
  */
 @Component({
   selector: 'app-offline-indicator',
@@ -13,5 +14,8 @@ import { NetworkStatusService } from '../../../../services/network-status.servic
   styleUrls: ['./offline-indicator.component.scss']
 })
 export class OfflineIndicatorComponent {
-  constructor(public networkStatus: NetworkStatusService) {}
+  constructor(
+    public networkStatus: NetworkStatusService,
+    public syncService: SyncService
+  ) {}
 }

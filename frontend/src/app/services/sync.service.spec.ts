@@ -49,4 +49,17 @@ describe('SyncService (20.7)', () => {
     onlineChanges$.next(false)
     expect(todoService.list).not.toHaveBeenCalled()
   })
+
+  it('should emit syncing true then false when sync runs (20.11)', (done) => {
+    const values: boolean[] = []
+    service.syncingChanges.subscribe((v) => {
+      values.push(v)
+      // 初期 false のあと true → false の順で届けばよい
+      if (values.indexOf(true) !== -1 && values.lastIndexOf(false) > values.indexOf(true)) {
+        done()
+      }
+    })
+    onlineChanges$.next(false)
+    onlineChanges$.next(true)
+  })
 })

@@ -3,4 +3,9 @@
     <i class="feather icon-wifi" aria-hidden="true"></i>
     <span class="ms-1">オフライン</span>
   </span>
+} @else if ((syncService.syncingChanges | async) === true) {
+  <span class="sync-badge" title="同期中です。">
+    <i class="feather icon-refresh-cw" aria-hidden="true"></i>
+    <span class="ms-1">同期中...</span>
+  </span>
 }
