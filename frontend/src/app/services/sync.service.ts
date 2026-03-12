@@ -59,5 +59,6 @@ export class SyncService implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next()
     this.destroy$.complete()
+    this.isSyncing$.complete()
   }
 }
