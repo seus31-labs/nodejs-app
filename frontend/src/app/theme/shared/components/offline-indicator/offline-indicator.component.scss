@@ -1,19 +1,25 @@
-.offline-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  color: var(--pc-sidebar-active-color, #fff);
-  background-color: var(--bs-warning, #ffc107);
-  border-radius: 4px;
-}
-
+/* オフライン・同期バッジ共通（20.14 スタイリング） */
+.offline-badge,
 .sync-badge {
   display: inline-flex;
   align-items: center;
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
-  color: var(--pc-sidebar-active-color, #fff);
-  background-color: var(--bs-info, #0dcaf0);
+  font-weight: 500;
   border-radius: 4px;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.offline-badge {
+  background-color: var(--bs-warning, #ffc107);
+  color: #212529;
+}
+
+.sync-badge {
+  background-color: var(--bs-info, #0dcaf0);
+  color: #212529;
 }
