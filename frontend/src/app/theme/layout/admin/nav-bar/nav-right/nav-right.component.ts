@@ -3,6 +3,7 @@ import { Router } from '@angular/router'
 import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap'
 import { AuthService } from '../../../../../services/auth.service'
 import { ThemeToggleComponent } from '../../../../shared/components/theme-toggle/theme-toggle.component'
+import { OfflineIndicatorComponent } from '../../../../shared/components/offline-indicator/offline-indicator.component'
 
 @Component({
   selector: 'app-nav-right',
@@ -10,6 +11,7 @@ import { ThemeToggleComponent } from '../../../../shared/components/theme-toggle
   standalone: true,
   imports: [
     ThemeToggleComponent,
+    OfflineIndicatorComponent,
     NgbDropdownToggle,
     NgbDropdown,
     NgbDropdownMenu
