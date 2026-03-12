@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { SharedModule } from './theme/shared/shared.module'
 import { ThemeService } from './services/theme.service'
 import { KeyboardShortcutService } from './services/keyboard-shortcut.service'
+import { SyncService } from './services/sync.service'
 import { ShortcutHelpDialogComponent } from './components/pages/dashboard/todo/shortcut-help-dialog/shortcut-help-dialog.component'
 
 @Component({
@@ -23,7 +24,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router,
     private themeService: ThemeService,
     private shortcutService: KeyboardShortcutService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private syncService: SyncService
   ) {}
 
   ngOnInit() {
