@@ -29,6 +29,7 @@ export class IndexedDbService {
     storeSchemas: IndexedDBStoreSchema[]
   ): Promise<void> {
     if (this.db && this.dbName === dbName) return
+    if (this.db) this.close()
 
     return new Promise((resolve, reject) => {
       const req = indexedDB.open(dbName, version)
@@ -86,10 +87,12 @@ export class IndexedDbService {
     return new Promise((resolve, reject) => {
       const db = this.assertOpen()
       const tx = db.transaction(storeName, 'readwrite')
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+      tx.onabort = () => reject(tx.error ?? new Error('Transaction aborted'))
       const store = tx.objectStore(storeName)
       const req = key !== undefined ? store.put(value, key) : store.put(value)
       req.onerror = () => reject(req.error)
-      req.onsuccess = () => resolve()
     })
   }
 
@@ -98,10 +101,12 @@ export class IndexedDbService {
     return new Promise((resolve, reject) => {
       const db = this.assertOpen()
       const tx = db.transaction(storeName, 'readwrite')
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+      tx.onabort = () => reject(tx.error ?? new Error('Transaction aborted'))
       const store = tx.objectStore(storeName)
       const req = store.delete(key)
       req.onerror = () => reject(req.error)
-      req.onsuccess = () => resolve()
     })
   }
 
@@ -122,10 +127,12 @@ export class IndexedDbService {
     return new Promise((resolve, reject) => {
       const db = this.assertOpen()
       const tx = db.transaction(storeName, 'readwrite')
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+      tx.onabort = () => reject(tx.error ?? new Error('Transaction aborted'))
       const store = tx.objectStore(storeName)
       const req = store.clear()
       req.onerror = () => reject(req.error)
-      req.onsuccess = () => resolve()
     })
   }
 }

@@ -11,10 +11,14 @@ describe('IndexedDbService (20.3)', () => {
     service = TestBed.inject(IndexedDbService)
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     service.close()
     if (typeof indexedDB !== 'undefined') {
-      indexedDB.deleteDatabase(TEST_DB)
+      await new Promise<void>((resolve) => {
+        const req = indexedDB.deleteDatabase(TEST_DB)
+        req.onsuccess = () => resolve()
+        req.onerror = () => resolve()
+      })
     }
   })
 
