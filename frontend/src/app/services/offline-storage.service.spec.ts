@@ -23,14 +23,22 @@ const mockTodos: Todo[] = [
 
 describe('OfflineStorageService (20.4)', () => {
   let service: OfflineStorageService
-  let indexedDb: jasmine.SpyObj<IndexedDbService>
+  let openSpy: jasmine.Spy
+  let getAllSpy: jasmine.Spy
+  let putSpy: jasmine.Spy
+  let clearSpy: jasmine.Spy
 
   beforeEach(() => {
-    indexedDb = jasmine.createSpyObj('IndexedDbService', ['open', 'getAll', 'put', 'clear'])
-    indexedDb.open.and.returnValue(Promise.resolve())
-    indexedDb.getAll.and.returnValue(Promise.resolve([]))
-    indexedDb.put.and.returnValue(Promise.resolve())
-    indexedDb.clear.and.returnValue(Promise.resolve())
+    openSpy = jasmine.createSpy('open').and.returnValue(Promise.resolve())
+    getAllSpy = jasmine.createSpy('getAll').and.returnValue(Promise.resolve([]))
+    putSpy = jasmine.createSpy('put').and.returnValue(Promise.resolve())
+    clearSpy = jasmine.createSpy('clear').and.returnValue(Promise.resolve())
+    const indexedDb = {
+      open: openSpy,
+      getAll: getAllSpy,
+      put: putSpy,
+      clear: clearSpy
+    } as unknown as IndexedDbService
 
     TestBed.configureTestingModule({
       providers: [{ provide: IndexedDbService, useValue: indexedDb }]
@@ -43,22 +51,24 @@ describe('OfflineStorageService (20.4)', () => {
   })
 
   it('should open DB and return todos from getTodos', async () => {
-    indexedDb.getAll.and.returnValue(Promise.resolve(mockTodos))
+    getAllSpy.and.returnValue(Promise.resolve(mockTodos))
     const result = await service.getTodos()
-    expect(indexedDb.open).toHaveBeenCalled()
-    expect(indexedDb.getAll).toHaveBeenCalledWith('todos')
+    expect(openSpy).toHaveBeenCalled()
+    expect(getAllSpy).toHaveBeenCalledWith('todos')
     expect(result).toEqual(mockTodos)
   })
 
   it('should clear and put each todo in saveTodos', async () => {
     await service.saveTodos(mockTodos)
-    expect(indexedDb.clear).toHaveBeenCalledWith('todos')
-    expect(indexedDb.put).toHaveBeenCalledWith('todos', mockTodos[0])
-    expect(indexedDb.put).toHaveBeenCalledTimes(mockTodos.length)
+    expect(clearSpy).toHaveBeenCalledWith('todos')
+    expect(putSpy.calls.count()).toBe(mockTodos.length)
+    const putCalls = putSpy.calls.all()
+    expect(putCalls.every((c) => c.args[0] === 'todos')).toBe(true)
+    expect(putCalls[0].args[1]).toEqual(mockTodos[0])
   })
 
   it('should clear todos store in clearTodos', async () => {
     await service.clearTodos()
-    expect(indexedDb.clear).toHaveBeenCalledWith('todos')
+    expect(clearSpy).toHaveBeenCalledWith('todos')
   })
 })
