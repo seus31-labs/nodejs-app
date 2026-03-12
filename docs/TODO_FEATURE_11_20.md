@@ -235,7 +235,7 @@
 ### Frontend タスク（15タスク）
 - [x] 20.1: Service Worker 設定
 - [x] 20.2: `ng add @angular/pwa` 実行（ng generate service-worker + 手動設定）
-- [ ] 20.3: IndexedDB ラッパーサービス作成
+- [x] 20.3: IndexedDB ラッパーサービス作成
 - [ ] 20.4: OfflineStorageService 作成
 - [ ] 20.5: オンライン/オフライン検知実装
 - [ ] 20.6: オフライン時のデータ保存実装
