@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { Observable } from 'rxjs'
+import { Observable, from } from 'rxjs'
+import { tap } from 'rxjs/operators'
 import { environment } from '../../environments/environment'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../models/todo.interface'
 import type { SearchParams } from '../models/search-params.interface'
 import type { SortOptions } from '../models/sort-options.interface'
+import { NetworkStatusService } from './network-status.service'
+import { OfflineStorageService } from './offline-storage.service'
 
 export interface TodoListFilters {
   completed?: boolean
@@ -19,13 +22,24 @@ export interface TodoListFilters {
 export class TodoService {
   private apiUrl = environment.apiUrl
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private networkStatus: NetworkStatusService,
+    private offlineStorage: OfflineStorageService
+  ) {}
 
   create(body: TodoCreateUpdate): Observable<Todo> {
     return this.http.post<Todo>(`${this.apiUrl}/todos`, body)
   }
 
+  /**
+   * Todo 一覧取得。オンライン時は API を呼び出し成功時にオフラインキャッシュへ保存。
+   * オフライン時はキャッシュから返す（20.6）。
+   */
   list(filters?: TodoListFilters, sort?: SortOptions): Observable<Todo[]> {
+    if (!this.networkStatus.isOnline) {
+      return from(this.offlineStorage.getTodos())
+    }
     const params: Record<string, string> = {}
     if (filters?.completed !== undefined) params['completed'] = String(filters.completed)
     if (filters?.priority) params['priority'] = filters.priority
@@ -33,7 +47,13 @@ export class TodoService {
     if (filters?.projectId != null) params['projectId'] = String(filters.projectId)
     if (sort?.sortBy) params['sortBy'] = sort.sortBy
     if (sort?.sortOrder) params['sortOrder'] = sort.sortOrder
-    return this.http.get<Todo[]>(`${this.apiUrl}/todos`, { params })
+    return this.http.get<Todo[]>(`${this.apiUrl}/todos`, { params }).pipe(
+      tap((todos) => {
+        this.offlineStorage.saveTodos(todos).catch(() => {
+          // キャッシュ保存失敗はメイン機能に影響させない（silent fail）
+        })
+      })
+    )
   }
 
   getById(id: number): Observable<Todo> {

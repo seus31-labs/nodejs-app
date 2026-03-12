@@ -2,18 +2,48 @@ import { TestBed } from '@angular/core/testing'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 import { environment } from '../../environments/environment'
 import { TodoService } from './todo.service'
+import { NetworkStatusService } from './network-status.service'
+import { OfflineStorageService } from './offline-storage.service'
 import type { SortOptions } from '../models/sort-options.interface'
 import type { SearchParams } from '../models/search-params.interface'
+import type { Todo } from '../models/todo.interface'
+
+const mockTodo: Todo = {
+  id: 1,
+  userId: 1,
+  title: 'cached',
+  description: null,
+  completed: false,
+  priority: 'medium',
+  dueDate: null,
+  sortOrder: 0,
+  projectId: null,
+  archived: false,
+  archivedAt: null,
+  createdAt: '',
+  updatedAt: ''
+}
 
 describe('TodoService', () => {
   let service: TodoService
   let httpMock: HttpTestingController
+  let networkStatus: jasmine.SpyObj<NetworkStatusService>
+  let offlineStorage: jasmine.SpyObj<OfflineStorageService>
   const apiUrl = environment.apiUrl
 
   beforeEach(() => {
+    networkStatus = jasmine.createSpyObj('NetworkStatusService', [], { isOnline: true })
+    offlineStorage = jasmine.createSpyObj('OfflineStorageService', ['getTodos', 'saveTodos'])
+    offlineStorage.saveTodos.and.returnValue(Promise.resolve())
+    offlineStorage.getTodos.and.returnValue(Promise.resolve([]))
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [TodoService],
+      providers: [
+        TodoService,
+        { provide: NetworkStatusService, useValue: networkStatus },
+        { provide: OfflineStorageService, useValue: offlineStorage }
+      ]
     })
     service = TestBed.inject(TodoService)
     httpMock = TestBed.inject(HttpTestingController)
@@ -27,15 +57,31 @@ describe('TodoService', () => {
     expect(service).toBeTruthy()
   })
 
+  describe('list (20.6 offline)', () => {
+    it('when offline should return cached todos without HTTP', (done) => {
+      Object.defineProperty(networkStatus, 'isOnline', { get: () => false, configurable: true })
+      offlineStorage.getTodos.and.returnValue(Promise.resolve([mockTodo]))
+      service.list().subscribe((todos) => {
+        expect(todos).toEqual([mockTodo])
+        expect(offlineStorage.getTodos).toHaveBeenCalled()
+        done()
+      })
+    })
+  })
+
   describe('list with sort (3.13.1)', () => {
     it('should call GET /todos with sortBy and sortOrder params when sort is provided', () => {
       const sort: SortOptions = { sortBy: 'dueDate', sortOrder: 'desc' }
-      service.list(undefined, sort).subscribe()
+      const response: Todo[] = []
+      service.list(undefined, sort).subscribe((todos) => {
+        expect(todos).toEqual(response)
+        expect(offlineStorage.saveTodos).toHaveBeenCalledWith(response)
+      })
 
       const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos` && r.method === 'GET')
       expect(req.request.params.get('sortBy')).toBe('dueDate')
       expect(req.request.params.get('sortOrder')).toBe('desc')
-      req.flush([])
+      req.flush(response)
     })
 
     it('should call GET /todos without sort params when sort is not provided', () => {
