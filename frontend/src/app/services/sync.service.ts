@@ -26,11 +26,14 @@ export class SyncService implements OnDestroy {
       )
       .subscribe(([prev, curr]) => {
         if (prev === false && curr === true) {
-          this.todoService.list().subscribe({
-            error: () => {
-              // 同期失敗は silent（キャッシュは既存のまま）
-            }
-          })
+          this.todoService
+            .list()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              error: () => {
+                // 同期失敗は silent（キャッシュは既存のまま）
+              }
+            })
         }
       })
   }
