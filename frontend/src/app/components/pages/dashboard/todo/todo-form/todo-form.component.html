@@ -15,7 +15,10 @@
     </div>
   }
   <div class="mb-2">
-    <label for="todo-title" class="form-label">タイトル <span class="text-danger">*</span></label>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <label for="todo-title" class="form-label mb-0">タイトル <span class="text-danger">*</span></label>
+      <app-voice-input (textRecognized)="onVoiceText($event)" />
+    </div>
     <input
       id="todo-title"
       type="text"

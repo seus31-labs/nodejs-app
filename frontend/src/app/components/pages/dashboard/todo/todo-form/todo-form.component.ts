@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms'
+import { VoiceInputComponent } from '../voice-input/voice-input.component'
 import type { Todo, TodoCreateUpdate } from '../../../../../models/todo.interface'
 import type { Project } from '../../../../../models/project.interface'
 import type { Template } from '../../../../../models/template.interface'
@@ -13,7 +14,7 @@ function noWhitespaceValidator(control: AbstractControl): ValidationErrors | nul
 @Component({
   selector: 'app-todo-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, VoiceInputComponent],
   templateUrl: './todo-form.component.html',
   styleUrls: ['./todo-form.component.scss']
 })
@@ -72,6 +73,15 @@ export class TodoFormComponent implements OnChanges {
 
   onCancel(): void {
     this.cancel.emit()
+  }
+
+  onVoiceText(text: string): void {
+    const title = this.form.get('title')
+    if (title) {
+      const current = (title.value as string)?.trim() ?? ''
+      title.setValue(current ? `${current} ${text}` : text)
+      title.markAsTouched()
+    }
   }
 
   onTemplateSelect(event: Event): void {

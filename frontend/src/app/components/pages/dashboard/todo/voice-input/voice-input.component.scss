@@ -1,0 +1,19 @@
+.voice-btn {
+  &.recording {
+    animation: voice-pulse 1s ease-in-out infinite;
+  }
+}
+
+.voice-icon {
+  font-size: 1.1rem;
+}
+
+@keyframes voice-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}

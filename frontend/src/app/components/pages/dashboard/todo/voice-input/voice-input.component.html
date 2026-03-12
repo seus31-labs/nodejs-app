@@ -1,0 +1,19 @@
+@if (isSupported) {
+  <button
+    type="button"
+    class="btn btn-outline-secondary btn-sm voice-btn"
+    [class.recording]="isListening"
+    [attr.aria-label]="isListening ? '音声認識を停止' : '音声入力'"
+    (click)="toggle()"
+  >
+    <span class="voice-icon" aria-hidden="true">🎤</span>
+    @if (isListening) {
+      <span class="ms-1 small">認識中...</span>
+    }
+  </button>
+  @if (error) {
+    <span class="small text-danger ms-1">{{ error }}</span>
+  }
+} @else {
+  <span class="small text-muted" title="お使いのブラウザでは音声入力に対応していません">音声入力（非対応）</span>
+}
