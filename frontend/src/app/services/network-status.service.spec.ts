@@ -26,8 +26,9 @@ describe('NetworkStatusService (20.5)', () => {
 
   it('should register online and offline event listeners', () => {
     const addSpy = spyOn(window, 'addEventListener')
-    new NetworkStatusService()
+    const manualService = new NetworkStatusService()
     expect(addSpy).toHaveBeenCalledWith('online', jasmine.any(Function))
     expect(addSpy).toHaveBeenCalledWith('offline', jasmine.any(Function))
+    manualService.ngOnDestroy()
   })
 })

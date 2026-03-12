@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, OnDestroy } from '@angular/core'
 import { BehaviorSubject, Observable } from 'rxjs'
 
 /**
@@ -8,14 +8,24 @@ import { BehaviorSubject, Observable } from 'rxjs'
 @Injectable({
   providedIn: 'root'
 })
-export class NetworkStatusService {
+export class NetworkStatusService implements OnDestroy {
   private readonly isOnline$ = new BehaviorSubject<boolean>(this.getInitial())
+  private readonly onOnline = () => this.isOnline$.next(true)
+  private readonly onOffline = () => this.isOnline$.next(false)
 
   constructor() {
     if (typeof window !== 'undefined') {
-      window.addEventListener('online', () => this.isOnline$.next(true))
-      window.addEventListener('offline', () => this.isOnline$.next(false))
+      window.addEventListener('online', this.onOnline)
+      window.addEventListener('offline', this.onOffline)
     }
+  }
+
+  ngOnDestroy(): void {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('online', this.onOnline)
+      window.removeEventListener('offline', this.onOffline)
+    }
+    this.isOnline$.complete()
   }
 
   private getInitial(): boolean {
