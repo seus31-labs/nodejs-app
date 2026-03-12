@@ -18,12 +18,17 @@ export class OfflineStorageService {
 
   constructor(private indexedDb: IndexedDbService) {}
 
-  /** DB を開く（初回のみ。同一 DB なら再利用） */
-  private async ensureOpen(): Promise<void> {
+  /** DB を開く（初回のみ。同一 DB なら再利用。失敗時は initPromise をリセットしてリトライ可能に） */
+  private ensureOpen(): Promise<void> {
     if (this.initPromise) return this.initPromise
-    this.initPromise = this.indexedDb.open(DB_NAME, DB_VERSION, [
-      { name: STORE_TODOS, keyPath: 'id', indexes: [{ name: 'byId', keyPath: 'id', unique: true }] }
-    ])
+    this.initPromise = this.indexedDb
+      .open(DB_NAME, DB_VERSION, [
+        { name: STORE_TODOS, keyPath: 'id', indexes: [{ name: 'byId', keyPath: 'id', unique: true }] }
+      ])
+      .catch((err) => {
+        this.initPromise = null
+        return Promise.reject(err)
+      })
     return this.initPromise
   }
 
@@ -37,9 +42,7 @@ export class OfflineStorageService {
   async saveTodos(todos: Todo[]): Promise<void> {
     await this.ensureOpen()
     await this.indexedDb.clear(STORE_TODOS)
-    for (const todo of todos) {
-      await this.indexedDb.put(STORE_TODOS, todo)
-    }
+    await Promise.all(todos.map((todo) => this.indexedDb.put(STORE_TODOS, todo)))
   }
 
   /** Todo キャッシュを空にする */
