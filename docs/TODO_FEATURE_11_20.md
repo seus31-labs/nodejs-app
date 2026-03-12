@@ -9,7 +9,7 @@
 - permission: ENUM('view', 'edit')
 
 ### Backend タスク（15タスク）
-- [ ] 11.1: TodoShare モデル作成（マイグレーション、モデル定義）
+- [x] 11.1: TodoShare モデル作成（マイグレーション、モデル定義）
 - [ ] 11.2: ShareService 作成（共有、権限チェック、共有解除）
 - [ ] 11.3: ShareController 作成
 - [ ] 11.4: Share ルート作成（POST /api/todos/:id/share, GET /api/todos/shared, DELETE /api/shares/:id）
