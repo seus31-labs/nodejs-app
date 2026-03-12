@@ -89,7 +89,6 @@ export class SpeechRecognitionService {
       if (event.error !== 'aborted') {
         subject.error(new Error(event.error))
       }
-      subject.complete()
     }
 
     this.recognition.onend = () => {
@@ -100,7 +99,6 @@ export class SpeechRecognitionService {
       this.recognition.start()
     } catch (e) {
       subject.error(e)
-      subject.complete()
     }
 
     return subject.asObservable()

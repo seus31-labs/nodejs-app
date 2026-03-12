@@ -64,4 +64,16 @@ describe('VoiceInputComponent (18)', () => {
     component.toggle()
     expect(speechService.startListening).not.toHaveBeenCalled()
   })
+
+  it('should set error and clear isListening on recognition error', () => {
+    const errorSubject = new Subject<string>()
+    speechService.startListening.and.returnValue(errorSubject.asObservable())
+    component.toggle()
+    expect(component.isListening).toBe(true)
+
+    errorSubject.error(new Error('no-speech'))
+
+    expect(component.isListening).toBe(false)
+    expect(component.error).toBeTruthy()
+  })
 })
