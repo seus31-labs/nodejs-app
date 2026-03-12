@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AsyncPipe, CommonModule } from '@angular/common'
+import { AsyncPipe } from '@angular/common'
 import { NetworkStatusService } from '../../../../services/network-status.service'
 
 /**
@@ -8,7 +8,7 @@ import { NetworkStatusService } from '../../../../services/network-status.servic
 @Component({
   selector: 'app-offline-indicator',
   standalone: true,
-  imports: [CommonModule, AsyncPipe],
+  imports: [AsyncPipe],
   templateUrl: './offline-indicator.component.html',
   styleUrls: ['./offline-indicator.component.scss']
 })
