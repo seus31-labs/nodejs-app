@@ -233,8 +233,8 @@
 - なし
 
 ### Frontend タスク（15タスク）
-- [ ] 20.1: Service Worker 設定
-- [ ] 20.2: `ng add @angular/pwa` 実行
+- [x] 20.1: Service Worker 設定
+- [x] 20.2: `ng add @angular/pwa` 実行（ng generate service-worker + 手動設定）
 - [ ] 20.3: IndexedDB ラッパーサービス作成
 - [ ] 20.4: OfflineStorageService 作成
 - [ ] 20.5: オンライン/オフライン検知実装
@@ -244,7 +244,7 @@
 - [ ] 20.9: SyncService 作成
 - [ ] 20.10: オフラインインジケーター表示
 - [ ] 20.11: 同期状態表示
-- [ ] 20.12: manifest.json 設定
+- [x] 20.12: manifest.json 設定
 - [ ] 20.13: アイコン設定
 - [ ] 20.14: スタイリング
 - [ ] 20.15: Frontend テスト
