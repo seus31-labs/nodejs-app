@@ -26,14 +26,16 @@ async function shareTodo(fastify, todoId, sharedWithUserId, permission, ownerUse
   if (Number(sharedWithUserId) === Number(ownerUserId)) {
     return null;
   }
-  const perm = PERMISSIONS.includes(permission) ? permission : 'view';
+  if (!PERMISSIONS.includes(permission)) {
+    throw fastify.httpErrors.badRequest(`Invalid permission: ${permission}`);
+  }
 
   const [share, created] = await fastify.models.TodoShare.findOrCreate({
     where: { todoId, sharedWithUserId: Number(sharedWithUserId) },
-    defaults: { permission: perm },
+    defaults: { permission },
   });
   if (!created) {
-    share.permission = perm;
+    share.permission = permission;
     await share.save();
   }
   return share;
@@ -49,14 +51,16 @@ async function shareTodo(fastify, todoId, sharedWithUserId, permission, ownerUse
 async function canView(fastify, todoId, userId) {
   const todo = await fastify.models.Todo.findOne({
     where: { id: todoId, archived: false },
+    include: [{
+      model: fastify.models.TodoShare,
+      as: 'TodoShares',
+      required: false,
+      where: { sharedWithUserId: userId },
+      attributes: [],
+    }],
   });
   if (!todo) return false;
-  if (todo.userId === userId) return true;
-
-  const share = await fastify.models.TodoShare.findOne({
-    where: { todoId, sharedWithUserId: userId },
-  });
-  return !!share;
+  return todo.userId === userId || (todo.TodoShares && todo.TodoShares.length > 0);
 }
 
 /**
@@ -69,14 +73,16 @@ async function canView(fastify, todoId, userId) {
 async function canEdit(fastify, todoId, userId) {
   const todo = await fastify.models.Todo.findOne({
     where: { id: todoId, archived: false },
+    include: [{
+      model: fastify.models.TodoShare,
+      as: 'TodoShares',
+      required: false,
+      where: { sharedWithUserId: userId, permission: 'edit' },
+      attributes: [],
+    }],
   });
   if (!todo) return false;
-  if (todo.userId === userId) return true;
-
-  const share = await fastify.models.TodoShare.findOne({
-    where: { todoId, sharedWithUserId: userId, permission: 'edit' },
-  });
-  return !!share;
+  return todo.userId === userId || (todo.TodoShares && todo.TodoShares.length > 0);
 }
 
 /**
