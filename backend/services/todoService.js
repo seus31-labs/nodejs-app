@@ -3,6 +3,7 @@
 const { Op } = require('sequelize');
 const tagService = require('./tagService');
 const projectService = require('./projectService');
+const shareService = require('./shareService');
 
 const SORT_BY_ALLOWED = ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'];
 const SORT_ORDER_ALLOWED = ['asc', 'desc'];
@@ -106,18 +107,22 @@ async function getTodosByProjectId(fastify, projectId, userId) {
 }
 
 /**
- * 未アーカイブの Todo を ID とユーザーで 1 件取得する（他ユーザー・アーカイブ済みは null）
- * 通常の GET/PUT/DELETE/toggle は未アーカイブのみ操作可能とする。
+ * 未アーカイブの Todo を 1 件取得する（11.5 共有対応）。
+ * 所有者または view/edit 共有先なら返す。それ以外は null。
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
  * @param {number} userId - ユーザー ID
  * @returns {Promise<object|null>}
  */
 async function getTodoById(fastify, todoId, userId) {
-  return fastify.models.Todo.findOne({
-    where: { id: todoId, userId, archived: false },
+  const todo = await fastify.models.Todo.findOne({
+    where: { id: todoId, archived: false },
     include: buildTodoInclude(fastify),
   });
+  if (!todo) return null;
+  if (todo.userId === userId) return todo;
+  const canView = await shareService.canView(fastify, todoId, userId);
+  return canView ? todo : null;
 }
 
 /**
@@ -134,7 +139,7 @@ async function getTodoByIdIncludingArchived(fastify, todoId, userId) {
 }
 
 /**
- * Todo を更新する（所有者のみ）
+ * Todo を更新する（所有者または edit 共有先のみ）（11.5）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
  * @param {number} userId - ユーザー ID
@@ -144,6 +149,7 @@ async function getTodoByIdIncludingArchived(fastify, todoId, userId) {
 async function updateTodo(fastify, todoId, userId, updateData) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return null;
+  if (!(await shareService.canEdit(fastify, todoId, userId))) return null;
   const { title, description, priority, dueDate, projectId } = updateData;
   const allowed = { title, description, priority, dueDate, projectId };
   Object.keys(allowed).forEach((k) => {
@@ -154,7 +160,7 @@ async function updateTodo(fastify, todoId, userId, updateData) {
 }
 
 /**
- * Todo を削除する（所有者のみ）
+ * Todo を削除する（所有者または edit 共有先のみ）（11.5）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
  * @param {number} userId - ユーザー ID
@@ -163,12 +169,13 @@ async function updateTodo(fastify, todoId, userId, updateData) {
 async function deleteTodo(fastify, todoId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return false;
+  if (!(await shareService.canEdit(fastify, todoId, userId))) return false;
   await todo.destroy();
   return true;
 }
 
 /**
- * 完了/未完了をトグルする（所有者のみ）
+ * 完了/未完了をトグルする（所有者または edit 共有先のみ）（11.5）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
  * @param {number} userId - ユーザー ID
@@ -177,6 +184,7 @@ async function deleteTodo(fastify, todoId, userId) {
 async function toggleComplete(fastify, todoId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return null;
+  if (!(await shareService.canEdit(fastify, todoId, userId))) return null;
   todo.completed = !todo.completed;
   await todo.save();
   return todo;
@@ -250,7 +258,7 @@ async function searchTodos(fastify, userId, params = {}) {
 }
 
 /**
- * Todo にタグを付与する（所有者の Todo と Tag のみ、冪等）
+ * Todo にタグを付与する（所有者または edit 共有先の Todo、冪等）（11.5）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
  * @param {number} tagId - タグ ID
@@ -260,6 +268,7 @@ async function searchTodos(fastify, userId, params = {}) {
 async function addTagToTodo(fastify, todoId, tagId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return false;
+  if (!(await shareService.canEdit(fastify, todoId, userId))) return false;
   const tag = await tagService.getTagById(fastify, tagId, userId);
   if (!tag) return false;
   const [todoTag] = await fastify.models.TodoTag.findOrCreate({
@@ -270,7 +279,7 @@ async function addTagToTodo(fastify, todoId, tagId, userId) {
 }
 
 /**
- * Todo からタグを外す（所有者のみ）
+ * Todo からタグを外す（所有者または edit 共有先のみ）（11.5）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
  * @param {number} tagId - タグ ID
@@ -280,6 +289,7 @@ async function addTagToTodo(fastify, todoId, tagId, userId) {
 async function removeTagFromTodo(fastify, todoId, tagId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return false;
+  if (!(await shareService.canEdit(fastify, todoId, userId))) return false;
   const tag = await tagService.getTagById(fastify, tagId, userId);
   if (!tag) return false;
   const result = await fastify.models.TodoTag.destroy({
