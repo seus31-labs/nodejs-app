@@ -24,7 +24,7 @@ async function shareTodo(fastify, todoId, sharedWithUserId, permission, ownerUse
   if (!todo) return null;
 
   if (Number(sharedWithUserId) === Number(ownerUserId)) {
-    return null;
+    throw fastify.httpErrors.badRequest('Cannot share with yourself');
   }
   if (!PERMISSIONS.includes(permission)) {
     throw fastify.httpErrors.badRequest(`Invalid permission: ${permission}`);
@@ -86,6 +86,31 @@ async function canEdit(fastify, todoId, userId) {
 }
 
 /**
+ * 指定ユーザーに共有されている Todo 一覧を取得する（GET /api/todos/shared 用）。
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} userId - 共有先ユーザー ID
+ * @returns {Promise<object[]>} { ...todo, sharedPermission } の配列
+ */
+async function getTodosSharedWithUser(fastify, userId) {
+  const shares = await fastify.models.TodoShare.findAll({
+    where: { sharedWithUserId: userId },
+    include: [
+      {
+        model: fastify.models.Todo,
+        as: 'Todo',
+        where: { archived: false },
+        required: true,
+        include: [
+          { model: fastify.models.Tag, as: 'Tags', through: { attributes: [] }, required: false },
+          { model: fastify.models.Project, as: 'Project', required: false },
+        ],
+      },
+    ],
+  });
+  return shares.map((s) => ({ ...s.Todo.toJSON(), sharedPermission: s.permission }));
+}
+
+/**
  * 共有を 1 件削除する。Todo の所有者のみ実行可能。
  * @param {object} fastify - Fastify インスタンス
  * @param {number} shareId - TodoShare の ID
@@ -107,5 +132,6 @@ module.exports = {
   shareTodo,
   canView,
   canEdit,
+  getTodosSharedWithUser,
   deleteShareById,
 };

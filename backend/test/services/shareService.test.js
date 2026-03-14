@@ -12,6 +12,7 @@ function createMockFastify(overrides = {}) {
     findOrCreate: overrides.TodoShareFindOrCreate ?? (() => Promise.resolve([null, false])),
     findOne: overrides.TodoShareFindOne ?? (() => Promise.resolve(null)),
     findByPk: overrides.TodoShareFindByPk ?? (() => Promise.resolve(null)),
+    findAll: overrides.TodoShareFindAll ?? (() => Promise.resolve([])),
   };
   const badRequest = (msg) => {
     const err = new Error(msg);
@@ -59,13 +60,20 @@ test('shareTodo: 他人の Todo に共有しようとした場合は null', asyn
   assert.strictEqual(result, null);
 });
 
-test('shareTodo: 自分自身への共有は null', async () => {
+test('shareTodo: 自分自身への共有は badRequest をスロー', async () => {
   const ownerId = 1;
   const fastify = createMockFastify({
     TodoFindOne: () => Promise.resolve({ id: 10, userId: ownerId }),
+    httpErrorsBadRequest: (msg) => {
+      const err = new Error(msg);
+      err.statusCode = 400;
+      return err;
+    },
   });
-  const result = await shareService.shareTodo(fastify, 10, ownerId, 'view', ownerId);
-  assert.strictEqual(result, null);
+  await assert.rejects(
+    () => shareService.shareTodo(fastify, 10, ownerId, 'view', ownerId),
+    (err) => err.statusCode === 400 && /Cannot share with yourself/.test(err.message)
+  );
 });
 
 test('shareTodo: 無効な permission の場合は badRequest をスロー', async () => {
@@ -158,4 +166,28 @@ test('deleteShareById: 共有が存在しない場合は false', async () => {
   const fastify = createMockFastify({ TodoShareFindByPk: () => Promise.resolve(null) });
   const result = await shareService.deleteShareById(fastify, 999, 1);
   assert.strictEqual(result, false);
+});
+
+test('getTodosSharedWithUser: 共有 Todo が sharedPermission 付きで返る', async () => {
+  const userId = 2;
+  const todoJson = { id: 10, userId: 1, title: 'Shared', completed: false, priority: 'medium' };
+  const mockTodo = { toJSON: () => todoJson };
+  const shares = [
+    { permission: 'edit', Todo: mockTodo },
+  ];
+  const fastify = createMockFastify({
+    TodoShareFindAll: () => Promise.resolve(shares),
+  });
+  const result = await shareService.getTodosSharedWithUser(fastify, userId);
+  assert.strictEqual(result.length, 1);
+  assert.strictEqual(result[0].id, 10);
+  assert.strictEqual(result[0].title, 'Shared');
+  assert.strictEqual(result[0].sharedPermission, 'edit');
+});
+
+test('getTodosSharedWithUser: 共有がなければ空配列', async () => {
+  const fastify = createMockFastify({ TodoShareFindAll: () => Promise.resolve([]) });
+  const result = await shareService.getTodosSharedWithUser(fastify, 1);
+  assert.strictEqual(Array.isArray(result), true);
+  assert.strictEqual(result.length, 0);
 });
