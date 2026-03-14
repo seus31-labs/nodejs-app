@@ -149,7 +149,7 @@ async function getTodoByIdIncludingArchived(fastify, todoId, userId) {
 async function updateTodo(fastify, todoId, userId, updateData) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return null;
-  if (!(await shareService.canEdit(fastify, todoId, userId))) return null;
+  if (todo.userId !== userId && !(await shareService.canEdit(fastify, todoId, userId))) return null;
   const { title, description, priority, dueDate, projectId } = updateData;
   const allowed = { title, description, priority, dueDate, projectId };
   Object.keys(allowed).forEach((k) => {
@@ -169,7 +169,7 @@ async function updateTodo(fastify, todoId, userId, updateData) {
 async function deleteTodo(fastify, todoId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return false;
-  if (!(await shareService.canEdit(fastify, todoId, userId))) return false;
+  if (todo.userId !== userId && !(await shareService.canEdit(fastify, todoId, userId))) return false;
   await todo.destroy();
   return true;
 }
@@ -184,7 +184,7 @@ async function deleteTodo(fastify, todoId, userId) {
 async function toggleComplete(fastify, todoId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return null;
-  if (!(await shareService.canEdit(fastify, todoId, userId))) return null;
+  if (todo.userId !== userId && !(await shareService.canEdit(fastify, todoId, userId))) return null;
   todo.completed = !todo.completed;
   await todo.save();
   return todo;
@@ -268,7 +268,7 @@ async function searchTodos(fastify, userId, params = {}) {
 async function addTagToTodo(fastify, todoId, tagId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return false;
-  if (!(await shareService.canEdit(fastify, todoId, userId))) return false;
+  if (todo.userId !== userId && !(await shareService.canEdit(fastify, todoId, userId))) return false;
   const tag = await tagService.getTagById(fastify, tagId, userId);
   if (!tag) return false;
   const [todoTag] = await fastify.models.TodoTag.findOrCreate({
@@ -289,7 +289,7 @@ async function addTagToTodo(fastify, todoId, tagId, userId) {
 async function removeTagFromTodo(fastify, todoId, tagId, userId) {
   const todo = await getTodoById(fastify, todoId, userId);
   if (!todo) return false;
-  if (!(await shareService.canEdit(fastify, todoId, userId))) return false;
+  if (todo.userId !== userId && !(await shareService.canEdit(fastify, todoId, userId))) return false;
   const tag = await tagService.getTagById(fastify, tagId, userId);
   if (!tag) return false;
   const result = await fastify.models.TodoTag.destroy({
