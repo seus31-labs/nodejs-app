@@ -49,6 +49,7 @@ const {
 } = require('../../../controllers/templateController');
 const { exportTodos } = require('../../../controllers/exportController');
 const { importTodos } = require('../../../controllers/importController');
+const { shareTodo, getSharedTodos, deleteShare } = require('../../../controllers/shareController');
 
 module.exports = async function (fastify, opts) {
   /**
@@ -398,6 +399,10 @@ module.exports = async function (fastify, opts) {
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => searchTodos(fastify, request, reply),
   });
+  fastify.get('/todos/shared', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getSharedTodos(fastify, request, reply),
+  });
   fastify.get('/todos/archived', {
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => getArchivedTodos(fastify, request, reply),
@@ -583,5 +588,35 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => unarchiveTodo(fastify, request, reply),
+  });
+  fastify.post('/todos/:id/share', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        required: ['sharedWithUserId'],
+        properties: {
+          sharedWithUserId: { type: 'integer', minimum: 1 },
+          permission: { type: 'string', enum: ['view', 'edit'] },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => shareTodo(fastify, request, reply),
+  });
+  fastify.delete('/shares/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => deleteShare(fastify, request, reply),
   });
 }

@@ -24,7 +24,7 @@ async function shareTodo(fastify, todoId, sharedWithUserId, permission, ownerUse
   if (!todo) return null;
 
   if (Number(sharedWithUserId) === Number(ownerUserId)) {
-    return null;
+    throw fastify.httpErrors.badRequest('Cannot share with yourself');
   }
   if (!PERMISSIONS.includes(permission)) {
     throw fastify.httpErrors.badRequest(`Invalid permission: ${permission}`);
