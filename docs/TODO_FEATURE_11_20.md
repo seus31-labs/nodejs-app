@@ -12,8 +12,8 @@
 - [x] 11.1: TodoShare モデル作成（マイグレーション、モデル定義）
 - [x] 11.2: ShareService 作成（共有、権限チェック、共有解除）
 - [x] 11.3: ShareController 作成
-- [ ] 11.4: Share ルート作成（POST /api/todos/:id/share, GET /api/todos/shared, DELETE /api/shares/:id）
-- [ ] 11.5: TodoService に共有チェック追加
+- [x] 11.4: Share ルート作成（POST /api/todos/:id/share, GET /api/todos/shared, DELETE /api/shares/:id）
+- [x] 11.5: TodoService に共有チェック追加
 - [ ] 11.6: Backend テスト
 
 ### Frontend タスク（10タスク）
