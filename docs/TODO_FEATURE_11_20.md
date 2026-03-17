@@ -14,10 +14,10 @@
 - [x] 11.3: ShareController 作成
 - [x] 11.4: Share ルート作成（POST /api/todos/:id/share, GET /api/todos/shared, DELETE /api/shares/:id）
 - [x] 11.5: TodoService に共有チェック追加
-- [ ] 11.6: Backend テスト
+- [x] 11.6: Backend テスト
 
 ### Frontend タスク（10タスク）
-- [ ] 11.7: Share インターフェース定義
+- [x] 11.7: Share インターフェース定義
 - [ ] 11.8: ShareService 作成
 - [ ] 11.9: ShareDialog コンポーネント作成（ユーザー検索、権限選択）
 - [ ] 11.10: TodoItem に共有ボタン追加
