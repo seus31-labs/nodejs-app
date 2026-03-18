@@ -18,7 +18,7 @@
 
 ### Frontend タスク（10タスク）
 - [x] 11.7: Share インターフェース定義
-- [ ] 11.8: ShareService 作成
+- [x] 11.8: ShareService 作成
 - [ ] 11.9: ShareDialog コンポーネント作成（ユーザー検索、権限選択）
 - [ ] 11.10: TodoItem に共有ボタン追加
 - [ ] 11.11: SharedTodosPage 作成
