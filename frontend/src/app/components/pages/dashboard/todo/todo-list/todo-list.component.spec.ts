@@ -5,9 +5,9 @@ import type { Todo } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 
 const mockTodos: Todo[] = [
-  { id: 1, userId: 1, title: 'A', description: '', completed: false, priority: 'medium', dueDate: null, sortOrder: 0, projectId: null, archived: false, archivedAt: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), Tags: [] },
-  { id: 2, userId: 1, title: 'B', description: '', completed: false, priority: 'medium', dueDate: null, sortOrder: 1, projectId: null, archived: false, archivedAt: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), Tags: [] },
-  { id: 3, userId: 1, title: 'C', description: '', completed: false, priority: 'medium', dueDate: null, sortOrder: 2, projectId: null, archived: false, archivedAt: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), Tags: [] },
+  { id: 1, userId: 1, title: 'A', description: '', completed: false, priority: 'medium', dueDate: null, sortOrder: 0, projectId: null, archived: false, archivedAt: null, reminderEnabled: true, reminderSentAt: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), Tags: [] },
+  { id: 2, userId: 1, title: 'B', description: '', completed: false, priority: 'medium', dueDate: null, sortOrder: 1, projectId: null, archived: false, archivedAt: null, reminderEnabled: true, reminderSentAt: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), Tags: [] },
+  { id: 3, userId: 1, title: 'C', description: '', completed: false, priority: 'medium', dueDate: null, sortOrder: 2, projectId: null, archived: false, archivedAt: null, reminderEnabled: true, reminderSentAt: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), Tags: [] },
 ]
 
 describe('TodoListComponent (3.13.3)', () => {

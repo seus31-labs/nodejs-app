@@ -20,6 +20,8 @@ const mockTodo: Todo = {
   projectId: null,
   archived: false,
   archivedAt: null,
+  reminderEnabled: true,
+  reminderSentAt: null,
   createdAt: '',
   updatedAt: ''
 }
@@ -155,7 +157,7 @@ describe('TodoService', () => {
       service.search(params).subscribe((list) => expect(list.length).toBe(1))
       const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/search` && r.method === 'GET')
       expect(req.request.params.get('q')).toBe('買い物')
-      req.flush([{ id: 1, userId: 1, title: '買い物', description: null, completed: false, priority: 'medium', dueDate: null, sortOrder: 0, archived: false, archivedAt: null, createdAt: '', updatedAt: '' }])
+      req.flush([{ id: 1, userId: 1, title: '買い物', description: null, completed: false, priority: 'medium', dueDate: null, sortOrder: 0, projectId: null, archived: false, archivedAt: null, reminderEnabled: true, reminderSentAt: null, createdAt: '', updatedAt: '' }])
     })
 
     it('should send completed, priority, tags and sort params when provided', () => {
@@ -177,6 +179,22 @@ describe('TodoService', () => {
       const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/search` && r.method === 'GET')
       expect(req.request.params.get('q')).toBe('keyword')
       req.flush([])
+    })
+  })
+
+  describe('reminder (4.7)', () => {
+    it('should call GET /todos/due-soon for getDueSoonTodos', () => {
+      service.getDueSoonTodos().subscribe((list) => expect(list).toEqual([]))
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/due-soon` && r.method === 'GET')
+      req.flush([])
+    })
+
+    it('should call PATCH /todos/:id/reminder with enabled for toggleReminder', () => {
+      const id = 10
+      service.toggleReminder(id, false).subscribe()
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/${id}/reminder` && r.method === 'PATCH')
+      expect(req.request.body).toEqual({ enabled: false })
+      req.flush({ id, reminderEnabled: false })
     })
   })
 

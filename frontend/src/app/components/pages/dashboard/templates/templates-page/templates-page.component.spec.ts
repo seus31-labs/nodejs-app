@@ -167,6 +167,8 @@ describe('TemplatesPageComponent (14.12)', () => {
         projectId: null,
         archived: false,
         archivedAt: null,
+        reminderEnabled: true,
+        reminderSentAt: null,
         createdAt: '',
         updatedAt: '',
       })

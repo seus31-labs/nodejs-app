@@ -18,6 +18,8 @@ const mockArchivedTodos: Todo[] = [
     projectId: null,
     archived: true,
     archivedAt: '2026-03-01T12:00:00.000Z',
+    reminderEnabled: true,
+    reminderSentAt: null,
     createdAt: '2026-03-01T10:00:00.000Z',
     updatedAt: '2026-03-01T12:00:00.000Z',
     Tags: [],

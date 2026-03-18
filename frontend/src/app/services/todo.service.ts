@@ -72,6 +72,14 @@ export class TodoService {
     return this.http.patch<Todo>(`${this.apiUrl}/todos/${id}/toggle`, {})
   }
 
+  getDueSoonTodos(): Observable<Todo[]> {
+    return this.http.get<Todo[]>(`${this.apiUrl}/todos/due-soon`)
+  }
+
+  toggleReminder(id: number, enabled: boolean): Observable<Todo> {
+    return this.http.patch<Todo>(`${this.apiUrl}/todos/${id}/reminder`, { enabled })
+  }
+
   /**
    * タイトル・説明で検索（q 必須。completed, priority, sort で絞り込み・ソート可）
    */

@@ -68,22 +68,22 @@ PATCH /api/todos/:id/reminder
 
 ### Task 4.7: TodoService にリマインダー機能追加
 
-- [ ] 4.7.1: `getDueSoonTodos(): Observable<Todo[]>` 実装
-- [ ] 4.7.2: `toggleReminder(id: number, enabled: boolean): Observable<Todo>` 実装
+- [x] 4.7.1: `getDueSoonTodos(): Observable<Todo[]>` 実装
+- [x] 4.7.2: `toggleReminder(id: number, enabled: boolean): Observable<Todo>` 実装
 
 ### Task 4.8: NotificationService 作成
 
-- [ ] 4.8.1: `frontend/src/app/services/notification.service.ts` 作成
-- [ ] 4.8.2: ブラウザ通知権限リクエスト実装
-- [ ] 4.8.3: `showNotification(title, body, data)` 実装
-- [ ] 4.8.4: 通知クリック時の処理実装
+- [x] 4.8.1: `frontend/src/app/services/notification.service.ts` 作成
+- [x] 4.8.2: ブラウザ通知権限リクエスト実装
+- [x] 4.8.3: `showNotification(title, body, data)` 実装
+- [x] 4.8.4: 通知クリック時の処理実装
 
 ### Task 4.9: ReminderService 作成
 
-- [ ] 4.9.1: `frontend/src/app/services/reminder.service.ts` 作成
-- [ ] 4.9.2: 定期チェック処理実装（5分ごと）
-- [ ] 4.9.3: 期限が近い Todo の通知送信
-- [ ] 4.9.4: 通知済みフラグ管理（LocalStorage）
+- [x] 4.9.1: `frontend/src/app/services/reminder.service.ts` 作成
+- [x] 4.9.2: 定期チェック処理実装（5分ごと）
+- [x] 4.9.3: 期限が近い Todo の通知送信
+- [x] 4.9.4: 通知済みフラグ管理（LocalStorage）
 
 ### Task 4.10: TodoItem にリマインダー切り替え追加
 
@@ -110,8 +110,8 @@ PATCH /api/todos/:id/reminder
 
 ### Task 4.14: Frontend テスト
 
-- [ ] 4.14.1: NotificationService のテスト
-- [ ] 4.14.2: ReminderService のテスト
+- [x] 4.14.1: NotificationService のテスト
+- [x] 4.14.2: ReminderService のテスト
 - [ ] 4.14.3: ReminderSettings コンポーネントテスト
 
 ---
