@@ -34,7 +34,7 @@ PATCH /api/todos/:id/reminder
 
 - [x] 4.1.1: マイグレーション生成 `add-reminder-fields-to-todos`
 - [x] 4.1.2: reminderEnabled, reminderSentAt カラム追加
-- [ ] 4.1.3: マイグレーション実行
+- [x] 4.1.3: マイグレーション実行
 
 ### Task 4.2: Todo モデル更新
 
