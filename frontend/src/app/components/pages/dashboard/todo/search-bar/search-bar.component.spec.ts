@@ -64,6 +64,51 @@ describe('SearchBarComponent (2.13.2)', () => {
     expect(localStorage.getItem('todo.search.history.v1')).toEqual('[]')
   }))
 
+  it('should filter history by query (case-insensitive)', fakeAsync(() => {
+    component.history = ['Banana', 'Apple']
+    component.query.setValue('app', { emitEvent: false })
+    expect(component.filteredHistory).toEqual(['Apple'])
+  }))
+
+  it('should limit dropdown items to 8', fakeAsync(() => {
+    component.history = Array.from({ length: 12 }, (_, i) => `k${i}`)
+    component.query.setValue('', { emitEvent: false })
+    expect(component.filteredHistory.length).toBe(8)
+  }))
+
+  it('selectHistory should emit once and move to top', fakeAsync(() => {
+    const emitted: string[] = []
+    component.searchTerm.subscribe((v) => emitted.push(v))
+
+    component.history = ['b', 'a']
+
+    component.selectHistory('a')
+    tick(300)
+
+    expect(emitted).toEqual(['a'])
+    expect(component.history).toEqual(['a', 'b'])
+  }))
+
+  it('should open on focus and close on blur (after delay)', fakeAsync(() => {
+    component.onFocus()
+    expect(component.isHistoryOpen).toBeTrue()
+
+    component.onBlur()
+    tick(149)
+    expect(component.isHistoryOpen).toBeTrue()
+    tick(1)
+    expect(component.isHistoryOpen).toBeFalse()
+  }))
+
+  it('should clear blur timer on destroy', fakeAsync(() => {
+    component.query.setValue('x')
+    tick(300)
+    component.onBlur()
+    expect(() => component.ngOnDestroy()).not.toThrow()
+    tick(200)
+    expect(component.isHistoryOpen).toBeFalse()
+  }))
+
   it('should not throw on destroy', () => {
     expect(() => component.ngOnDestroy()).not.toThrow()
   })

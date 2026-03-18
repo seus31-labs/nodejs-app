@@ -13,6 +13,8 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs'
 export class SearchBarComponent implements OnInit, OnDestroy {
   private static readonly HISTORY_STORAGE_KEY = 'todo.search.history.v1'
   private static readonly HISTORY_LIMIT = 10
+  private static readonly DROPDOWN_MAX_ITEMS = 8
+  private static readonly BLUR_CLOSE_DELAY_MS = 150
 
   @Output() searchTerm = new EventEmitter<string>()
   @ViewChild('searchInput') searchInputRef?: ElementRef<HTMLInputElement>
@@ -20,6 +22,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   query = new FormControl('', { nonNullable: true })
   history: string[] = []
   isHistoryOpen = false
+  private blurTimer?: ReturnType<typeof setTimeout>
   private destroy$ = new Subject<void>()
 
   ngOnInit(): void {
@@ -35,6 +38,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.blurTimer) clearTimeout(this.blurTimer)
     this.destroy$.next()
     this.destroy$.complete()
   }
@@ -49,23 +53,25 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   onFocus(): void {
+    if (this.blurTimer) clearTimeout(this.blurTimer)
     this.isHistoryOpen = true
   }
 
   onBlur(): void {
-    setTimeout(() => {
+    if (this.blurTimer) clearTimeout(this.blurTimer)
+    this.blurTimer = setTimeout(() => {
       this.isHistoryOpen = false
-    }, 150)
+    }, SearchBarComponent.BLUR_CLOSE_DELAY_MS)
   }
 
   get filteredHistory(): string[] {
     const q = (this.query.value ?? '').trim().toLowerCase()
     const list = q ? this.history.filter((h) => h.toLowerCase().includes(q)) : this.history
-    return list.slice(0, 8)
+    return list.slice(0, SearchBarComponent.DROPDOWN_MAX_ITEMS)
   }
 
   selectHistory(term: string): void {
-    this.query.setValue(term)
+    this.query.setValue(term, { emitEvent: false })
     this.searchTerm.emit(term)
     this.saveHistory(term)
     this.isHistoryOpen = false
@@ -84,7 +90,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         return
       }
       const parsed = JSON.parse(raw)
-      this.history = Array.isArray(parsed) ? parsed.filter((v) => typeof v === 'string' && v.trim()).slice(0, SearchBarComponent.HISTORY_LIMIT) : []
+      this.history = Array.isArray(parsed)
+        ? parsed
+            .filter((v): v is string => typeof v === 'string' && !!v.trim())
+            .slice(0, SearchBarComponent.HISTORY_LIMIT)
+        : []
     } catch {
       this.history = []
     }
