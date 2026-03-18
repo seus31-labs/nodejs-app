@@ -1,0 +1,48 @@
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">期限リマインダー設定</h5>
+
+    <div class="mb-2 small text-muted">
+      通知権限: {{ permissionLabel }}
+    </div>
+
+    <div class="mb-3">
+      リマインダー監視: <span class="fw-semibold">{{ (reminderRunning$ | async) ? 'ON' : 'OFF' }}</span>
+    </div>
+
+    @if (!apiAvailable) {
+      <div class="alert alert-warning" role="alert">
+        このブラウザでは通知が利用できません。
+      </div>
+    } @else {
+      <div class="d-flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-testid="permission-button"
+          (click)="requestPermission()"
+          [disabled]="loadingRequest || permission === 'granted'"
+        >
+          {{ permission === 'granted' ? '権限は許可済み' : '通知権限を許可' }}
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          data-testid="test-button"
+          (click)="sendTestNotification()"
+          [disabled]="permission !== 'granted'"
+        >
+          通知テスト
+        </button>
+      </div>
+    }
+
+    @if (message) {
+      <div class="alert alert-info mt-3" role="status">
+        {{ message }}
+      </div>
+    }
+  </div>
+</div>
+

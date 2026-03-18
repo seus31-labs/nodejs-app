@@ -92,10 +92,10 @@ PATCH /api/todos/:id/reminder
 
 ### Task 4.11: ReminderSettings コンポーネント作成
 
-- [ ] 4.11.1: `ng generate component components/reminder-settings` 実行
-- [ ] 4.11.2: 通知権限リクエストボタン実装
-- [ ] 4.11.3: リマインダー設定 UI 実装
-- [ ] 4.11.4: 通知テストボタン実装
+- [x] 4.11.1: `ng generate component components/reminder-settings` 実行
+- [x] 4.11.2: 通知権限リクエストボタン実装
+- [x] 4.11.3: リマインダー設定 UI 実装
+- [x] 4.11.4: 通知テストボタン実装
 
 ### Task 4.12: App 初期化時にリマインダー開始
 
@@ -112,7 +112,7 @@ PATCH /api/todos/:id/reminder
 
 - [x] 4.14.1: NotificationService のテスト
 - [x] 4.14.2: ReminderService のテスト
-- [ ] 4.14.3: ReminderSettings コンポーネントテスト
+- [x] 4.14.3: ReminderSettings コンポーネントテスト
 
 ---
 
