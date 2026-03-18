@@ -62,6 +62,17 @@ module.exports = (sequelize) => {
         allowNull: true,
         field: 'archived_at',
       },
+      reminderEnabled: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+        field: 'reminder_enabled',
+      },
+      reminderSentAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        field: 'reminder_sent_at',
+      },
       projectId: {
         type: DataTypes.INTEGER,
         allowNull: true,
