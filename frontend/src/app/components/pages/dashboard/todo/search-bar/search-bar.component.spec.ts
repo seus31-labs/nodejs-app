@@ -6,6 +6,7 @@ describe('SearchBarComponent (2.13.2)', () => {
   let fixture: ComponentFixture<SearchBarComponent>
 
   beforeEach(async () => {
+    localStorage.clear()
     await TestBed.configureTestingModule({
       imports: [SearchBarComponent],
     }).compileComponents()
@@ -36,6 +37,32 @@ describe('SearchBarComponent (2.13.2)', () => {
     expect(component.query.value).toBe('')
     expect(emitted).toEqual([''])
   })
+
+  it('should save search history to localStorage', fakeAsync(() => {
+    component.query.setValue('apple')
+    tick(300)
+    const raw = localStorage.getItem('todo.search.history.v1')
+    expect(raw).toBeTruthy()
+    expect(JSON.parse(raw as string)).toEqual(['apple'])
+  }))
+
+  it('should move duplicated term to top', fakeAsync(() => {
+    component.query.setValue('a')
+    tick(300)
+    component.query.setValue('b')
+    tick(300)
+    component.query.setValue('a')
+    tick(300)
+    expect(component.history).toEqual(['a', 'b'])
+  }))
+
+  it('should clear search history', fakeAsync(() => {
+    component.query.setValue('x')
+    tick(300)
+    component.clearHistory()
+    expect(component.history).toEqual([])
+    expect(localStorage.getItem('todo.search.history.v1')).toEqual('[]')
+  }))
 
   it('should not throw on destroy', () => {
     expect(() => component.ngOnDestroy()).not.toThrow()

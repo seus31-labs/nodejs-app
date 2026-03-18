@@ -107,9 +107,9 @@ GET /api/todos/search?q=買い物&priority=high&completed=false&tags=1,2
 
 ### Task 2.11: 検索履歴機能（オプション）
 
-- [ ] 2.11.1: LocalStorage に検索履歴保存
-- [ ] 2.11.2: 検索履歴のドロップダウン表示
-- [ ] 2.11.3: 履歴クリア機能
+- [x] 2.11.1: LocalStorage に検索履歴保存
+- [x] 2.11.2: 検索履歴のドロップダウン表示
+- [x] 2.11.3: 履歴クリア機能
 
 ### Task 2.12: スタイリング
 
