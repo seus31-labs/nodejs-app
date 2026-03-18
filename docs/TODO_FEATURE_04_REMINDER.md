@@ -59,7 +59,7 @@ PATCH /api/todos/:id/reminder
 
 ### Task 4.6: Backend テスト
 
-- [ ] 4.6.1: TodoService リマインダー機能のテスト
+- [x] 4.6.1: TodoService リマインダー機能のテスト
 - [x] 4.6.2: リマインダー API のテスト
 
 ---
