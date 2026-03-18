@@ -271,6 +271,30 @@ async function removeTagFromTodo(fastify, req, reply) {
   }
 }
 
+async function getDueSoonTodos(fastify, req, reply) {
+  try {
+    const todos = await todoService.getDueSoonTodos(fastify, req.user.id);
+    reply.code(200).send(todos.map((t) => t.toJSON()));
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Failed to get due soon todos');
+  }
+}
+
+async function toggleReminder(fastify, req, reply) {
+  try {
+    const todoId = parseTodoId(req.params.id);
+    if (todoId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id' });
+    }
+    const enabled = !!req.body?.enabled;
+    const todo = await todoService.toggleReminder(fastify, todoId, req.user.id, enabled);
+    if (!todo) return reply.code(404).send({ error: 'Not found' });
+    reply.code(200).send(todo.toJSON());
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Failed to toggle reminder');
+  }
+}
+
 module.exports = {
   createTodo,
   getTodos,
@@ -290,4 +314,6 @@ module.exports = {
   bulkAddTag,
   addTagToTodo,
   removeTagFromTodo,
+  getDueSoonTodos,
+  toggleReminder,
 };

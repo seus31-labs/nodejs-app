@@ -480,6 +480,66 @@ async function bulkAddTag(fastify, todoIds, tagId, userId) {
   return newIds.length;
 }
 
+/**
+ * 期限が近い Todo を取得する（24時間以内）。アーカイブ済み・完了済み・リマインダー無効は除外。
+ * @param {object} fastify
+ * @param {number} userId
+ * @returns {Promise<object[]>}
+ */
+async function getDueSoonTodos(fastify, userId) {
+  const now = new Date();
+  const limit = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const startDate = now.toISOString().slice(0, 10);
+  const endDate = limit.toISOString().slice(0, 10);
+  return fastify.models.Todo.findAll({
+    where: {
+      userId,
+      archived: false,
+      completed: false,
+      reminderEnabled: true,
+      dueDate: { [Op.between]: [startDate, endDate] },
+      // 現状は「未通知のみ」を返す（通知のスパム防止・シンプル優先）
+      reminderSentAt: { [Op.is]: null },
+    },
+    include: buildTodoInclude(fastify),
+    order: [['dueDate', 'ASC']],
+  });
+}
+
+/**
+ * リマインダーの有効/無効を切り替える（所有者のみ）
+ * @param {object} fastify
+ * @param {number} todoId
+ * @param {number} userId
+ * @param {boolean} enabled
+ * @returns {Promise<object|null>}
+ */
+async function toggleReminder(fastify, todoId, userId, enabled) {
+  const todo = await getTodoByIdIncludingArchived(fastify, todoId, userId);
+  if (!todo) return null;
+  todo.reminderEnabled = !!enabled;
+  if (!todo.reminderEnabled) {
+    todo.reminderSentAt = null;
+  }
+  await todo.save();
+  return todo;
+}
+
+/**
+ * 指定 Todo を通知済みとしてマーク（所有者のみ）
+ * @param {object} fastify
+ * @param {number} todoId
+ * @param {number} userId
+ * @returns {Promise<boolean>}
+ */
+async function markReminderSent(fastify, todoId, userId) {
+  const todo = await getTodoByIdIncludingArchived(fastify, todoId, userId);
+  if (!todo) return false;
+  todo.reminderSentAt = new Date();
+  await todo.save();
+  return true;
+}
+
 module.exports = {
   createTodo,
   getTodosByUserId,
@@ -500,4 +560,7 @@ module.exports = {
   bulkAddTag,
   addTagToTodo,
   removeTagFromTodo,
+  getDueSoonTodos,
+  toggleReminder,
+  markReminderSent,
 };

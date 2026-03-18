@@ -21,6 +21,8 @@ const {
   bulkAddTag,
   addTagToTodo,
   removeTagFromTodo,
+  getDueSoonTodos,
+  toggleReminder,
 } = require('../../../controllers/todoController');
 const {
   createTag,
@@ -407,6 +409,10 @@ module.exports = async function (fastify, opts) {
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => getArchivedTodos(fastify, request, reply),
   });
+  fastify.get('/todos/due-soon', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getDueSoonTodos(fastify, request, reply),
+  });
   fastify.delete('/todos/archived', {
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => deleteArchivedTodos(fastify, request, reply),
@@ -588,6 +594,24 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => unarchiveTodo(fastify, request, reply),
+  });
+  fastify.patch('/todos/:id/reminder', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        required: ['enabled'],
+        properties: {
+          enabled: { type: 'boolean' },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => toggleReminder(fastify, request, reply),
   });
   fastify.post('/todos/:id/share', {
     schema: {

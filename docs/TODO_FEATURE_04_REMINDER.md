@@ -32,35 +32,35 @@ PATCH /api/todos/:id/reminder
 
 ### Task 4.1: リマインダーカラム追加
 
-- [ ] 4.1.1: マイグレーション生成 `add-reminder-fields-to-todos`
-- [ ] 4.1.2: reminderEnabled, reminderSentAt カラム追加
+- [x] 4.1.1: マイグレーション生成 `add-reminder-fields-to-todos`
+- [x] 4.1.2: reminderEnabled, reminderSentAt カラム追加
 - [ ] 4.1.3: マイグレーション実行
 
 ### Task 4.2: Todo モデル更新
 
-- [ ] 4.2.1: reminderEnabled, reminderSentAt フィールド追加
+- [x] 4.2.1: reminderEnabled, reminderSentAt フィールド追加
 
 ### Task 4.3: TodoService にリマインダー機能追加
 
-- [ ] 4.3.1: `getDueSoonTodos(userId)` 実装（24時間以内の期限）
-- [ ] 4.3.2: `toggleReminder(todoId, userId, enabled)` 実装
-- [ ] 4.3.3: `markReminderSent(todoId)` 実装
+- [x] 4.3.1: `getDueSoonTodos(userId)` 実装（24時間以内の期限）
+- [x] 4.3.2: `toggleReminder(todoId, userId, enabled)` 実装
+- [x] 4.3.3: `markReminderSent(todoId)` 実装
 
 ### Task 4.4: TodoController にリマインダー機能追加
 
-- [ ] 4.4.1: `getDueSoonTodos` ハンドラ実装
-- [ ] 4.4.2: `toggleReminder` ハンドラ実装
+- [x] 4.4.1: `getDueSoonTodos` ハンドラ実装
+- [x] 4.4.2: `toggleReminder` ハンドラ実装
 
 ### Task 4.5: Todo ルート更新
 
-- [ ] 4.5.1: GET /api/todos/due-soon のルート定義
-- [ ] 4.5.2: PATCH /api/todos/:id/reminder のルート定義
-- [ ] 4.5.3: JSON Schema 定義
+- [x] 4.5.1: GET /api/todos/due-soon のルート定義
+- [x] 4.5.2: PATCH /api/todos/:id/reminder のルート定義
+- [x] 4.5.3: JSON Schema 定義
 
 ### Task 4.6: Backend テスト
 
 - [ ] 4.6.1: TodoService リマインダー機能のテスト
-- [ ] 4.6.2: リマインダー API のテスト
+- [x] 4.6.2: リマインダー API のテスト
 
 ---
 
