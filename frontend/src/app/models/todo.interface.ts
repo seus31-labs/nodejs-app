@@ -21,6 +21,8 @@ export interface Todo {
   projectId: number | null
   archived: boolean
   archivedAt: string | null
+  reminderEnabled?: boolean
+  reminderSentAt?: string | null
   createdAt: string
   updatedAt: string
   Tags?: Tag[]

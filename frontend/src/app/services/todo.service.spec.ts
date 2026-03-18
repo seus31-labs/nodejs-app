@@ -180,6 +180,22 @@ describe('TodoService', () => {
     })
   })
 
+  describe('reminder (4.7)', () => {
+    it('should call GET /todos/due-soon for getDueSoonTodos', () => {
+      service.getDueSoonTodos().subscribe((list) => expect(list).toEqual([]))
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/due-soon` && r.method === 'GET')
+      req.flush([])
+    })
+
+    it('should call PATCH /todos/:id/reminder with enabled for toggleReminder', () => {
+      const id = 10
+      service.toggleReminder(id, false).subscribe()
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/${id}/reminder` && r.method === 'PATCH')
+      expect(req.request.body).toEqual({ enabled: false })
+      req.flush({ id, reminderEnabled: false })
+    })
+  })
+
   describe('bulk (15.17)', () => {
     it('should call POST /todos/bulk-complete with todoIds in body', () => {
       const todoIds = [1, 2, 3]
