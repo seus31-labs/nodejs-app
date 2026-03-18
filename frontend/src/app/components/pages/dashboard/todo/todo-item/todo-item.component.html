@@ -1,4 +1,4 @@
-<div class="d-flex align-items-center gap-2 py-2 border-bottom todo-item" [class.completed]="todo.completed">
+<div class="d-flex flex-wrap align-items-center gap-2 py-2 border-bottom todo-item" [class.completed]="todo.completed">
   <input
     type="checkbox"
     class="form-check-input"
@@ -8,9 +8,25 @@
   />
   <div class="flex-grow-1 min-width-0">
     <span class="todo-title" [class.text-decoration-line-through]="todo.completed" [class.text-muted]="todo.completed">
-      {{ todo.title }}
+      @for (p of highlightParts(todo.title); track $index) {
+        @if (p.match) {
+          <mark class="todo-highlight">{{ p.text }}</mark>
+        } @else {
+          <span>{{ p.text }}</span>
+        }
+      }
     </span>
-    <span *ngIf="todo.description" class="d-block small text-muted">{{ todo.description }}</span>
+    @if (todo.description) {
+      <span class="d-block small text-muted">
+        @for (p of highlightParts(todo.description); track $index) {
+          @if (p.match) {
+            <mark class="todo-highlight">{{ p.text }}</mark>
+          } @else {
+            <span>{{ p.text }}</span>
+          }
+        }
+      </span>
+    }
     <span class="badge ms-1" [ngClass]="priorityClass(todo.priority)">{{ todo.priority }}</span>
     <span *ngIf="todo.dueDate" class="ms-2 small" [ngClass]="dueDateClass(todo.dueDate)">
       {{ todo.dueDate }}
@@ -33,7 +49,7 @@
       }
     </div>
   </div>
-  <div class="btn-group btn-group-sm">
+  <div class="btn-group btn-group-sm ms-auto w-100 w-sm-auto mt-2 mt-sm-0">
     @if (todo.completed) {
       <button type="button" class="btn btn-outline-secondary" (click)="onArchive()" title="アーカイブ">アーカイブ</button>
     }

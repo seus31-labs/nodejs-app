@@ -15,6 +15,7 @@ import type { Tag } from '../../../../../models/tag.interface'
 export class TodoListComponent {
   @Input() todos: Todo[] = []
   @Input() allTags: Tag[] = []
+  @Input() highlightQuery = ''
   @Input() loading = false
   @Input() error: string | null = null
   /** true のときドラッグ無効（ソートが「手動」以外のとき） */

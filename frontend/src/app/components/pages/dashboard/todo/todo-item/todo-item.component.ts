@@ -15,6 +15,7 @@ import { TagChipComponent } from '../tag-chip/tag-chip.component'
 export class TodoItemComponent {
   @Input({ required: true }) todo!: Todo
   @Input() allTags: Tag[] = []
+  @Input() highlightQuery = ''
   @Output() toggle = new EventEmitter<number>()
   @Output() edit = new EventEmitter<Todo>()
   @Output() delete = new EventEmitter<number>()
@@ -79,5 +80,35 @@ export class TodoItemComponent {
     if (due < today) return 'text-danger'
     if (due.getTime() === today.getTime()) return 'text-warning'
     return ''
+  }
+
+  highlightParts(text: string): Array<{ text: string; match: boolean }> {
+    const raw = (this.highlightQuery ?? '').trim()
+    if (!raw) return [{ text, match: false }]
+
+    const tokens = raw.split(/\s+/).filter((t) => t.length >= 2)
+    if (tokens.length === 0) return [{ text, match: false }]
+
+    const escaped = tokens.map((t) => this.escapeRegExp(t))
+    const re = new RegExp(`(${escaped.join('|')})`, 'gi')
+    const parts: Array<{ text: string; match: boolean }> = []
+    let lastIndex = 0
+    let m: RegExpExecArray | null
+
+    while ((m = re.exec(text)) !== null) {
+      const start = m.index
+      const end = start + m[0].length
+      if (start > lastIndex) parts.push({ text: text.slice(lastIndex, start), match: false })
+      parts.push({ text: text.slice(start, end), match: true })
+      lastIndex = end
+      if (m[0].length === 0) re.lastIndex++
+    }
+
+    if (lastIndex < text.length) parts.push({ text: text.slice(lastIndex), match: false })
+    return parts.length ? parts : [{ text, match: false }]
+  }
+
+  private escapeRegExp(input: string): string {
+    return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   }
 }
