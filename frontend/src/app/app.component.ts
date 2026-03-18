@@ -1,11 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router'
 import { MatDialog } from '@angular/material/dialog'
+import { Subject, filter, takeUntil } from 'rxjs'
 import { SharedModule } from './theme/shared/shared.module'
 import { ThemeService } from './services/theme.service'
 import { KeyboardShortcutService } from './services/keyboard-shortcut.service'
 import { SyncService } from './services/sync.service'
 import { ShortcutHelpDialogComponent } from './components/pages/dashboard/todo/shortcut-help-dialog/shortcut-help-dialog.component'
+import { AuthService } from './services/auth.service'
+import { ReminderService } from './services/reminder.service'
 
 @Component({
   selector: 'app-root',
@@ -19,23 +22,34 @@ import { ShortcutHelpDialogComponent } from './components/pages/dashboard/todo/s
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'Node App Frontend'
+  private destroy$ = new Subject<void>()
 
   constructor(
     private router: Router,
     private themeService: ThemeService,
     private shortcutService: KeyboardShortcutService,
     private dialog: MatDialog,
-    private syncService: SyncService
+    private syncService: SyncService,
+    private authService: AuthService,
+    private reminderService: ReminderService
   ) {}
 
   ngOnInit() {
     this.themeService.init()
-    this.router.events.subscribe((evt) => {
-      if (!(evt instanceof NavigationEnd)) {
-        return
-      }
-      window.scrollTo(0, 0)
-    })
+    this.router.events
+      .pipe(
+        filter((evt): evt is NavigationEnd => evt instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => window.scrollTo(0, 0))
+
+    this.authService.authState$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((authed) => {
+        if (authed) this.reminderService.start()
+        else this.reminderService.stop()
+      })
+
     this.shortcutService.register('Shift+?', () => {
       this.dialog.open(ShortcutHelpDialogComponent, { width: '400px' })
     }, 'ショートカット一覧を表示')
@@ -43,5 +57,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.shortcutService.unregister('Shift+?')
+    this.destroy$.next()
+    this.destroy$.complete()
   }
 }

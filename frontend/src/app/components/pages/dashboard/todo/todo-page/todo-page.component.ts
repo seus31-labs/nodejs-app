@@ -19,6 +19,7 @@ import {
 import { ImportDialogComponent } from '../import-dialog/import-dialog.component'
 import { ExportService } from '../../../../../services/export.service'
 import { KeyboardShortcutService } from '../../../../../services/keyboard-shortcut.service'
+import type { ReminderToggleEvent } from '../todo-item/todo-item.component'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import type { Project } from '../../../../../models/project.interface'
@@ -382,6 +383,20 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => this.loadTodos(),
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? '更新に失敗しました'
+        }
+      })
+  }
+
+  onReminderToggled(event: ReminderToggleEvent): void {
+    this.todoService
+      .toggleReminder(event.todoId, event.enabled)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (updated) => {
+          this.todos = this.todos.map((t) => (t.id === updated.id ? updated : t))
+        },
         error: (err) => {
           this.error = err?.error?.message ?? err?.message ?? '更新に失敗しました'
         }

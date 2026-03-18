@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { TodoItemComponent } from './todo-item.component'
+import type { ReminderToggleEvent } from './todo-item.component'
 import type { Todo } from '../../../../../models/todo.interface'
 
 const mockTodo: Todo = {
@@ -65,6 +66,26 @@ describe('TodoItemComponent (2.12.2)', () => {
   it('should not throw on special regex chars in query', () => {
     component.highlightQuery = '(買い物)'
     expect(() => component.highlightParts('(買い物)に行く')).not.toThrow()
+  })
+
+  it('onToggleReminder should emit false when reminderEnabled is true', () => {
+    const emitted: ReminderToggleEvent[] = []
+    component.reminderToggled.subscribe((e) => emitted.push(e))
+
+    component.todo = { ...mockTodo, reminderEnabled: true }
+    component.onToggleReminder()
+
+    expect(emitted).toEqual([{ todoId: mockTodo.id, enabled: false }])
+  })
+
+  it('onToggleReminder should emit true when reminderEnabled is false', () => {
+    const emitted: ReminderToggleEvent[] = []
+    component.reminderToggled.subscribe((e) => emitted.push(e))
+
+    component.todo = { ...mockTodo, reminderEnabled: false }
+    component.onToggleReminder()
+
+    expect(emitted).toEqual([{ todoId: mockTodo.id, enabled: true }])
   })
 })
 

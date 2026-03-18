@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
 import { TodoItemComponent } from '../todo-item/todo-item.component'
+import type { ReminderToggleEvent } from '../todo-item/todo-item.component'
 import type { Todo } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 
@@ -26,6 +27,7 @@ export class TodoListComponent {
   @Output() edit = new EventEmitter<Todo>()
   @Output() delete = new EventEmitter<number>()
   @Output() archive = new EventEmitter<number>()
+  @Output() reminderToggled = new EventEmitter<ReminderToggleEvent>()
   @Output() reorder = new EventEmitter<number[]>()
   @Output() tagRemoved = new EventEmitter<{ todoId: number; tag: Tag }>()
   @Output() tagAdded = new EventEmitter<{ todoId: number; tagId: number }>()

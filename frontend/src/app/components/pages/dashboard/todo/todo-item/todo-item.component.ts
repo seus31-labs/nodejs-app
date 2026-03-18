@@ -5,6 +5,11 @@ import type { Todo } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import { TagChipComponent } from '../tag-chip/tag-chip.component'
 
+export interface ReminderToggleEvent {
+  todoId: number
+  enabled: boolean
+}
+
 @Component({
   selector: 'app-todo-item',
   standalone: true,
@@ -21,6 +26,7 @@ export class TodoItemComponent implements OnChanges {
   @Output() edit = new EventEmitter<Todo>()
   @Output() delete = new EventEmitter<number>()
   @Output() archive = new EventEmitter<number>()
+  @Output() reminderToggled = new EventEmitter<ReminderToggleEvent>()
   @Output() tagRemoved = new EventEmitter<{ todoId: number; tag: Tag }>()
   @Output() tagAdded = new EventEmitter<{ todoId: number; tagId: number }>()
 
@@ -48,6 +54,10 @@ export class TodoItemComponent implements OnChanges {
 
   onArchive(): void {
     this.archive.emit(this.todo.id)
+  }
+
+  onToggleReminder(): void {
+    this.reminderToggled.emit({ todoId: this.todo.id, enabled: !this.todo.reminderEnabled })
   }
 
   onTagRemoved(tag: Tag): void {

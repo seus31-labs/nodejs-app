@@ -87,8 +87,8 @@ PATCH /api/todos/:id/reminder
 
 ### Task 4.10: TodoItem にリマインダー切り替え追加
 
-- [ ] 4.10.1: リマインダー ON/OFF トグルボタン追加
-- [ ] 4.10.2: @Output() reminderToggled 実装
+- [x] 4.10.1: リマインダー ON/OFF トグルボタン追加
+- [x] 4.10.2: @Output() reminderToggled 実装
 
 ### Task 4.11: ReminderSettings コンポーネント作成
 
@@ -99,9 +99,9 @@ PATCH /api/todos/:id/reminder
 
 ### Task 4.12: App 初期化時にリマインダー開始
 
-- [ ] 4.12.1: AppComponent で ReminderService 初期化
-- [ ] 4.12.2: ログイン時にリマインダー開始
-- [ ] 4.12.3: ログアウト時にリマインダー停止
+- [x] 4.12.1: AppComponent で ReminderService 初期化
+- [x] 4.12.2: ログイン時にリマインダー開始
+- [x] 4.12.3: ログアウト時にリマインダー停止
 
 ### Task 4.13: スタイリング
 
