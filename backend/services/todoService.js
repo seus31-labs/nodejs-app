@@ -488,8 +488,11 @@ async function bulkAddTag(fastify, todoIds, tagId, userId) {
  */
 async function getDueSoonTodos(fastify, userId) {
   const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
   const tomorrow = new Date(now);
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const startDate = yesterday.toISOString().slice(0, 10);
   const endDate = tomorrow.toISOString().slice(0, 10);
   return fastify.models.Todo.findAll({
     where: {
@@ -497,7 +500,8 @@ async function getDueSoonTodos(fastify, userId) {
       archived: false,
       completed: false,
       reminderEnabled: true,
-      dueDate: { [Op.lte]: endDate },
+      // 「昨日〜明日」の範囲でタイムゾーン差を吸収する（最大 ±14h 程度）意図
+      dueDate: { [Op.between]: [startDate, endDate] },
       // 現状は「未通知のみ」を返す（通知のスパム防止・シンプル優先）
       reminderSentAt: { [Op.is]: null },
     },

@@ -191,3 +191,28 @@ test('GET /api/v1/todos/due-soon excludes archived and completed todos', async (
   assert(list.every((t) => t.id !== todoArchived.id))
 })
 
+test('GET /api/v1/todos/due-soon excludes far past due todos', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const token = await registerAndLogin(app, suffix)
+
+  const farPast = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  const farPastRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'far past', dueDate: ymd(farPast) }
+  })
+  assert.strictEqual(farPastRes.statusCode, 201)
+  const farPastTodo = JSON.parse(farPastRes.payload)
+
+  const dueRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/due-soon',
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(dueRes.statusCode, 200)
+  const list = JSON.parse(dueRes.payload)
+  assert(list.every((t) => t.id !== farPastTodo.id))
+})
+
