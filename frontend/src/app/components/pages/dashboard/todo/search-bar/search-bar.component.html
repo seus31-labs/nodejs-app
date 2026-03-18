@@ -5,10 +5,41 @@
     class="form-control"
     placeholder="タイトル・説明で検索..."
     [formControl]="query"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
   />
+  @if (filteredHistory.length) {
+    <button
+      type="button"
+      class="btn btn-outline-secondary btn-sm"
+      (click)="isHistoryOpen = !isHistoryOpen"
+      aria-label="検索履歴を表示"
+    >
+      履歴
+    </button>
+  }
   @if (query.value) {
     <button type="button" class="btn btn-outline-secondary btn-sm" (click)="onClear()" aria-label="検索をクリア">
       クリア
     </button>
   }
 </div>
+
+@if (isHistoryOpen) {
+  <div class="search-history mb-2">
+    <div class="list-group">
+      @if (filteredHistory.length) {
+        @for (item of filteredHistory; track item) {
+          <button type="button" class="list-group-item list-group-item-action" (click)="selectHistory(item)">
+            {{ item }}
+          </button>
+        }
+      } @else {
+        <div class="list-group-item text-secondary">一致する履歴がありません</div>
+      }
+      <button type="button" class="list-group-item list-group-item-action text-danger" (click)="clearHistory()">
+        履歴をクリア
+      </button>
+    </div>
+  </div>
+}
