@@ -394,7 +394,9 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       .toggleReminder(event.todoId, event.enabled)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => this.loadTodos(),
+        next: (updated) => {
+          this.todos = this.todos.map((t) => (t.id === updated.id ? updated : t))
+        },
         error: (err) => {
           this.error = err?.error?.message ?? err?.message ?? '更新に失敗しました'
         }
