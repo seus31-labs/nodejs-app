@@ -29,6 +29,7 @@
         <app-todo-item
           [todo]="todo"
           [allTags]="allTags"
+          [highlightQuery]="highlightQuery"
           (toggle)="toggle.emit($event)"
           (edit)="edit.emit($event)"
           (delete)="delete.emit($event)"
