@@ -1,0 +1,72 @@
+<h2 mat-dialog-title>Todo を共有</h2>
+<mat-dialog-content>
+  <div class="d-flex flex-column gap-3">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>ユーザー検索</mat-label>
+      <input
+        matInput
+        [formControl]="searchControl"
+        placeholder="名前または email"
+      />
+    </mat-form-field>
+
+    @if (loading) {
+      <div class="d-flex align-items-center gap-2">
+        <mat-spinner diameter="24"></mat-spinner>
+        <span class="small">読み込み中...</span>
+      </div>
+    }
+
+    @if (error) {
+      <p class="text-danger small mb-0">{{ error }}</p>
+    }
+
+    @if (!loading && !error) {
+      <div class="d-flex flex-column gap-2">
+        @if (filteredUsers.length === 0) {
+          <p class="small text-muted mb-0">該当するユーザーが見つかりません。</p>
+        } @else {
+          <div class="d-flex flex-column gap-1">
+            @for (u of filteredUsers; track u.id) {
+              <button
+                type="button"
+                class="list-group-item list-group-item-action d-flex flex-column align-items-start"
+                [class.active]="u.id === selectedUserId"
+                (click)="selectUser(u.id)"
+              >
+                <span class="fw-semibold">{{ u.name }}</span>
+                <span class="small text-muted">{{ u.email }}</span>
+              </button>
+            }
+          </div>
+        }
+
+        <mat-form-field appearance="outline" class="w-100 mt-2">
+          <mat-label>権限</mat-label>
+          <mat-select
+            [value]="permission"
+            [disabled]="selectedUserId == null"
+            (selectionChange)="permission = $event.value"
+          >
+            @for (opt of permissionOptions; track opt.value) {
+              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">キャンセル</button>
+  <button
+    mat-flat-button
+    color="primary"
+    [disabled]="!canShare()"
+    (click)="share()"
+  >
+    共有する
+  </button>
+</mat-dialog-actions>
+
