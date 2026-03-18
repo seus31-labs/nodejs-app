@@ -54,8 +54,6 @@ test('getDueSoonTodos: dueDate/riminder flags filter is applied', async () => {
   assert.strictEqual(captured.args.where.completed, false)
   assert.strictEqual(captured.args.where.reminderEnabled, true)
 
-  const start = new Date('2026-03-17T12:00:00.000Z')
-  start.setUTCDate(start.getUTCDate() - 0) // keep for readability
   const expectedStartDate = new Date('2026-03-17T12:00:00.000Z').toISOString().slice(0, 10)
   const expectedEndDate = new Date('2026-03-19T12:00:00.000Z').toISOString().slice(0, 10)
 
@@ -78,16 +76,19 @@ test('toggleReminder: disable reminder resets reminderSentAt and saves', async (
     save: async () => {},
   }
 
-  let savedTodo = null
+  let didSave = false
+  let capturedTodo = null
   const fastify = {
     models: {
       Todo: {
-        findOne: async () => ({
-          ...todo,
-          save: async () => {
-            savedTodo = todo
-          },
-        }),
+        findOne: async () => {
+          const t = { ...todo }
+          t.save = async () => {
+            didSave = true
+            capturedTodo = t
+          }
+          return t
+        }
       },
     },
   }
@@ -96,6 +97,11 @@ test('toggleReminder: disable reminder resets reminderSentAt and saves', async (
   assert(res != null)
   assert.strictEqual(res.reminderEnabled, false)
   assert.strictEqual(res.reminderSentAt, null)
+  assert.strictEqual(didSave, true)
+  assert(capturedTodo != null, 'save() should have been called')
+  assert.strictEqual(capturedTodo.reminderEnabled, false)
+  assert.strictEqual(capturedTodo.reminderSentAt, null)
+  assert.strictEqual(res, capturedTodo)
 })
 
 test('toggleReminder: enable reminder keeps reminderSentAt and saves', async () => {
@@ -140,6 +146,8 @@ test('toggleReminder: missing todo returns null', async () => {
 })
 
 test('markReminderSent: sets reminderSentAt and returns true', async () => {
+  const restore = mockDate('2026-03-18T12:00:00.000Z')
+
   const todo = {
     id: 1,
     userId: 10,
@@ -148,15 +156,18 @@ test('markReminderSent: sets reminderSentAt and returns true', async () => {
   }
 
   let didSave = false
+  let capturedTodo = null
   const fastify = {
     models: {
       Todo: {
-        findOne: async () => ({
-          ...todo,
-          save: async () => {
+        findOne: async () => {
+          const t = { ...todo }
+          t.save = async () => {
             didSave = true
-          },
-        }),
+            capturedTodo = t
+          }
+          return t
+        }
       },
     },
   }
@@ -164,6 +175,11 @@ test('markReminderSent: sets reminderSentAt and returns true', async () => {
   const res = await todoService.markReminderSent(fastify, 1, 10)
   assert.strictEqual(res, true)
   assert.strictEqual(didSave, true)
+  assert(capturedTodo != null, 'save() should have been called')
+  assert(capturedTodo.reminderSentAt instanceof Date, 'reminderSentAt should be set to a Date')
+  assert.strictEqual(capturedTodo.reminderSentAt.toISOString(), '2026-03-18T12:00:00.000Z')
+
+  restore()
 })
 
 test('markReminderSent: missing todo returns false', async () => {
