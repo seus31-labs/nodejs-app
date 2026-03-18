@@ -410,6 +410,14 @@ module.exports = async function (fastify, opts) {
     handler: async (request, reply) => getArchivedTodos(fastify, request, reply),
   });
   fastify.get('/todos/due-soon', {
+    schema: {
+      response: {
+        200: {
+          type: 'array',
+          items: { type: 'object', additionalProperties: true },
+        },
+      },
+    },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => getDueSoonTodos(fastify, request, reply),
   });

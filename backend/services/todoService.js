@@ -488,16 +488,16 @@ async function bulkAddTag(fastify, todoIds, tagId, userId) {
  */
 async function getDueSoonTodos(fastify, userId) {
   const now = new Date();
-  const limit = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const startDate = now.toISOString().slice(0, 10);
-  const endDate = limit.toISOString().slice(0, 10);
+  const tomorrow = new Date(now);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const endDate = tomorrow.toISOString().slice(0, 10);
   return fastify.models.Todo.findAll({
     where: {
       userId,
       archived: false,
       completed: false,
       reminderEnabled: true,
-      dueDate: { [Op.between]: [startDate, endDate] },
+      dueDate: { [Op.lte]: endDate },
       // 現状は「未通知のみ」を返す（通知のスパム防止・シンプル優先）
       reminderSentAt: { [Op.is]: null },
     },
@@ -519,6 +519,7 @@ async function toggleReminder(fastify, todoId, userId, enabled) {
   if (!todo) return null;
   todo.reminderEnabled = !!enabled;
   if (!todo.reminderEnabled) {
+    // 再有効化時に再通知が走るよう、無効化時に送信履歴をリセットする
     todo.reminderSentAt = null;
   }
   await todo.save();
