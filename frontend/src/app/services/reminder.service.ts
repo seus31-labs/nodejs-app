@@ -49,7 +49,8 @@ export class ReminderService {
       if (notified.has(t.id)) continue
       const title = '期限が近い Todo'
       const body = t.title
-      this.notificationService.showNotification(title, body, { url: '/dashboard/todo', todoId: t.id })
+      // 期限リマインダー通知の遷移先は Todos 一覧（/dashboard/todos）に統一
+      this.notificationService.showNotification(title, body, { url: '/dashboard/todos', todoId: t.id })
       notified.add(t.id)
     }
 
