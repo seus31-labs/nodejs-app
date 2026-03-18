@@ -31,8 +31,8 @@ describe('ReminderService (4.14.2)', () => {
 
   it('start should poll and notify once per todoId', fakeAsync(() => {
     const todos: Todo[] = [
-      { id: 1, userId: 1, title: 'A', description: null, completed: false, priority: 'medium', dueDate: null, sortOrder: 0, projectId: null, archived: false, archivedAt: null, createdAt: '', updatedAt: '' },
-      { id: 2, userId: 1, title: 'B', description: null, completed: false, priority: 'medium', dueDate: null, sortOrder: 0, projectId: null, archived: false, archivedAt: null, createdAt: '', updatedAt: '' },
+      { id: 1, userId: 1, title: 'A', description: null, completed: false, priority: 'medium', dueDate: null, sortOrder: 0, projectId: null, archived: false, archivedAt: null, reminderEnabled: true, reminderSentAt: null, createdAt: '', updatedAt: '' },
+      { id: 2, userId: 1, title: 'B', description: null, completed: false, priority: 'medium', dueDate: null, sortOrder: 0, projectId: null, archived: false, archivedAt: null, reminderEnabled: true, reminderSentAt: null, createdAt: '', updatedAt: '' },
     ]
     todoService.getDueSoonTodos.and.returnValue(of(todos))
 
@@ -53,6 +53,32 @@ describe('ReminderService (4.14.2)', () => {
     tick(0)
     expect(notification.showNotification).not.toHaveBeenCalled()
     service.stop()
+  }))
+
+  it('start should continue polling after error', fakeAsync(() => {
+    const todos: Todo[] = [
+      { id: 1, userId: 1, title: 'A', description: null, completed: false, priority: 'medium', dueDate: null, sortOrder: 0, projectId: null, archived: false, archivedAt: null, reminderEnabled: true, reminderSentAt: null, createdAt: '', updatedAt: '' },
+    ]
+    todoService.getDueSoonTodos.and.returnValues(
+      throwError(() => new Error('first fail')),
+      of(todos)
+    )
+
+    service.start()
+    tick(0)
+    expect(notification.showNotification).not.toHaveBeenCalled()
+    tick(5 * 60 * 1000)
+    expect(notification.showNotification).toHaveBeenCalled()
+    service.stop()
+  }))
+
+  it('stop should set running$ false', fakeAsync(() => {
+    todoService.getDueSoonTodos.and.returnValue(of([]))
+    service.start()
+    tick(0)
+    expect(service.running$.value).toBeTrue()
+    service.stop()
+    expect(service.running$.value).toBeFalse()
   }))
 })
 

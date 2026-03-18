@@ -24,10 +24,11 @@ export class ReminderService {
 
     this.sub = timer(0, this.intervalMs)
       .pipe(
-        switchMap(() => this.todoService.getDueSoonTodos()),
-        catchError(() => {
-          return of([] as Todo[])
-        })
+        switchMap(() =>
+          this.todoService.getDueSoonTodos().pipe(
+            catchError(() => of([] as Todo[]))
+          )
+        )
       )
       .subscribe((todos) => this.handleDueSoon(todos))
   }
@@ -40,7 +41,8 @@ export class ReminderService {
 
   private handleDueSoon(todos: Todo[]): void {
     if (!todos.length) return
-    const notified = this.loadNotified()
+    const currentIds = new Set(todos.map((t) => t.id).filter((id) => Number.isInteger(id)))
+    const notified = new Set([...this.loadNotified()].filter((id) => currentIds.has(id)))
 
     for (const t of todos) {
       if (!t?.id) continue

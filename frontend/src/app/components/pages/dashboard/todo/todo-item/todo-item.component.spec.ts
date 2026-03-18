@@ -14,6 +14,8 @@ const mockTodo: Todo = {
   projectId: null,
   archived: false,
   archivedAt: null,
+  reminderEnabled: true,
+  reminderSentAt: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   Tags: [],

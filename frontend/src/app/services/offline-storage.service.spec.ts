@@ -16,6 +16,8 @@ const mockTodos: Todo[] = [
     projectId: null,
     archived: false,
     archivedAt: null,
+    reminderEnabled: true,
+    reminderSentAt: null,
     createdAt: '',
     updatedAt: ''
   }
