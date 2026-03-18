@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap'
 import type { Todo } from '../../../../../models/todo.interface'
@@ -10,9 +10,10 @@ import { TagChipComponent } from '../tag-chip/tag-chip.component'
   standalone: true,
   imports: [CommonModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, TagChipComponent],
   templateUrl: './todo-item.component.html',
-  styleUrls: ['./todo-item.component.scss']
+  styleUrls: ['./todo-item.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TodoItemComponent {
+export class TodoItemComponent implements OnChanges {
   @Input({ required: true }) todo!: Todo
   @Input() allTags: Tag[] = []
   @Input() highlightQuery = ''
@@ -22,6 +23,16 @@ export class TodoItemComponent {
   @Output() archive = new EventEmitter<number>()
   @Output() tagRemoved = new EventEmitter<{ todoId: number; tag: Tag }>()
   @Output() tagAdded = new EventEmitter<{ todoId: number; tagId: number }>()
+
+  titleParts: Array<{ text: string; match: boolean }> = []
+  descParts: Array<{ text: string; match: boolean }> = []
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['todo'] || changes['highlightQuery']) {
+      this.titleParts = this.highlightParts(this.todo?.title ?? '')
+      this.descParts = this.todo?.description ? this.highlightParts(this.todo.description) : []
+    }
+  }
 
   onToggle(): void {
     this.toggle.emit(this.todo.id)
@@ -86,7 +97,7 @@ export class TodoItemComponent {
     const raw = (this.highlightQuery ?? '').trim()
     if (!raw) return [{ text, match: false }]
 
-    const tokens = raw.split(/\s+/).filter((t) => t.length >= 2)
+    const tokens = raw.split(/\s+/).filter((t) => t.length >= 1)
     if (tokens.length === 0) return [{ text, match: false }]
 
     const escaped = tokens.map((t) => this.escapeRegExp(t))

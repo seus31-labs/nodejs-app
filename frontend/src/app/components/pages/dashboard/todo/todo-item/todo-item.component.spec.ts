@@ -49,5 +49,20 @@ describe('TodoItemComponent (2.12.2)', () => {
     expect(parts.some((p) => p.match)).toBeTrue()
     expect(parts.map((p) => p.text).join('')).toEqual('牛乳とパンを買う')
   })
+
+  it('should correctly split parts with match flags', () => {
+    component.highlightQuery = 'パン'
+    const parts = component.highlightParts('牛乳とパンを買う')
+    expect(parts).toEqual([
+      { text: '牛乳と', match: false },
+      { text: 'パン', match: true },
+      { text: 'を買う', match: false },
+    ])
+  })
+
+  it('should not throw on special regex chars in query', () => {
+    component.highlightQuery = '(買い物)'
+    expect(() => component.highlightParts('(買い物)に行く')).not.toThrow()
+  })
 })
 
