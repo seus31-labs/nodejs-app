@@ -22,3 +22,17 @@
     margin-top: 0 !important;
   }
 }
+
+.reminder-toggle-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+}
+
+.reminder-toggle-btn i {
+  font-size: 1.05rem;
+  line-height: 1;
+}
