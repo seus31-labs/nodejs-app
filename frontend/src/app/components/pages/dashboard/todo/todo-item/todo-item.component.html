@@ -53,6 +53,17 @@
     @if (todo.completed) {
       <button type="button" class="btn btn-outline-secondary" (click)="onArchive()" title="アーカイブ">アーカイブ</button>
     }
+    <button
+      type="button"
+      class="btn"
+      [class.btn-outline-warning]="todo.reminderEnabled"
+      [class.btn-outline-secondary]="!todo.reminderEnabled"
+      (click)="onToggleReminder()"
+      [attr.aria-label]="'リマインダー切り替え: ' + todo.title"
+      title="リマインダー"
+    >
+      @if (todo.reminderEnabled) { リマインダーON } @else { リマインダーOFF }
+    </button>
     <button type="button" class="btn btn-outline-primary" (click)="onEdit()">編集</button>
     <button type="button" class="btn btn-outline-danger" (click)="onDelete()">削除</button>
   </div>
