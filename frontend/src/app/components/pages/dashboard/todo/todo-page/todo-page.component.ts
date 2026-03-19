@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { Subject, takeUntil } from 'rxjs'
+import { EMPTY, Subject, takeUntil } from 'rxjs'
 import { MatDialog } from '@angular/material/dialog'
 import { TodoService, type TodoListFilters } from '../../../../../services/todo.service'
 import { TagService } from '../../../../../services/tag.service'
@@ -29,6 +29,7 @@ import type { Template } from '../../../../../models/template.interface'
 import type { SharePermission } from '../../../../../models/share.interface'
 import type { SortBy, SortOrder } from '../../../../../models/sort-options.interface'
 import type { SearchParams } from '../../../../../models/search-params.interface'
+import { switchMap } from 'rxjs/operators'
 
 @Component({
   selector: 'app-todo-page',
@@ -221,19 +222,20 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
 
     type ShareDialogResult = { sharedWithUserId: number; permission: SharePermission }
 
-    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result: ShareDialogResult | undefined) => {
-      if (!result) return
-
-      this.shareService
-        .shareTodo(todoId, result.sharedWithUserId, result.permission)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => this.loadTodos(),
-          error: (err) => {
-            this.error = err?.error?.message ?? err?.message ?? '共有に失敗しました'
-          }
+    ref.afterClosed()
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap((result: ShareDialogResult | undefined) => {
+          if (!result) return EMPTY
+          return this.shareService.shareTodo(todoId, result.sharedWithUserId, result.permission)
         })
-    })
+      )
+      .subscribe({
+        next: () => {},
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? '共有に失敗しました'
+        }
+      })
   }
 
   onFiltersChange(): void {
