@@ -22,7 +22,7 @@
 - [x] 11.9: ShareDialog コンポーネント作成（ユーザー検索、権限選択）
 - [x] 11.10: TodoItem に共有ボタン追加
 - [x] 11.11: SharedTodosPage 作成
-- [ ] 11.12: Frontend テスト
+- [x] 11.12: Frontend テスト
 
 ---
 
