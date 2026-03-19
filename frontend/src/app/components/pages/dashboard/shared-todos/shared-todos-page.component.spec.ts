@@ -70,6 +70,16 @@ describe('SharedTodosPageComponent (11.12)', () => {
     expect(component.loading).toBe(false)
   })
 
+  it('should keep empty todos when getSharedTodos returns empty array', () => {
+    shareService.getSharedTodos.and.returnValue(of([]))
+
+    component.ngOnInit()
+
+    expect(component.todos).toEqual([])
+    expect(component.loading).toBe(false)
+    expect(component.error).toBeNull()
+  })
+
   it('permissionLabel should map permission labels', () => {
     expect(component.permissionLabel('view')).toBe('閲覧のみ')
     expect(component.permissionLabel('edit')).toBe('編集可')
@@ -77,5 +87,12 @@ describe('SharedTodosPageComponent (11.12)', () => {
 
   it('formatDueDate should return fallback for null', () => {
     expect(component.formatDueDate(null)).toBe('期限なし')
+  })
+
+  it('formatDueDate should format a date string', () => {
+    const result = component.formatDueDate('2026-03-20T10:00:00.000Z')
+
+    expect(result).not.toBe('期限なし')
+    expect(result.length).toBeGreaterThan(0)
   })
 })
