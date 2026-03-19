@@ -34,7 +34,7 @@
 
 ### Backend タスク（5タスク）
 - [x] 12.1: TodoService に日付範囲フィルタ追加
-- [ ] 12.2: GET /api/todos?startDate=&endDate= 実装
+- [x] 12.2: GET /api/todos?startDate=&endDate= 実装
 - [ ] 12.3: Backend テスト
 
 ### Frontend タスク（12タスク）

@@ -38,6 +38,8 @@ async function getTodos(fastify, req, reply) {
       sortOrder: req.query.sortOrder,
       tagIds: parseTagIdsQuery(req.query.tags),
       projectId: req.query.projectId,
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
     };
     const todos = await todoService.getTodosByUserId(fastify, userId, options);
     reply.code(200).send(todos.map((t) => t.toJSON()));
