@@ -624,6 +624,56 @@ test('GET /api/v1/todos with sortBy and sortOrder returns sorted list', async (t
   }
 })
 
+test('GET /api/v1/todos with startDate and endDate returns todos in range', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `dr-${suffix}`, email: `dr-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'in-range', dueDate: '2026-03-15' }
+  })
+  await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'out-of-range', dueDate: '2026-04-01' }
+  })
+
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    query: { startDate: '2026-03-01', endDate: '2026-03-31' }
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const todos = JSON.parse(res.payload)
+  assert(todos.some((todo) => todo.title === 'in-range'))
+  assert(!todos.some((todo) => todo.title === 'out-of-range'))
+})
+
+test('GET /api/v1/todos with startDate > endDate returns 400', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `drinv-${suffix}`, email: `drinv-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    query: { startDate: '2026-04-01', endDate: '2026-03-01' }
+  })
+  assert.strictEqual(res.statusCode, 400)
+})
+
 test('PUT /api/v1/todos/reorder without auth returns 401', async (t) => {
   const app = await build(t)
   const res = await app.inject({

@@ -361,6 +361,8 @@ module.exports = async function (fastify, opts) {
           sortOrder: { type: 'string', enum: ['asc', 'desc'] },
           tags: { type: 'string' },
           projectId: { type: 'string', pattern: '^[0-9]+$' },
+          startDate: { type: 'string', format: 'date' },
+          endDate: { type: 'string', format: 'date' },
         },
       },
     },

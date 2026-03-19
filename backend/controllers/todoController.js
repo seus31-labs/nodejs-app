@@ -31,6 +31,9 @@ function parseTagIdsQuery(q) {
 async function getTodos(fastify, req, reply) {
   try {
     const userId = req.user.id;
+    if (req.query.startDate && req.query.endDate && req.query.startDate > req.query.endDate) {
+      return reply.code(400).send({ error: 'startDate must be less than or equal to endDate' });
+    }
     const options = {
       completed: req.query.completed === 'true' ? true : req.query.completed === 'false' ? false : undefined,
       priority: req.query.priority,
@@ -38,6 +41,8 @@ async function getTodos(fastify, req, reply) {
       sortOrder: req.query.sortOrder,
       tagIds: parseTagIdsQuery(req.query.tags),
       projectId: req.query.projectId,
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
     };
     const todos = await todoService.getTodosByUserId(fastify, userId, options);
     reply.code(200).send(todos.map((t) => t.toJSON()));
