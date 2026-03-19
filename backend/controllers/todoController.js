@@ -31,6 +31,9 @@ function parseTagIdsQuery(q) {
 async function getTodos(fastify, req, reply) {
   try {
     const userId = req.user.id;
+    if (req.query.startDate && req.query.endDate && req.query.startDate > req.query.endDate) {
+      return reply.code(400).send({ error: 'startDate must be less than or equal to endDate' });
+    }
     const options = {
       completed: req.query.completed === 'true' ? true : req.query.completed === 'false' ? false : undefined,
       priority: req.query.priority,
