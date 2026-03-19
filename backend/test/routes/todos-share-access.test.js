@@ -12,6 +12,11 @@ function uniqueSuffix() {
   return `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+function tokenUserId(token) {
+  const payload = token.split('.')[1];
+  return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')).id;
+}
+
 async function setupOwnerViewEditUnshared(t, app) {
   const suffix = uniqueSuffix();
   const owner = { name: `tsa-owner-${suffix}`, email: `tsa-owner-${suffix}@test.local`, password: 'pass123' };
@@ -22,10 +27,14 @@ async function setupOwnerViewEditUnshared(t, app) {
     await app.inject({ method: 'POST', url: '/api/v1/register', payload: u });
   }
   const ownerLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: owner.email, password: owner.password } });
+  const viewLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: viewUser.email, password: viewUser.password } });
+  const editLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: editUser.email, password: editUser.password } });
+  const unsharedLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: unshared.email, password: unshared.password } });
   const ownerToken = JSON.parse(ownerLogin.payload).token;
-  const usersList = JSON.parse((await app.inject({ method: 'GET', url: '/api/v1/users', headers: { authorization: `Bearer ${ownerToken}` } })).payload);
-  const viewId = usersList.find((u) => u.email === viewUser.email).id;
-  const editId = usersList.find((u) => u.email === editUser.email).id;
+  const viewToken = JSON.parse(viewLogin.payload).token;
+  const editToken = JSON.parse(editLogin.payload).token;
+  const viewId = tokenUserId(viewToken);
+  const editId = tokenUserId(editToken);
   const todoRes = await app.inject({
     method: 'POST',
     url: '/api/v1/todos',
@@ -46,14 +55,11 @@ async function setupOwnerViewEditUnshared(t, app) {
     headers: { authorization: `Bearer ${ownerToken}` },
     payload: { sharedWithUserId: editId, permission: 'edit' },
   });
-  const viewLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: viewUser.email, password: viewUser.password } });
-  const editLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: editUser.email, password: editUser.password } });
-  const unsharedLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: unshared.email, password: unshared.password } });
   return {
     todo,
     ownerToken,
-    viewToken: JSON.parse(viewLogin.payload).token,
-    editToken: JSON.parse(editLogin.payload).token,
+    viewToken,
+    editToken,
     unsharedToken: JSON.parse(unsharedLogin.payload).token,
   };
 }
@@ -128,9 +134,10 @@ test('deleteTodo: edit 権限の共有ユーザーは削除できる', async (t)
   await app.inject({ method: 'POST', url: '/api/v1/register', payload: owner });
   await app.inject({ method: 'POST', url: '/api/v1/register', payload: editUser });
   const ownerLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: owner.email, password: owner.password } });
+  const editLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: editUser.email, password: editUser.password } });
   const ownerToken = JSON.parse(ownerLogin.payload).token;
-  const usersList = JSON.parse((await app.inject({ method: 'GET', url: '/api/v1/users', headers: { authorization: `Bearer ${ownerToken}` } })).payload);
-  const editId = usersList.find((u) => u.email === editUser.email).id;
+  const editToken = JSON.parse(editLogin.payload).token;
+  const editId = tokenUserId(editToken);
   const todoRes = await app.inject({
     method: 'POST',
     url: '/api/v1/todos',
@@ -144,8 +151,6 @@ test('deleteTodo: edit 権限の共有ユーザーは削除できる', async (t)
     headers: { authorization: `Bearer ${ownerToken}` },
     payload: { sharedWithUserId: editId, permission: 'edit' },
   });
-  const editLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: editUser.email, password: editUser.password } });
-  const editToken = JSON.parse(editLogin.payload).token;
   const res = await app.inject({
     method: 'DELETE',
     url: `/api/v1/todos/${todo.id}`,
@@ -215,7 +220,7 @@ test('addTagToTodo: edit 権限の共有ユーザーはタグ付けできる', a
     headers: { authorization: `Bearer ${editToken}` },
     payload: { tagId: tag.id },
   });
-  assert.ok([200, 201].includes(res.statusCode));
+  assert.strictEqual(res.statusCode, 204);
 });
 
 test('removeTagFromTodo: view 権限のみは 404', async (t) => {
