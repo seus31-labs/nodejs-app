@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { EMPTY, Subject, takeUntil } from 'rxjs'
+import { EMPTY, Subject, switchMap, takeUntil } from 'rxjs'
 import { MatDialog } from '@angular/material/dialog'
 import { TodoService, type TodoListFilters } from '../../../../../services/todo.service'
 import { TagService } from '../../../../../services/tag.service'
@@ -29,8 +29,6 @@ import type { Template } from '../../../../../models/template.interface'
 import type { SharePermission } from '../../../../../models/share.interface'
 import type { SortBy, SortOrder } from '../../../../../models/sort-options.interface'
 import type { SearchParams } from '../../../../../models/search-params.interface'
-import { switchMap } from 'rxjs/operators'
-
 @Component({
   selector: 'app-todo-page',
   standalone: true,
