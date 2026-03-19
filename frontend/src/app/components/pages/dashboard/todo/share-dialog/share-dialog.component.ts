@@ -7,7 +7,7 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog'
 import { MatButtonModule } from '@angular/material/button'
-import { MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog'
+import { MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
@@ -31,7 +31,6 @@ export interface ShareDialogData {
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
@@ -44,8 +43,8 @@ export interface ShareDialogData {
 })
 export class ShareDialogComponent implements OnInit, OnDestroy {
   readonly permissionOptions: Array<{ value: SharePermission; label: string }> = [
-    { value: 'view', label: 'view' },
-    { value: 'edit', label: 'edit' }
+    { value: 'view', label: '閲覧のみ' },
+    { value: 'edit', label: '編集可' }
   ]
 
   searchControl = new FormControl<string>('', { nonNullable: true })

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { ShareDialogComponent, type ShareDialogData } from './share-dialog.component'
 import { UserService } from '../../../../../services/user.service'
 import type { UserListResponse } from '../../../../../models/user.interface'
@@ -64,6 +64,12 @@ describe('ShareDialogComponent (11.9)', () => {
     expect(component.filteredUsers[0].id).toBe(1)
   })
 
+  it('should filter users by email too', () => {
+    component.searchControl.setValue('bob@test.local')
+    expect(component.filteredUsers.length).toBe(1)
+    expect(component.filteredUsers[0].email).toBe('bob@test.local')
+  })
+
   it('should close with shared user and permission on share()', () => {
     component.selectedUserId = 2
     component.permission = 'edit' as SharePermission
@@ -73,6 +79,24 @@ describe('ShareDialogComponent (11.9)', () => {
       sharedWithUserId: 2,
       permission: 'edit'
     })
+  })
+
+  it('should not close when selectedUserId is null (share disabled)', () => {
+    component.selectedUserId = null
+    component.share()
+    expect(component.canShare()).toBe(false)
+    expect(dialogRef.close).not.toHaveBeenCalledWith(
+      jasmine.objectContaining({ sharedWithUserId: jasmine.any(Number) })
+    )
+  })
+
+  it('should set error when userService.list fails', () => {
+    userService.list.and.returnValue(throwError(() => ({ error: { message: 'User list failed' } })))
+    component.ngOnInit()
+    fixture.detectChanges()
+
+    expect(component.error).toBe('User list failed')
+    expect(component.loading).toBe(false)
   })
 
   it('should close without payload on cancel()', () => {
