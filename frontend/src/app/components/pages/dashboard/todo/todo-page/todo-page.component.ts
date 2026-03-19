@@ -6,6 +6,7 @@ import { TodoService, type TodoListFilters } from '../../../../../services/todo.
 import { TagService } from '../../../../../services/tag.service'
 import { ProjectService } from '../../../../../services/project.service'
 import { TemplateService } from '../../../../../services/template.service'
+import { ShareService } from '../../../../../services/share.service'
 import { TodoListComponent } from '../todo-list/todo-list.component'
 import { TodoFormComponent } from '../todo-form/todo-form.component'
 import { SearchBarComponent } from '../search-bar/search-bar.component'
@@ -17,6 +18,7 @@ import {
   type AdvancedSearchDialogData
 } from '../advanced-search-dialog/advanced-search-dialog.component'
 import { ImportDialogComponent } from '../import-dialog/import-dialog.component'
+import { ShareDialogComponent } from '../share-dialog/share-dialog.component'
 import { ExportService } from '../../../../../services/export.service'
 import { KeyboardShortcutService } from '../../../../../services/keyboard-shortcut.service'
 import type { ReminderToggleEvent } from '../todo-item/todo-item.component'
@@ -24,6 +26,7 @@ import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models
 import type { Tag } from '../../../../../models/tag.interface'
 import type { Project } from '../../../../../models/project.interface'
 import type { Template } from '../../../../../models/template.interface'
+import type { SharePermission } from '../../../../../models/share.interface'
 import type { SortBy, SortOrder } from '../../../../../models/sort-options.interface'
 import type { SearchParams } from '../../../../../models/search-params.interface'
 
@@ -71,6 +74,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     private templateService: TemplateService,
     private exportService: ExportService,
     private shortcutService: KeyboardShortcutService,
+    private shareService: ShareService,
     private dialog: MatDialog
   ) {}
 
@@ -206,6 +210,29 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       this.filterTagIds = params.tagIds ?? []
       this.selectedIds = []
       this.loadTodos()
+    })
+  }
+
+  onShare(todoId: number): void {
+    const ref = this.dialog.open(ShareDialogComponent, {
+      width: '420px',
+      data: { todoId }
+    })
+
+    type ShareDialogResult = { sharedWithUserId: number; permission: SharePermission }
+
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result: ShareDialogResult | undefined) => {
+      if (!result) return
+
+      this.shareService
+        .shareTodo(todoId, result.sharedWithUserId, result.permission)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => this.loadTodos(),
+          error: (err) => {
+            this.error = err?.error?.message ?? err?.message ?? '共有に失敗しました'
+          }
+        })
     })
   }
 
