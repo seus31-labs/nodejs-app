@@ -9,6 +9,11 @@ function uniqueSuffix() {
   return `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+function tokenUserId(token) {
+  const payload = token.split('.')[1];
+  return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')).id;
+}
+
 test('POST /api/v1/todos/:id/share without auth returns 401', async (t) => {
   const app = await build(t);
   const res = await app.inject({
@@ -82,13 +87,7 @@ test('POST /api/v1/todos/:id/share 自分自身への共有で 400', async (t) =
   await app.inject({ method: 'POST', url: '/api/v1/register', payload: user });
   const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } });
   const token = JSON.parse(loginRes.payload).token;
-  const userRes = await app.inject({
-    method: 'GET',
-    url: '/api/v1/users',
-    headers: { authorization: `Bearer ${token}` },
-  });
-  const users = JSON.parse(userRes.payload);
-  const me = users.find((u) => u.email === user.email);
+  const me = { id: tokenUserId(token) };
   assert(me != null);
   const todoRes = await app.inject({
     method: 'POST',
@@ -117,9 +116,9 @@ test('POST /api/v1/todos/:id/share 成功で 201', async (t) => {
   await app.inject({ method: 'POST', url: '/api/v1/register', payload: owner });
   await app.inject({ method: 'POST', url: '/api/v1/register', payload: other });
   const ownerLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: owner.email, password: owner.password } });
+  const otherLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: other.email, password: other.password } });
   const ownerToken = JSON.parse(ownerLogin.payload).token;
-  const usersList = JSON.parse((await app.inject({ method: 'GET', url: '/api/v1/users', headers: { authorization: `Bearer ${ownerToken}` } })).payload);
-  const otherId = usersList.find((u) => u.email === other.email).id;
+  const otherId = tokenUserId(JSON.parse(otherLogin.payload).token);
   const todoRes = await app.inject({
     method: 'POST',
     url: '/api/v1/todos',
@@ -202,9 +201,9 @@ test('DELETE /api/v1/shares/:id 成功で 204', async (t) => {
   await app.inject({ method: 'POST', url: '/api/v1/register', payload: owner });
   await app.inject({ method: 'POST', url: '/api/v1/register', payload: other });
   const ownerLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: owner.email, password: owner.password } });
+  const otherLogin = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: other.email, password: other.password } });
   const ownerToken = JSON.parse(ownerLogin.payload).token;
-  const usersList = JSON.parse((await app.inject({ method: 'GET', url: '/api/v1/users', headers: { authorization: `Bearer ${ownerToken}` } })).payload);
-  const otherId = usersList.find((u) => u.email === other.email).id;
+  const otherId = tokenUserId(JSON.parse(otherLogin.payload).token);
   const todoRes = await app.inject({
     method: 'POST',
     url: '/api/v1/todos',

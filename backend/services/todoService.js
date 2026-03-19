@@ -8,6 +8,20 @@ const shareService = require('./shareService');
 const SORT_BY_ALLOWED = ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'];
 const SORT_ORDER_ALLOWED = ['asc', 'desc'];
 
+function isDateOnly(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [yearText, monthText, dayText] = value.split('-');
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() + 1 === month &&
+    date.getUTCDate() === day
+  );
+}
+
 /** Todo 取得時の共通 include（Tags + Project） */
 function buildTodoInclude(fastify) {
   return [
@@ -50,7 +64,7 @@ async function createTodo(fastify, userId, todoData) {
  * ユーザーの Todo 一覧をフィルタ・ソート付きで取得する（タグ・プロジェクト付き）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} userId - ユーザー ID
- * @param {object} options - { completed?, priority?, sortBy?, sortOrder?, tagIds?, projectId? }
+ * @param {object} options - { completed?, priority?, sortBy?, sortOrder?, tagIds?, projectId?, startDate?, endDate? }
  * @returns {Promise<object[]>} Todo 配列（Tags, Project を含む）
  */
 async function getTodosByUserId(fastify, userId, options = {}) {
@@ -64,6 +78,13 @@ async function getTodosByUserId(fastify, userId, options = {}) {
   const projectId = options.projectId != null ? Number(options.projectId) : null;
   if (Number.isInteger(projectId) && projectId > 0) {
     where.projectId = projectId;
+  }
+  if (isDateOnly(options.startDate) && isDateOnly(options.endDate)) {
+    where.dueDate = { [Op.between]: [options.startDate, options.endDate] };
+  } else if (isDateOnly(options.startDate)) {
+    where.dueDate = { [Op.gte]: options.startDate };
+  } else if (isDateOnly(options.endDate)) {
+    where.dueDate = { [Op.lte]: options.endDate };
   }
   const order = buildOrder(
     fastify.sequelize,

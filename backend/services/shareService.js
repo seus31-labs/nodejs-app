@@ -56,7 +56,7 @@ async function canView(fastify, todoId, userId) {
       as: 'TodoShares',
       required: false,
       where: { sharedWithUserId: userId },
-      attributes: [],
+      attributes: ['id'],
     }],
   });
   if (!todo) return false;
@@ -78,7 +78,7 @@ async function canEdit(fastify, todoId, userId) {
       as: 'TodoShares',
       required: false,
       where: { sharedWithUserId: userId, permission: 'edit' },
-      attributes: [],
+      attributes: ['id'],
     }],
   });
   if (!todo) return false;

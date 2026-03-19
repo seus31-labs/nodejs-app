@@ -33,7 +33,7 @@
 - Frontend: `@fullcalendar/angular`, `@fullcalendar/core`, `@fullcalendar/daygrid`
 
 ### Backend タスク（5タスク）
-- [ ] 12.1: TodoService に日付範囲フィルタ追加
+- [x] 12.1: TodoService に日付範囲フィルタ追加
 - [ ] 12.2: GET /api/todos?startDate=&endDate= 実装
 - [ ] 12.3: Backend テスト
 
