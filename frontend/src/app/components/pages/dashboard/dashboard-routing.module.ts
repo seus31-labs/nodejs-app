@@ -18,6 +18,10 @@ const routes: Routes = [
         loadComponent: () => import('./archived-todos/archived-todos-page.component')
       },
       {
+        path: 'shared',
+        loadComponent: () => import('./shared-todos/shared-todos-page.component')
+      },
+      {
         path: 'tags',
         loadComponent: () => import('./tags/tags-page.component')
       },

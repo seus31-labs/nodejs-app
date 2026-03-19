@@ -53,6 +53,14 @@ const NavigationItems = [
         classes: 'nav-item'
       },
       {
+        id: 'shared',
+        title: '共有Todo',
+        type: 'item',
+        url: '/dashboard/shared',
+        icon: 'feather icon-users',
+        classes: 'nav-item'
+      },
+      {
         id: 'projects',
         title: 'プロジェクト',
         type: 'item',
