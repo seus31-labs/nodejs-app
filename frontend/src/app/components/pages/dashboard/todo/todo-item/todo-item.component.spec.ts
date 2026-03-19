@@ -87,5 +87,12 @@ describe('TodoItemComponent (2.12.2)', () => {
 
     expect(emitted).toEqual([{ todoId: mockTodo.id, enabled: true }])
   })
+
+  it('onShare should emit todoId', () => {
+    const emitted: number[] = []
+    component.share.subscribe((id) => emitted.push(id))
+    component.onShare()
+    expect(emitted).toEqual([mockTodo.id])
+  })
 })
 
