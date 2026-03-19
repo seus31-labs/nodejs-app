@@ -27,6 +27,7 @@ export class TodoListComponent {
   @Output() edit = new EventEmitter<Todo>()
   @Output() delete = new EventEmitter<number>()
   @Output() archive = new EventEmitter<number>()
+  @Output() share = new EventEmitter<number>()
   @Output() reminderToggled = new EventEmitter<ReminderToggleEvent>()
   @Output() reorder = new EventEmitter<number[]>()
   @Output() tagRemoved = new EventEmitter<{ todoId: number; tag: Tag }>()
