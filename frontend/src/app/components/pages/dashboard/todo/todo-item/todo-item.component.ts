@@ -26,7 +26,6 @@ export class TodoItemComponent implements OnChanges {
   @Output() edit = new EventEmitter<Todo>()
   @Output() delete = new EventEmitter<number>()
   @Output() archive = new EventEmitter<number>()
-  @Output() share = new EventEmitter<number>()
   @Output() reminderToggled = new EventEmitter<ReminderToggleEvent>()
   @Output() tagRemoved = new EventEmitter<{ todoId: number; tag: Tag }>()
   @Output() tagAdded = new EventEmitter<{ todoId: number; tagId: number }>()
@@ -55,10 +54,6 @@ export class TodoItemComponent implements OnChanges {
 
   onArchive(): void {
     this.archive.emit(this.todo.id)
-  }
-
-  onShare(): void {
-    this.share.emit(this.todo.id)
   }
 
   onToggleReminder(): void {
