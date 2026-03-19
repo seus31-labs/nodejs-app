@@ -11,7 +11,7 @@ import type { SharedTodo, SharePermission } from '../../../../models/share.inter
   standalone: true,
   imports: [CommonModule, CardComponent],
   templateUrl: './shared-todos-page.component.html',
-  styleUrls: ['./shared-todos-page.component.scss']
+  styleUrl: './shared-todos-page.component.scss'
 })
 export default class SharedTodosPageComponent implements OnInit, OnDestroy {
   todos: SharedTodo<Todo>[] = []
@@ -31,7 +31,7 @@ export default class SharedTodosPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete()
   }
 
-  loadSharedTodos(): void {
+  private loadSharedTodos(): void {
     this.loading = true
     this.error = null
 
