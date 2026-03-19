@@ -1,0 +1,54 @@
+<div class="row">
+  <div class="col-12">
+    <app-card cardTitle="共有された Todo（{{ todos.length }} 件）">
+      @if (error) {
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+      }
+
+      @if (loading) {
+        <div class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">読み込み中...</span>
+          </div>
+        </div>
+      } @else if (todos.length === 0) {
+        <p class="text-muted py-3">共有されている Todo はありません。</p>
+      } @else {
+        <div class="shared-list">
+          @for (todo of todos; track todo.id) {
+            <div class="shared-item border rounded p-3 mb-2">
+              <div class="d-flex align-items-start justify-content-between gap-2">
+                <div>
+                  <h6 class="mb-1">
+                    {{ todo.title }}
+                    @if (todo.completed) {
+                      <span class="badge text-bg-success ms-2">完了</span>
+                    }
+                  </h6>
+                  @if (todo.description) {
+                    <p class="mb-2 text-muted small">{{ todo.description }}</p>
+                  }
+                </div>
+                <span
+                  class="badge"
+                  [class.text-bg-warning]="todo.sharedPermission === 'edit'"
+                  [class.text-bg-secondary]="todo.sharedPermission === 'view'"
+                >
+                  {{ permissionLabel(todo.sharedPermission) }}
+                </span>
+              </div>
+
+              <div class="small text-muted d-flex flex-wrap gap-3">
+                <span>期限: {{ formatDueDate(todo.dueDate) }}</span>
+                <span>優先度: {{ todo.priority }}</span>
+                @if (todo.Project) {
+                  <span>プロジェクト: {{ todo.Project.name }}</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </app-card>
+  </div>
+</div>
