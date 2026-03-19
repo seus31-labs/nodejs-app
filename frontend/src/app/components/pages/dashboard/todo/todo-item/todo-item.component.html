@@ -64,6 +64,15 @@
     >
       <i class="feather icon-bell" aria-hidden="true"></i>
     </button>
+    <button
+      type="button"
+      class="btn btn-outline-secondary"
+      (click)="onShare()"
+      [attr.aria-label]="'Todo を共有: ' + todo.title"
+      title="共有"
+    >
+      <i class="feather icon-share-2" aria-hidden="true"></i>
+    </button>
     <button type="button" class="btn btn-outline-primary" (click)="onEdit()">編集</button>
     <button type="button" class="btn btn-outline-danger" (click)="onDelete()">削除</button>
   </div>
