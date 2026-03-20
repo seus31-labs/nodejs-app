@@ -1,0 +1,15 @@
+<div class="calendar-wrapper">
+  @if (error) {
+    <div class="alert alert-danger mb-3" role="alert">{{ error }}</div>
+  }
+
+  @if (loading) {
+    <div class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">読み込み中...</span>
+      </div>
+    </div>
+  } @else {
+    <full-calendar [options]="calendarOptions" [events]="events"></full-calendar>
+  }
+</div>
