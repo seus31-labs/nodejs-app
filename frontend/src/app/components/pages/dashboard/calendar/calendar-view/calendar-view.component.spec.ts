@@ -22,8 +22,8 @@ describe('CalendarViewComponent', () => {
 
   it('should emit dateRangeChange when datesSet is called', () => {
     const emitSpy = spyOn(component.dateRangeChange, 'emit')
-    const start = new Date('2026-03-01T00:00:00.000Z')
-    const end = new Date('2026-04-01T00:00:00.000Z')
+    const start = new Date(2026, 2, 1)
+    const end = new Date(2026, 3, 1)
 
     component.onDatesSet({ start, end } as any)
 

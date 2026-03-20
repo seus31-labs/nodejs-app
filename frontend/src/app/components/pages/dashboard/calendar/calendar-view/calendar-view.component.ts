@@ -1,9 +1,9 @@
-import { CommonModule } from '@angular/common'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FullCalendarModule } from '@fullcalendar/angular'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import type { DatesSetArg, EventClickArg, EventInput } from '@fullcalendar/core'
 import { CalendarOptions } from '@fullcalendar/core'
+import jaLocale from '@fullcalendar/core/locales/ja'
 
 export interface CalendarDateRange {
   startDate: string
@@ -18,9 +18,9 @@ export interface CalendarTodoMoveEvent {
 @Component({
   selector: 'app-calendar-view',
   standalone: true,
-  imports: [CommonModule, FullCalendarModule],
+  imports: [FullCalendarModule],
   templateUrl: './calendar-view.component.html',
-  styleUrls: ['./calendar-view.component.scss']
+  styleUrl: './calendar-view.component.scss'
 })
 export class CalendarViewComponent {
   @Input() events: EventInput[] = []
@@ -29,12 +29,13 @@ export class CalendarViewComponent {
 
   @Output() dateRangeChange = new EventEmitter<CalendarDateRange>()
   @Output() todoClick = new EventEmitter<number>()
+  // 12.8 でドラッグ&ドロップによる期限変更を実装する際に使用する
   @Output() todoMove = new EventEmitter<CalendarTodoMoveEvent>()
 
   readonly calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin],
     initialView: 'dayGridMonth',
-    locale: 'ja',
+    locale: jaLocale,
     height: 'auto',
     editable: false,
     dayMaxEvents: true,
@@ -61,6 +62,9 @@ export class CalendarViewComponent {
   }
 
   private toIsoDate(value: Date): string {
-    return value.toISOString().slice(0, 10)
+    const y = value.getFullYear()
+    const m = String(value.getMonth() + 1).padStart(2, '0')
+    const d = String(value.getDate()).padStart(2, '0')
+    return `${y}-${m}-${d}`
   }
 }
