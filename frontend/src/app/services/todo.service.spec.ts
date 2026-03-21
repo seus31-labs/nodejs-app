@@ -103,6 +103,20 @@ describe('TodoService', () => {
     })
   })
 
+  describe('list with date range (12.7 calendar)', () => {
+    it('should call GET /todos with startDate and endDate when filters include them', () => {
+      service
+        .list({ startDate: '2026-03-01', endDate: '2026-03-31' }, { sortBy: 'dueDate', sortOrder: 'asc' })
+        .subscribe()
+
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos` && r.method === 'GET')
+      expect(req.request.params.get('startDate')).toBe('2026-03-01')
+      expect(req.request.params.get('endDate')).toBe('2026-03-31')
+      expect(req.request.params.get('sortBy')).toBe('dueDate')
+      req.flush([])
+    })
+  })
+
   describe('reorderTodos (3.13.1)', () => {
     it('should call PUT /todos/reorder with todoIds in body', () => {
       const todoIds = [3, 1, 2]

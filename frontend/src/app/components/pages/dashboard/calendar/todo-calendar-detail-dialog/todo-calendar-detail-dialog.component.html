@@ -1,0 +1,43 @@
+<h2 mat-dialog-title>Todo 詳細</h2>
+<mat-dialog-content class="calendar-detail-content">
+  @if (loading) {
+    <div class="d-flex align-items-center gap-2 py-3">
+      <mat-spinner diameter="28"></mat-spinner>
+      <span class="small text-muted">読み込み中...</span>
+    </div>
+  } @else if (error) {
+    <p class="text-danger small mb-0">{{ error }}</p>
+  } @else if (todo) {
+    <div class="detail-body">
+      <h3 class="h6 mb-2">{{ todo.title }}</h3>
+      @if (todo.description) {
+        <p class="small text-muted mb-2 text-break">{{ todo.description }}</p>
+      }
+      <dl class="row small mb-0 g-1">
+        <dt class="col-sm-4 text-muted">期限</dt>
+        <dd class="col-sm-8 mb-0">{{ formatDueDate(todo.dueDate) }}</dd>
+        <dt class="col-sm-4 text-muted">優先度</dt>
+        <dd class="col-sm-8 mb-0">{{ priorityLabel(todo.priority) }}</dd>
+        <dt class="col-sm-4 text-muted">状態</dt>
+        <dd class="col-sm-8 mb-0">{{ todo.completed ? '完了' : '未完了' }}</dd>
+        @if (todo.Project) {
+          <dt class="col-sm-4 text-muted">プロジェクト</dt>
+          <dd class="col-sm-8 mb-0">{{ todo.Project.name }}</dd>
+        }
+      </dl>
+      @if (todo.Tags && todo.Tags.length > 0) {
+        <div class="mt-2">
+          <span class="small text-muted d-block mb-1">タグ</span>
+          <div class="d-flex flex-wrap gap-1">
+            @for (tag of todo.Tags; track tag.id) {
+              <span class="badge rounded-pill" [style.background-color]="tag.color">{{ tag.name }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" mat-button mat-dialog-close>閉じる</button>
+</mat-dialog-actions>

@@ -1,0 +1,13 @@
+<div class="row">
+  <div class="col-12">
+    <app-card cardTitle="カレンダー">
+      <app-calendar-view
+        [events]="calendarEvents"
+        [loading]="loading"
+        [error]="error"
+        (dateRangeChange)="onDateRangeChange($event)"
+        (todoClick)="onTodoClick($event)"
+      />
+    </app-card>
+  </div>
+</div>

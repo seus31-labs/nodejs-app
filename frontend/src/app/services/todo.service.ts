@@ -14,6 +14,9 @@ export interface TodoListFilters {
   priority?: TodoPriority
   tagIds?: number[]
   projectId?: number | null
+  /** GET /todos の startDate / endDate（DATEONLY、カレンダー範囲用） */
+  startDate?: string
+  endDate?: string
 }
 
 @Injectable({
@@ -45,6 +48,8 @@ export class TodoService {
     if (filters?.priority) params['priority'] = filters.priority
     if (filters?.tagIds?.length) params['tags'] = filters.tagIds.join(',')
     if (filters?.projectId != null) params['projectId'] = String(filters.projectId)
+    if (filters?.startDate) params['startDate'] = filters.startDate
+    if (filters?.endDate) params['endDate'] = filters.endDate
     if (sort?.sortBy) params['sortBy'] = sort.sortBy
     if (sort?.sortOrder) params['sortOrder'] = sort.sortOrder
     return this.http.get<Todo[]>(`${this.apiUrl}/todos`, { params }).pipe(
