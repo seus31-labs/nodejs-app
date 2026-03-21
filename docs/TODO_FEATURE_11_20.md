@@ -40,7 +40,7 @@
 ### Frontend タスク（12タスク）
 - [x] 12.4: FullCalendar インストール
 - [x] 12.5: CalendarView コンポーネント作成
-- [ ] 12.6: Todo を FullCalendar イベントに変換
+- [x] 12.6: Todo を FullCalendar イベントに変換
 - [ ] 12.7: イベントクリックで Todo 詳細表示
 - [ ] 12.8: ドラッグ&ドロップで期限変更
 - [ ] 12.9: CalendarPage 作成
