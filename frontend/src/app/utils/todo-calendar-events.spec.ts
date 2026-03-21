@@ -66,12 +66,24 @@ describe('todoToCalendarEvent', () => {
   it('should apply completed styling', () => {
     const ev = todoToCalendarEvent(makeTodo({ completed: true }))
     expect(ev?.classNames).toEqual(['calendar-todo--completed'])
-    expect(ev?.textColor).toBeDefined()
+    expect(ev?.textColor).toBe('#546e7a')
   })
 
   it('should apply high priority colors when not completed', () => {
     const ev = todoToCalendarEvent(makeTodo({ priority: 'high', completed: false }))
     expect(ev?.borderColor).toBe('#e53935')
+  })
+
+  it('should apply medium priority colors', () => {
+    const ev = todoToCalendarEvent(makeTodo({ priority: 'medium', completed: false }))
+    expect(ev?.borderColor).toBe('#ffa000')
+    expect(ev?.backgroundColor).toBe('#fff8e1')
+  })
+
+  it('should apply low priority colors', () => {
+    const ev = todoToCalendarEvent(makeTodo({ priority: 'low', completed: false }))
+    expect(ev?.borderColor).toBe('#43a047')
+    expect(ev?.backgroundColor).toBe('#e8f5e9')
   })
 })
 

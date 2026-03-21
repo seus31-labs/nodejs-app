@@ -44,8 +44,7 @@ export function todoToCalendarEvent(todo: Todo): EventInput | null {
       todoId: todo.id,
       completed: todo.completed,
       priority: todo.priority
-    },
-    ...(todo.completed ? { classNames: ['calendar-todo--completed'] } : {})
+    }
   }
 
   if (todo.completed) {
@@ -53,7 +52,8 @@ export function todoToCalendarEvent(todo: Todo): EventInput | null {
       ...base,
       backgroundColor: COMPLETED_COLORS.backgroundColor,
       borderColor: COMPLETED_COLORS.borderColor,
-      textColor: COMPLETED_COLORS.textColor
+      textColor: COMPLETED_COLORS.textColor,
+      classNames: ['calendar-todo--completed']
     }
   }
 
