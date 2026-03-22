@@ -8,6 +8,7 @@ const TodoTag = require('./todoTag')
 const Project = require('./project')
 const TodoTemplate = require('./todoTemplate')
 const TodoShare = require('./todoShare')
+const Comment = require('./comment')
 
 module.exports = fp(async function (fastify, opts) {
   const sequelize = fastify.sequelize
@@ -20,6 +21,7 @@ module.exports = fp(async function (fastify, opts) {
     Project: Project(sequelize),
     TodoTemplate: TodoTemplate(sequelize),
     TodoShare: TodoShare(sequelize),
+    Comment: Comment(sequelize),
   }
 
   Object.keys(models).forEach((name) => {

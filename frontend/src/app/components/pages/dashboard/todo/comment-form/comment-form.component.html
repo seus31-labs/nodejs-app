@@ -1,0 +1,22 @@
+<form class="comment-form" (ngSubmit)="onSubmit()">
+  <label class="form-label visually-hidden" for="comment-draft">コメント</label>
+  <textarea
+    id="comment-draft"
+    name="draft"
+    class="form-control form-control-sm"
+    rows="2"
+    [(ngModel)]="draft"
+    [disabled]="disabled || submitting"
+    placeholder="コメントを入力…"
+    maxlength="8000"
+  ></textarea>
+  <div class="d-flex justify-content-end mt-1">
+    <button type="submit" class="btn btn-sm btn-primary" [disabled]="disabled || submitting || !draft.trim()">
+      @if (submitting) {
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      } @else {
+        投稿
+      }
+    </button>
+  </div>
+</form>

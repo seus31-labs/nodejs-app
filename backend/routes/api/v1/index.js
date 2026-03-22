@@ -53,6 +53,12 @@ const { exportTodos } = require('../../../controllers/exportController');
 const { importTodos } = require('../../../controllers/importController');
 const { shareTodo, getSharedTodos, deleteShare } = require('../../../controllers/shareController');
 const {
+  getCommentsForTodo,
+  postComment,
+  putComment,
+  deleteComment,
+} = require('../../../controllers/commentController');
+const {
   getCompletionRate,
   getTodosByPriority: getAnalyticsByPriority,
   getTodosByTag: getAnalyticsByTag,
@@ -535,6 +541,70 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => removeTagFromTodo(fastify, request, reply),
+  });
+  fastify.get('/todos/:todoId/comments', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['todoId'],
+        properties: { todoId: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      response: {
+        200: {
+          type: 'array',
+          items: { type: 'object', additionalProperties: true },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getCommentsForTodo(fastify, request, reply),
+  });
+  fastify.post('/todos/:todoId/comments', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['todoId'],
+        properties: { todoId: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        required: ['content'],
+        properties: {
+          content: { type: 'string', minLength: 1, maxLength: 8000 },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => postComment(fastify, request, reply),
+  });
+  fastify.put('/comments/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        required: ['content'],
+        properties: {
+          content: { type: 'string', minLength: 1, maxLength: 8000 },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => putComment(fastify, request, reply),
+  });
+  fastify.delete('/comments/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => deleteComment(fastify, request, reply),
   });
   fastify.get('/todos/:id', {
     schema: {

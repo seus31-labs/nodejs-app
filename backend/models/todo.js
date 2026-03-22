@@ -99,6 +99,7 @@ module.exports = (sequelize) => {
       as: 'Tags',
     });
     Todo.hasMany(models.TodoShare, { foreignKey: 'todoId' });
+    Todo.hasMany(models.Comment, { foreignKey: 'todoId' });
   };
 
   return Todo;
