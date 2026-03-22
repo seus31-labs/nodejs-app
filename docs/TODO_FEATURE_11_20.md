@@ -56,15 +56,15 @@
 - 既存テーブルのみ使用（集計クエリ）
 
 ### Backend タスク（10タスク）
-- [ ] 13.1: AnalyticsService 作成
-- [ ] 13.2: `getCompletionRate(userId, period)` 実装
-- [ ] 13.3: `getTodosByPriority(userId)` 実装
-- [ ] 13.4: `getTodosByTag(userId)` 実装
-- [ ] 13.5: `getTodosByProject(userId)` 実装
-- [ ] 13.6: `getWeeklyStats(userId)` 実装
+- [x] 13.1: AnalyticsService 作成
+- [x] 13.2: `getCompletionRate(userId, period)` 実装
+- [x] 13.3: `getTodosByPriority(userId)` 実装
+- [x] 13.4: `getTodosByTag(userId)` 実装
+- [x] 13.5: `getTodosByProject(userId)` 実装
+- [x] 13.6: `getWeeklyStats(userId)` 実装
 - [ ] 13.7: AnalyticsController 作成
 - [ ] 13.8: Analytics ルート作成（GET /api/analytics/*)
-- [ ] 13.9: Backend テスト
+- [x] 13.9: Backend テスト
 
 ### Frontend タスク（15タスク）
 - [ ] 13.10: AnalyticsService 作成

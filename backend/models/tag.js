@@ -47,7 +47,12 @@ module.exports = (sequelize) => {
 
   Tag.associate = function (models) {
     Tag.belongsTo(models.User, { foreignKey: 'userId' });
-    Tag.belongsToMany(models.Todo, { through: models.TodoTag, foreignKey: 'tagId', otherKey: 'todoId' });
+    Tag.belongsToMany(models.Todo, {
+      through: models.TodoTag,
+      foreignKey: 'tagId',
+      otherKey: 'todoId',
+      as: 'Todos',
+    });
   };
 
   return Tag;
