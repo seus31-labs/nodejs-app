@@ -5,7 +5,7 @@
   } @else {
     <table class="table table-sm table-borderless mb-0">
       <tbody>
-        @for (entry of entries; track entry.keys) {
+        @for (entry of entries; track entry.keys + entry.description) {
           <tr>
             <td class="text-nowrap"><kbd class="shortcut-kbd">{{ entry.keys }}</kbd></td>
             <td>{{ entry.description }}</td>
@@ -13,6 +13,43 @@
         }
       </tbody>
     </table>
+  }
+
+  @if (rows.length > 0) {
+    <hr class="my-3" />
+    <h3 class="h6 mb-2">カスタマイズ</h3>
+    <p class="text-muted small mb-2">設定はこのブラウザの LocalStorage に保存されます。変更は修飾キー（Ctrl / Shift / Alt）を含む組み合わせのみ有効です。</p>
+    @if (feedback) {
+      <p class="small mb-2" [class.text-danger]="feedback !== '保存しました' && feedback !== '初期値に戻しました' && feedback !== 'すべて初期値に戻しました'">{{ feedback }}</p>
+    }
+    @if (captureForId) {
+      <p class="small text-primary mb-2">録画中… キーを押してください</p>
+    }
+    <table class="table table-sm align-middle mb-2">
+      <thead>
+        <tr>
+          <th scope="col">操作</th>
+          <th scope="col">現在</th>
+          <th scope="col" class="text-end">変更</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.id) {
+          <tr>
+            <td>{{ row.description }}</td>
+            <td>
+              <kbd class="shortcut-kbd">{{ row.currentKeysLabel }}</kbd>
+              <span class="text-muted small ms-1">（初期: {{ row.defaultKeysLabel }}）</span>
+            </td>
+            <td class="text-end text-nowrap">
+              <button type="button" mat-button color="primary" (click)="startCapture(row.id)" [disabled]="captureForId !== null">変更</button>
+              <button type="button" mat-button (click)="resetRow(row.id)">初期化</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <button type="button" mat-stroked-button (click)="resetAll()" [disabled]="captureForId !== null">すべてデフォルトに戻す</button>
   }
 </mat-dialog-content>
 <mat-dialog-actions align="end">

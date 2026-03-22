@@ -20,7 +20,7 @@ import {
 import { ImportDialogComponent } from '../import-dialog/import-dialog.component'
 import { ShareDialogComponent } from '../share-dialog/share-dialog.component'
 import { ExportService } from '../../../../../services/export.service'
-import { KeyboardShortcutService } from '../../../../../services/keyboard-shortcut.service'
+import { KeyboardShortcutService, KEYBOARD_SHORTCUT_IDS } from '../../../../../services/keyboard-shortcut.service'
 import type { ReminderToggleEvent } from '../todo-item/todo-item.component'
 import type { Todo, TodoCreateUpdate, TodoPriority } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
@@ -82,8 +82,20 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
     this.loadProjects()
     this.loadTemplates()
     this.loadTodos()
-    this.shortcutService.register('Ctrl+N', () => this.showToNewTodoForm(), '新規 Todo フォームを表示')
-    this.shortcutService.register('Ctrl+F', () => this.focusSearch(), '検索バーにフォーカス')
+    this.shortcutService.registerBinding({
+      id: KEYBOARD_SHORTCUT_IDS.NEW_TODO,
+      defaultKeys: 'ctrl+n',
+      defaultKeysLabel: 'Ctrl+N',
+      handler: () => this.showToNewTodoForm(),
+      description: '新規 Todo フォームを表示',
+    })
+    this.shortcutService.registerBinding({
+      id: KEYBOARD_SHORTCUT_IDS.FOCUS_SEARCH,
+      defaultKeys: 'ctrl+f',
+      defaultKeysLabel: 'Ctrl+F',
+      handler: () => this.focusSearch(),
+      description: '検索バーにフォーカス',
+    })
   }
 
   showToNewTodoForm(): void {
@@ -116,8 +128,8 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.shortcutService.unregister('ctrl+n')
-    this.shortcutService.unregister('ctrl+f')
+    this.shortcutService.unregisterBinding(KEYBOARD_SHORTCUT_IDS.NEW_TODO)
+    this.shortcutService.unregisterBinding(KEYBOARD_SHORTCUT_IDS.FOCUS_SEARCH)
     this.destroy$.next()
     this.destroy$.complete()
   }
