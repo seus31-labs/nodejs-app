@@ -1,3 +1,63 @@
+/* FullCalendar は子 DOM にスタイルを持つため、Bootstrap / テーマ変数へ寄せてダッシュボードと馴染ませる */
+:host {
+  display: block;
+}
+
 .calendar-wrapper {
-  min-height: 360px;
+  min-height: 380px;
+}
+
+:host ::ng-deep {
+  .fc {
+    --fc-border-color: var(--bs-border-color, #dee2e6);
+    --fc-page-bg-color: var(--bs-body-bg, #fff);
+    --fc-neutral-bg-color: var(--bs-secondary-bg, #e9ecef);
+    --fc-today-bg-color: color-mix(in srgb, var(--bs-primary, #0d6efd) 10%, transparent);
+    --fc-button-bg-color: var(--bs-primary, #0d6efd);
+    --fc-button-border-color: var(--bs-primary, #0d6efd);
+    --fc-button-text-color: var(--bs-btn-color, #fff);
+    --fc-button-hover-bg-color: var(--bs-primary, #0d6efd);
+    --fc-button-hover-border-color: var(--bs-primary, #0d6efd);
+    --fc-button-active-bg-color: var(--bs-primary, #0d6efd);
+    --fc-button-active-border-color: var(--bs-primary, #0d6efd);
+    font-size: 0.875rem;
+  }
+
+  .fc .fc-toolbar.fc-header-toolbar {
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--bs-body-color, #212529);
+  }
+
+  .fc .fc-col-header-cell-cushion,
+  .fc .fc-daygrid-day-number {
+    color: var(--bs-body-color, #212529);
+  }
+
+  .fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame {
+    background-color: transparent;
+  }
+
+  .fc .fc-daygrid-day.fc-day-today {
+    background-color: var(--fc-today-bg-color) !important;
+  }
+
+  /* 未完了 Todo のドラッグ操作ヒント（完了済みは todo-calendar-events の class で無効化） */
+  .fc .fc-daygrid-event:not(.calendar-todo--completed) {
+    cursor: grab;
+  }
+
+  .fc .fc-daygrid-event:not(.calendar-todo--completed):active {
+    cursor: grabbing;
+  }
+
+  .fc .fc-daygrid-event.calendar-todo--completed {
+    cursor: pointer;
+  }
 }
