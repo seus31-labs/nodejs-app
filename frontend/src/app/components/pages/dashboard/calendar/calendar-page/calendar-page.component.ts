@@ -24,7 +24,7 @@ import { TodoCalendarDetailDialogComponent } from '../todo-calendar-detail-dialo
   templateUrl: './calendar-page.component.html',
   styleUrl: './calendar-page.component.scss'
 })
-export default class CalendarPageComponent implements OnDestroy {
+export class CalendarPageComponent implements OnDestroy {
   todos: Todo[] = []
   loading = false
   error: string | null = null
