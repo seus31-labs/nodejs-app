@@ -2,6 +2,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
+const { Op } = require('sequelize');
 const analyticsService = require('../../services/analyticsService');
 
 function createMockFastify(overrides = {}) {
@@ -54,6 +55,18 @@ test('getCompletionRate: 不正 period は all として扱う', async () => {
   });
   const r = await analyticsService.getCompletionRate(fastify, 1, 'invalid');
   assert.strictEqual(r.period, 'all');
+});
+
+test('getCompletionRate: week のとき updatedAt フィルタが where に付く', async () => {
+  const fastify = createMockFastify({
+    TodoFindAll: (opts) => {
+      assert.ok(opts.where.updatedAt != null);
+      assert.ok(opts.where.updatedAt[Op.gte] instanceof Date);
+      return Promise.resolve([]);
+    },
+  });
+  const r = await analyticsService.getCompletionRate(fastify, 1, 'week');
+  assert.strictEqual(r.period, 'week');
 });
 
 test('getTodosByPriority: 集計を low/medium/high にマップ', async () => {
@@ -129,4 +142,20 @@ test('getWeeklyStats: 7 日分の count を返す', async () => {
   assert.strictEqual(r.days.length, 7);
   assert.match(r.days[0].date, /^\d{4}-\d{2}-\d{2}$/);
   assert.strictEqual(n, 14);
+});
+
+test('getWeeklyStats: 各日の created / completed が Todo.count の結果を反映', async () => {
+  const fastify = createMockFastify({
+    TodoCount: (opts) => {
+      if (opts.where.createdAt != null) return Promise.resolve(4);
+      if (opts.where.updatedAt != null && opts.where.completed === true) return Promise.resolve(2);
+      assert.fail('unexpected Todo.count where shape');
+    },
+  });
+  const r = await analyticsService.getWeeklyStats(fastify, 1);
+  assert.strictEqual(r.days.length, 7);
+  for (const day of r.days) {
+    assert.strictEqual(day.created, 4);
+    assert.strictEqual(day.completed, 2);
+  }
 });

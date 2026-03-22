@@ -2,7 +2,9 @@
 
 const { Op, fn, col } = require('sequelize');
 
-/** 完了率の期間（日数）。all はフィルタなし */
+/**
+ * 完了率の期間（日数）。month / year は近似（30 日・365 日、閏年・月末差は未考慮）。all はフィルタなし。
+ */
 const PERIOD_DAYS = {
   week: 7,
   month: 30,
