@@ -43,6 +43,7 @@ export class CalendarViewComponent {
     initialView: 'dayGridMonth',
     locale: jaLocale,
     height: 'auto',
+    // interactionPlugin のドラッグを有効化。startEditable / durationEditable は各イベントで制御する（12.8）
     editable: true,
     dayMaxEvents: true,
     headerToolbar: {

@@ -136,6 +136,17 @@ describe('CalendarPageComponent', () => {
     })
   })
 
+  it('should clear moveError when opening todo detail dialog', () => {
+    component.moveError = '期限の更新に失敗しました'
+    const afterClosed$ = new Subject<void>()
+    const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed'])
+    dialogRefSpy.afterClosed.and.returnValue(afterClosed$.asObservable())
+    spyOn(dialog, 'open').and.returnValue(dialogRefSpy)
+
+    component.onTodoClick(1)
+    expect(component.moveError).toBeNull()
+  })
+
   it('should PUT new dueDate on todoMove', fakeAsync(() => {
     component.todos = [sampleTodo({ id: 5, title: 'Alpha', dueDate: '2026-03-01' })]
     const revertSpy = jasmine.createSpy('revert')

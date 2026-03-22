@@ -82,6 +82,7 @@ export default class CalendarPageComponent implements OnDestroy {
   }
 
   onTodoClick(todoId: number): void {
+    this.moveError = null
     if (this.detailDialogRef) return
     this.detailDialogRef = this.dialog.open(TodoCalendarDetailDialogComponent, {
       width: '440px',

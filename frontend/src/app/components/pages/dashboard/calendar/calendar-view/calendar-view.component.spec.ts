@@ -77,6 +77,18 @@ describe('CalendarViewComponent', () => {
     expect(revertSpy).toHaveBeenCalled()
   })
 
+  it('should revert when start is null on drop', () => {
+    const emitSpy = spyOn(component.todoMove, 'emit')
+    const revertSpy = jasmine.createSpy('revert')
+    component.onEventDrop({
+      event: { extendedProps: { todoId: 7 }, start: null },
+      revert: revertSpy
+    } as any)
+
+    expect(emitSpy).not.toHaveBeenCalled()
+    expect(revertSpy).toHaveBeenCalled()
+  })
+
   it('should render calendar events', () => {
     const events: EventInput[] = [{ title: 'test', start: '2026-03-20', extendedProps: { todoId: 1 } }]
     component.events = events
