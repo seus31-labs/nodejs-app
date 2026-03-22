@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { CdkDragDrop } from '@angular/cdk/drag-drop'
 import { TodoListComponent } from './todo-list.component'
 import type { Todo } from '../../../../../models/todo.interface'
@@ -16,7 +17,7 @@ describe('TodoListComponent (3.13.3)', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TodoListComponent],
+      imports: [TodoListComponent, HttpClientTestingModule],
     }).compileComponents()
 
     fixture = TestBed.createComponent(TodoListComponent)
