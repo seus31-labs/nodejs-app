@@ -40,6 +40,9 @@ export function todoToCalendarEvent(todo: Todo): EventInput | null {
     title: todo.title,
     start,
     allDay: true,
+    /** 完了済みはドラッグで期限変更させない（12.8） */
+    startEditable: !todo.completed,
+    durationEditable: false,
     extendedProps: {
       todoId: todo.id,
       completed: todo.completed,
