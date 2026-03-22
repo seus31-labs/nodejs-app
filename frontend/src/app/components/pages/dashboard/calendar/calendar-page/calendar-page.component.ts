@@ -6,7 +6,11 @@ import { CardComponent } from '../../../../../theme/shared/components/card/card.
 import { TodoService } from '../../../../../services/todo.service'
 import { todosToCalendarEvents } from '../../../../../utils/todo-calendar-events'
 import type { Todo } from '../../../../../models/todo.interface'
-import { CalendarViewComponent, type CalendarDateRange } from '../calendar-view/calendar-view.component'
+import {
+  CalendarViewComponent,
+  type CalendarDateRange,
+  type CalendarTodoMoveEvent
+} from '../calendar-view/calendar-view.component'
 import { TodoCalendarDetailDialogComponent } from '../todo-calendar-detail-dialog/todo-calendar-detail-dialog.component'
 
 /**
@@ -24,6 +28,8 @@ export default class CalendarPageComponent implements OnDestroy {
   todos: Todo[] = []
   loading = false
   error: string | null = null
+  /** 一覧取得とは別に、ドラッグによる期限更新失敗だけを表示する */
+  moveError: string | null = null
 
   private range: CalendarDateRange | null = null
   private destroy$ = new Subject<void>()
@@ -49,6 +55,32 @@ export default class CalendarPageComponent implements OnDestroy {
     queueMicrotask(() => this.loadTodos())
   }
 
+  /**
+   * カレンダーでイベントをドロップしたときに期限を更新する。
+   * TodoCreateUpdate の型上 title が必須のため、既存タイトルを送る（API は部分更新可）。
+   */
+  onTodoMove(ev: CalendarTodoMoveEvent): void {
+    this.moveError = null
+    const todo = this.todos.find((t) => t.id === ev.todoId)
+    if (!todo) {
+      ev.revert()
+      this.moveError = 'Todo が見つかりません'
+      return
+    }
+    this.todoService
+      .update(ev.todoId, { title: todo.title, dueDate: ev.dueDate })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (updated) => {
+          this.todos = this.todos.map((t) => (t.id === updated.id ? { ...t, ...updated } : t))
+        },
+        error: (err) => {
+          ev.revert()
+          this.moveError = err?.error?.message ?? err?.message ?? '期限の更新に失敗しました'
+        }
+      })
+  }
+
   onTodoClick(todoId: number): void {
     if (this.detailDialogRef) return
     this.detailDialogRef = this.dialog.open(TodoCalendarDetailDialogComponent, {
@@ -64,6 +96,7 @@ export default class CalendarPageComponent implements OnDestroy {
     if (!this.range) return
     this.loading = true
     this.error = null
+    this.moveError = null
     this.todoService
       .list(
         { startDate: this.range.startDate, endDate: this.range.endDate },

@@ -4,9 +4,10 @@
       <app-calendar-view
         [events]="calendarEvents"
         [loading]="loading"
-        [error]="error"
+        [error]="error || moveError"
         (dateRangeChange)="onDateRangeChange($event)"
         (todoClick)="onTodoClick($event)"
+        (todoMove)="onTodoMove($event)"
       />
     </app-card>
   </div>

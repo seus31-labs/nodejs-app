@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FullCalendarModule } from '@fullcalendar/angular'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import type { DatesSetArg, EventClickArg, EventInput } from '@fullcalendar/core'
+import interactionPlugin from '@fullcalendar/interaction'
+import type { DatesSetArg, EventClickArg, EventDropArg, EventInput } from '@fullcalendar/core'
 import { CalendarOptions } from '@fullcalendar/core'
 import jaLocale from '@fullcalendar/core/locales/ja'
 
@@ -10,9 +11,15 @@ export interface CalendarDateRange {
   endDate: string
 }
 
+/**
+ * カレンダー上でイベントをドロップしたときに親へ渡す。
+ * API 失敗時は `revert` で FullCalendar の表示を元に戻す。
+ */
 export interface CalendarTodoMoveEvent {
   todoId: number
-  dueDate: string | null
+  /** ドロップ先の日付（YYYY-MM-DD、終日イベント） */
+  dueDate: string
+  revert: () => void
 }
 
 @Component({
@@ -29,15 +36,14 @@ export class CalendarViewComponent {
 
   @Output() dateRangeChange = new EventEmitter<CalendarDateRange>()
   @Output() todoClick = new EventEmitter<number>()
-  // 12.8 でドラッグ&ドロップによる期限変更を実装する際に使用する
   @Output() todoMove = new EventEmitter<CalendarTodoMoveEvent>()
 
   readonly calendarOptions: CalendarOptions = {
-    plugins: [dayGridPlugin],
+    plugins: [dayGridPlugin, interactionPlugin],
     initialView: 'dayGridMonth',
     locale: jaLocale,
     height: 'auto',
-    editable: false,
+    editable: true,
     dayMaxEvents: true,
     headerToolbar: {
       left: 'prev,next today',
@@ -45,7 +51,8 @@ export class CalendarViewComponent {
       right: 'dayGridMonth,dayGridWeek'
     },
     datesSet: (arg) => this.onDatesSet(arg),
-    eventClick: (arg) => this.onEventClick(arg)
+    eventClick: (arg) => this.onEventClick(arg),
+    eventDrop: (arg) => this.onEventDrop(arg)
   }
 
   onDatesSet(arg: DatesSetArg): void {
@@ -59,6 +66,24 @@ export class CalendarViewComponent {
     const todoId = Number(arg.event.extendedProps['todoId'])
     if (!Number.isFinite(todoId)) return
     this.todoClick.emit(todoId)
+  }
+
+  onEventDrop(arg: EventDropArg): void {
+    const todoId = Number(arg.event.extendedProps['todoId'])
+    if (!Number.isFinite(todoId)) {
+      arg.revert()
+      return
+    }
+    const start = arg.event.start
+    if (!start) {
+      arg.revert()
+      return
+    }
+    this.todoMove.emit({
+      todoId,
+      dueDate: this.toIsoDate(start),
+      revert: () => arg.revert()
+    })
   }
 
   private toIsoDate(value: Date): string {

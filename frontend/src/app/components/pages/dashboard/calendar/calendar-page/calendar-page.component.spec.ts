@@ -11,7 +11,8 @@ import { TodoService } from '../../../../../services/todo.service'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
 import CalendarPageComponent from './calendar-page.component'
 import { TodoCalendarDetailDialogComponent } from '../todo-calendar-detail-dialog/todo-calendar-detail-dialog.component'
-import type { CalendarDateRange } from '../calendar-view/calendar-view.component'
+import type { CalendarDateRange, CalendarTodoMoveEvent } from '../calendar-view/calendar-view.component'
+import type { Todo } from '../../../../../models/todo.interface'
 
 /** FullCalendar を避け、ページのデータ取得・ダイアログ配線のみ検証する */
 @Component({
@@ -25,6 +26,28 @@ class CalendarViewStubComponent {
   @Input() error: string | null = null
   @Output() dateRangeChange = new EventEmitter<CalendarDateRange>()
   @Output() todoClick = new EventEmitter<number>()
+  @Output() todoMove = new EventEmitter<CalendarTodoMoveEvent>()
+}
+
+function sampleTodo(overrides: Partial<Todo> = {}): Todo {
+  return {
+    id: 1,
+    userId: 1,
+    title: 'T',
+    description: null,
+    completed: false,
+    priority: 'medium',
+    dueDate: '2026-03-01',
+    sortOrder: 0,
+    projectId: null,
+    archived: false,
+    archivedAt: null,
+    reminderEnabled: false,
+    reminderSentAt: null,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    ...overrides
+  }
 }
 
 describe('CalendarPageComponent', () => {
@@ -111,6 +134,44 @@ describe('CalendarPageComponent', () => {
       width: '440px',
       data: { todoId: 42 }
     })
+  })
+
+  it('should PUT new dueDate on todoMove', fakeAsync(() => {
+    component.todos = [sampleTodo({ id: 5, title: 'Alpha', dueDate: '2026-03-01' })]
+    const revertSpy = jasmine.createSpy('revert')
+    component.onTodoMove({ todoId: 5, dueDate: '2026-03-15', revert: revertSpy })
+
+    const req = httpMock.expectOne(`${apiUrl}/todos/5`)
+    expect(req.request.method).toBe('PUT')
+    expect(req.request.body).toEqual({ title: 'Alpha', dueDate: '2026-03-15' })
+    req.flush(sampleTodo({ id: 5, title: 'Alpha', dueDate: '2026-03-15' }))
+    flushMicrotasks()
+
+    expect(component.todos[0].dueDate).toBe('2026-03-15')
+    expect(revertSpy).not.toHaveBeenCalled()
+    expect(component.moveError).toBeNull()
+  }))
+
+  it('should revert and set moveError when todoMove update fails', fakeAsync(() => {
+    component.todos = [sampleTodo({ id: 5, title: 'Alpha', dueDate: '2026-03-01' })]
+    const revertSpy = jasmine.createSpy('revert')
+    component.onTodoMove({ todoId: 5, dueDate: '2026-03-15', revert: revertSpy })
+
+    const req = httpMock.expectOne(`${apiUrl}/todos/5`)
+    req.flush({ message: '更新できません' }, { status: 500, statusText: 'Server Error' })
+    flushMicrotasks()
+
+    expect(revertSpy).toHaveBeenCalled()
+    expect(component.moveError).toContain('更新できません')
+    expect(component.todos[0].dueDate).toBe('2026-03-01')
+  }))
+
+  it('should revert when todo is missing on todoMove', () => {
+    component.todos = []
+    const revertSpy = jasmine.createSpy('revert')
+    component.onTodoMove({ todoId: 99, dueDate: '2026-03-15', revert: revertSpy })
+    expect(revertSpy).toHaveBeenCalled()
+    expect(component.moveError).toContain('見つかりません')
   })
 
   it('should not open a second dialog while the first is still open', () => {
