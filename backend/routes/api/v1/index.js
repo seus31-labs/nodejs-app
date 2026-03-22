@@ -52,6 +52,13 @@ const {
 const { exportTodos } = require('../../../controllers/exportController');
 const { importTodos } = require('../../../controllers/importController');
 const { shareTodo, getSharedTodos, deleteShare } = require('../../../controllers/shareController');
+const {
+  getCompletionRate,
+  getTodosByPriority: getAnalyticsByPriority,
+  getTodosByTag: getAnalyticsByTag,
+  getTodosByProject: getAnalyticsByProject,
+  getWeeklyStats,
+} = require('../../../controllers/analyticsController');
 
 module.exports = async function (fastify, opts) {
   /**
@@ -652,5 +659,112 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => deleteShare(fastify, request, reply),
+  });
+
+  /**
+   * Analytics（JWT 必須）— 既存 API と同様に /api/v1 配下
+   */
+  const analyticsCompletionRateResponse = {
+    type: 'object',
+    required: ['period', 'total', 'completed', 'rate'],
+    properties: {
+      period: { type: 'string' },
+      total: { type: 'number' },
+      completed: { type: 'number' },
+      rate: { type: 'number' },
+    },
+  };
+  const analyticsByPriorityResponse = {
+    type: 'object',
+    required: ['low', 'medium', 'high'],
+    properties: {
+      low: { type: 'number' },
+      medium: { type: 'number' },
+      high: { type: 'number' },
+    },
+  };
+  const analyticsByTagResponse = {
+    type: 'array',
+    items: {
+      type: 'object',
+      required: ['tagId', 'name', 'color', 'count'],
+      properties: {
+        tagId: { type: 'integer' },
+        name: { type: 'string' },
+        color: { type: 'string' },
+        count: { type: 'number' },
+      },
+    },
+  };
+  const analyticsByProjectResponse = {
+    type: 'array',
+    items: {
+      type: 'object',
+      required: ['projectId', 'name', 'count'],
+      properties: {
+        projectId: { type: ['integer', 'null'] },
+        name: { type: 'string' },
+        count: { type: 'number' },
+      },
+    },
+  };
+  const analyticsWeeklyResponse = {
+    type: 'object',
+    required: ['days'],
+    properties: {
+      days: {
+        type: 'array',
+        items: {
+          type: 'object',
+          required: ['date', 'created', 'completed'],
+          properties: {
+            date: { type: 'string' },
+            created: { type: 'number' },
+            completed: { type: 'number' },
+          },
+        },
+      },
+    },
+  };
+  fastify.get('/analytics/completion-rate', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          period: { type: 'string', enum: ['week', 'month', 'year', 'all'], default: 'all' },
+        },
+      },
+      response: { 200: analyticsCompletionRateResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getCompletionRate(fastify, request, reply),
+  });
+  fastify.get('/analytics/by-priority', {
+    schema: {
+      response: { 200: analyticsByPriorityResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getAnalyticsByPriority(fastify, request, reply),
+  });
+  fastify.get('/analytics/by-tag', {
+    schema: {
+      response: { 200: analyticsByTagResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getAnalyticsByTag(fastify, request, reply),
+  });
+  fastify.get('/analytics/by-project', {
+    schema: {
+      response: { 200: analyticsByProjectResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getAnalyticsByProject(fastify, request, reply),
+  });
+  fastify.get('/analytics/weekly', {
+    schema: {
+      response: { 200: analyticsWeeklyResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getWeeklyStats(fastify, request, reply),
   });
 }
