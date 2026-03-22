@@ -68,4 +68,18 @@ describe('AnalyticsPageComponent (13.15–13.18)', () => {
     component.onCompletionPeriodChange('week')
     expect(analyticsSpy.getCompletionRate).toHaveBeenCalledWith('week')
   })
+
+  it('should clear error when period change refetch succeeds after loadAll failed', () => {
+    analyticsSpy.getCompletionRate.and.returnValue(throwError(() => ({ error: { error: 'fail' } })))
+    fixture.detectChanges()
+    expect(component.error).toBe('fail')
+
+    analyticsSpy.getCompletionRate.and.returnValue(
+      of({ period: 'week', total: 2, completed: 1, rate: 0.5 })
+    )
+    component.onCompletionPeriodChange('week')
+    expect(component.error).toBeNull()
+    expect(component.completionRate?.period).toBe('week')
+    expect(component.completionRefreshing).toBe(false)
+  })
 })

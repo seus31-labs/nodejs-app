@@ -34,6 +34,10 @@ export class AnalyticsService {
     return this.http.get<TagCountDto[]>(`${this.apiUrl}/analytics/by-tag`)
   }
 
+  /**
+   * プロジェクト別件数。AnalyticsPage では未使用（TODO にフロント項目なし）だが API 整合のため提供。
+   * 将来プロジェクト別チャートを載せる際に呼び出す。
+   */
   getByProject(): Observable<ProjectCountDto[]> {
     return this.http.get<ProjectCountDto[]>(`${this.apiUrl}/analytics/by-project`)
   }

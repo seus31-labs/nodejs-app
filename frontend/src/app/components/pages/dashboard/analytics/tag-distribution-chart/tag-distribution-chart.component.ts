@@ -15,7 +15,7 @@ import type { TagCountDto } from '../../../../../models/analytics.interface'
   standalone: true,
   imports: [CommonModule, NgApexchartsModule],
   templateUrl: './tag-distribution-chart.component.html',
-  styleUrls: ['./tag-distribution-chart.component.scss'],
+  styleUrl: './tag-distribution-chart.component.scss',
 })
 export class TagDistributionChartComponent implements OnChanges {
   @Input() data: TagCountDto[] | null = null

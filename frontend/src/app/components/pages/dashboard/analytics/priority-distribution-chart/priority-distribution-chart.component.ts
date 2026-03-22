@@ -15,7 +15,7 @@ import type { PriorityDistributionDto } from '../../../../../models/analytics.in
   standalone: true,
   imports: [CommonModule, NgApexchartsModule],
   templateUrl: './priority-distribution-chart.component.html',
-  styleUrls: ['./priority-distribution-chart.component.scss'],
+  styleUrl: './priority-distribution-chart.component.scss',
 })
 export class PriorityDistributionChartComponent implements OnChanges {
   @Input() data: PriorityDistributionDto | null = null

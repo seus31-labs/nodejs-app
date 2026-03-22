@@ -9,7 +9,7 @@ import type { WeeklyStatsDto } from '../../../../../models/analytics.interface'
   standalone: true,
   imports: [CommonModule, NgApexchartsModule],
   templateUrl: './weekly-activity-chart.component.html',
-  styleUrls: ['./weekly-activity-chart.component.scss'],
+  styleUrl: './weekly-activity-chart.component.scss',
 })
 export class WeeklyActivityChartComponent implements OnChanges {
   @Input() data: WeeklyStatsDto | null = null

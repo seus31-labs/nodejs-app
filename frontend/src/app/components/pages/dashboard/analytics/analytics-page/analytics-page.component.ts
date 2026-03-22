@@ -27,7 +27,7 @@ import type {
     WeeklyActivityChartComponent,
   ],
   templateUrl: './analytics-page.component.html',
-  styleUrls: ['./analytics-page.component.scss'],
+  styleUrl: './analytics-page.component.scss',
 })
 export default class AnalyticsPageComponent implements OnInit, OnDestroy {
   period: AnalyticsPeriod = 'all'
@@ -81,6 +81,7 @@ export default class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   onCompletionPeriodChange(next: AnalyticsPeriod): void {
     this.period = next
+    this.error = null
     this.completionRefreshing = true
     this.analytics
       .getCompletionRate(next)

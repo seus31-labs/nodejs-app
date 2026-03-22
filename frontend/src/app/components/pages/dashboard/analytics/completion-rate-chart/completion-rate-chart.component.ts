@@ -17,7 +17,7 @@ import type { AnalyticsPeriod, CompletionRateDto } from '../../../../../models/a
   standalone: true,
   imports: [CommonModule, FormsModule, NgApexchartsModule],
   templateUrl: './completion-rate-chart.component.html',
-  styleUrls: ['./completion-rate-chart.component.scss'],
+  styleUrl: './completion-rate-chart.component.scss',
 })
 export class CompletionRateChartComponent implements OnChanges {
   @Input() data: CompletionRateDto | null = null
