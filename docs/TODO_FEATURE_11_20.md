@@ -67,15 +67,15 @@
 - [x] 13.9: Backend テスト
 
 ### Frontend タスク（15タスク）
-- [ ] 13.10: AnalyticsService 作成
-- [ ] 13.11: CompletionRateChart コンポーネント作成（ApexCharts 使用）
-- [ ] 13.12: PriorityDistributionChart コンポーネント作成
-- [ ] 13.13: TagDistributionChart コンポーネント作成
-- [ ] 13.14: WeeklyActivityChart コンポーネント作成
-- [ ] 13.15: AnalyticsPage 作成（各チャート統合）
-- [ ] 13.16: ルーティング追加
-- [ ] 13.17: スタイリング
-- [ ] 13.18: Frontend テスト
+- [x] 13.10: AnalyticsService 作成
+- [x] 13.11: CompletionRateChart コンポーネント作成（ApexCharts 使用）
+- [x] 13.12: PriorityDistributionChart コンポーネント作成
+- [x] 13.13: TagDistributionChart コンポーネント作成
+- [x] 13.14: WeeklyActivityChart コンポーネント作成
+- [x] 13.15: AnalyticsPage 作成（各チャート統合）
+- [x] 13.16: ルーティング追加
+- [x] 13.17: スタイリング
+- [x] 13.18: Frontend テスト
 
 ---
 
