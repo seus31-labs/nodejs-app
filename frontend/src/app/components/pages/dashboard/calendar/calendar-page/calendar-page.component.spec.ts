@@ -9,7 +9,7 @@ import { NetworkStatusService } from '../../../../../services/network-status.ser
 import { OfflineStorageService } from '../../../../../services/offline-storage.service'
 import { TodoService } from '../../../../../services/todo.service'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
-import { CalendarPageComponent } from './calendar-page.component'
+import CalendarPageComponent from './calendar-page.component'
 import { TodoCalendarDetailDialogComponent } from '../todo-calendar-detail-dialog/todo-calendar-detail-dialog.component'
 import type { CalendarDateRange, CalendarTodoMoveEvent } from '../calendar-view/calendar-view.component'
 import type { Todo } from '../../../../../models/todo.interface'

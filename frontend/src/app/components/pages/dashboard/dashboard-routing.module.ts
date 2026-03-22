@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 
-const routes: Routes = [
+/** 単体テストで lazy load の解決を検証するため export（12.12） */
+export const DASHBOARD_ROUTES: Routes = [
   {
     path: '',
     children: [
@@ -46,7 +47,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forChild(DASHBOARD_ROUTES)],
   exports: [RouterModule]
 })
 export class DashboardRoutingModule {}
