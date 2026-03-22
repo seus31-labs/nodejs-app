@@ -1,0 +1,11 @@
+.analytics-page {
+  padding-bottom: 2rem;
+
+  h4 {
+    font-weight: 600;
+  }
+
+  ::ng-deep .card .card-block {
+    padding-top: 1rem;
+  }
+}

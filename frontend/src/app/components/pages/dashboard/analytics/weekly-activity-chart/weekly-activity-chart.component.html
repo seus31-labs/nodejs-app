@@ -1,0 +1,15 @@
+<div class="weekly-activity-chart">
+  @if (loading) {
+    <p class="text-muted mb-0">読み込み中…</p>
+  } @else if (!data || !data.days.length) {
+    <p class="text-muted mb-0">週次データを取得できませんでした。</p>
+  } @else {
+    <apx-chart
+      [series]="chartSeries"
+      [chart]="chart"
+      [dataLabels]="dataLabels"
+      [xaxis]="xaxis"
+    />
+    <p class="small text-muted mt-2 mb-0">直近7日（UTC 日付基準、バックエンド集計に準拠）</p>
+  }
+</div>

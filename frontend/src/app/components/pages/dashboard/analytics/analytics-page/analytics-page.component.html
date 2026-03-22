@@ -1,0 +1,39 @@
+<div class="analytics-page container-fluid">
+  <div class="row mb-3">
+    <div class="col-12">
+      <h4 class="mb-1">分析</h4>
+      <p class="text-muted small mb-0">Todo の集計をグラフで表示します（アーカイブ済みは除く）。</p>
+    </div>
+  </div>
+
+  @if (error) {
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+  }
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <app-card cardTitle="完了率" [options]="false">
+        <app-completion-rate-chart
+          [data]="completionRate"
+          [loading]="completionChartLoading"
+          (periodChange)="onCompletionPeriodChange($event)"
+        />
+      </app-card>
+    </div>
+    <div class="col-lg-6">
+      <app-card cardTitle="優先度別" [options]="false">
+        <app-priority-distribution-chart [data]="priority" [loading]="loading" />
+      </app-card>
+    </div>
+    <div class="col-lg-6">
+      <app-card cardTitle="タグ別件数" [options]="false">
+        <app-tag-distribution-chart [data]="tags" [loading]="loading" />
+      </app-card>
+    </div>
+    <div class="col-lg-6">
+      <app-card cardTitle="直近7日の動き" [options]="false">
+        <app-weekly-activity-chart [data]="weekly" [loading]="loading" />
+      </app-card>
+    </div>
+  </div>
+</div>

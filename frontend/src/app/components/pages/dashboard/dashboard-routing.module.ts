@@ -39,6 +39,10 @@ export const DASHBOARD_ROUTES: Routes = [
         loadComponent: () => import('./templates/templates-page/templates-page.component')
       },
       {
+        path: 'analytics',
+        loadComponent: () => import('./analytics/analytics-page/analytics-page.component')
+      },
+      {
         path: 'projects/:id',
         loadComponent: () => import('./projects/project-detail-page/project-detail-page.component')
       },
