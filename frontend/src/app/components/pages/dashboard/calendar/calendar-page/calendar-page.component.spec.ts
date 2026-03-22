@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { ComponentFixture, TestBed, fakeAsync, flushMicrotasks, waitForAsync } from '@angular/core/testing'
+import { Subject } from 'rxjs'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { MatDialog, MatDialogModule } from '@angular/material/dialog'
@@ -87,12 +88,44 @@ describe('CalendarPageComponent', () => {
     expect(component.todos).toEqual([])
   }))
 
+  it('should set error when API fails', fakeAsync(() => {
+    component.onDateRangeChange({ startDate: '2026-03-01', endDate: '2026-03-31' })
+    flushMicrotasks()
+
+    const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos` && r.method === 'GET')
+    req.flush({ message: '取得に失敗しました' }, { status: 500, statusText: 'Server Error' })
+    flushMicrotasks()
+
+    expect(component.error).toContain('取得に失敗しました')
+    expect(component.loading).toBe(false)
+  }))
+
   it('should open todo detail dialog on todoClick', () => {
-    const openSpy = spyOn(dialog, 'open')
+    const afterClosed$ = new Subject<void>()
+    const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed'])
+    dialogRefSpy.afterClosed.and.returnValue(afterClosed$.asObservable())
+    const openSpy = spyOn(dialog, 'open').and.returnValue(dialogRefSpy)
+
     component.onTodoClick(42)
     expect(openSpy).toHaveBeenCalledWith(TodoCalendarDetailDialogComponent, {
       width: '440px',
       data: { todoId: 42 }
     })
+  })
+
+  it('should not open a second dialog while the first is still open', () => {
+    const afterClosed$ = new Subject<void>()
+    const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed'])
+    dialogRefSpy.afterClosed.and.returnValue(afterClosed$.asObservable())
+    spyOn(dialog, 'open').and.returnValue(dialogRefSpy)
+
+    component.onTodoClick(1)
+    component.onTodoClick(2)
+    expect(dialog.open).toHaveBeenCalledTimes(1)
+
+    afterClosed$.next()
+    afterClosed$.complete()
+    component.onTodoClick(2)
+    expect(dialog.open).toHaveBeenCalledTimes(2)
   })
 })
