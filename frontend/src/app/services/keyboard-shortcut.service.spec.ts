@@ -126,4 +126,16 @@ describe('KeyboardShortcutService (19.11 / 19.9)', () => {
     document.dispatchEvent(ev)
     expect(fn).toHaveBeenCalled()
   })
+
+  it('setBindingKeys rejects combo without modifier keys', () => {
+    service.registerBinding({
+      id: KEYBOARD_SHORTCUT_IDS.NEW_TODO,
+      defaultKeys: 'ctrl+n',
+      defaultKeysLabel: 'Ctrl+N',
+      handler: () => {},
+      description: '新規',
+    })
+    const res = service.setBindingKeys(KEYBOARD_SHORTCUT_IDS.NEW_TODO, 'n')
+    expect(res.ok).toBe(false)
+  })
 })

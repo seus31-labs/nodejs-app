@@ -34,6 +34,8 @@ export class ShortcutHelpDialogComponent implements OnDestroy {
   rows: ShortcutCustomizationRow[] = []
   captureForId: KeyboardShortcutId | null = null
   feedback: string | null = null
+  /** 成功メッセージとエラーを HTML 側の文字列列挙で区別しない（レビュー指摘対応） */
+  feedbackIsError = false
 
   private captureListener: ((e: Event) => void) | null = null
 
@@ -61,6 +63,7 @@ export class ShortcutHelpDialogComponent implements OnDestroy {
     this.detachCaptureListener()
     this.captureForId = id
     this.feedback = 'キーを押してください（Escape でキャンセル）'
+    this.feedbackIsError = false
     this.captureListener = (ev: Event) => this.onCaptureKeydown(ev as KeyboardEvent)
     document.addEventListener('keydown', this.captureListener, true)
   }
@@ -80,6 +83,7 @@ export class ShortcutHelpDialogComponent implements OnDestroy {
     if (e.key === 'Escape') {
       this.captureForId = null
       this.feedback = null
+      this.feedbackIsError = false
       this.detachCaptureListener()
       return
     }
@@ -89,8 +93,10 @@ export class ShortcutHelpDialogComponent implements OnDestroy {
     this.detachCaptureListener()
     if (res.ok === false) {
       this.feedback = res.error
+      this.feedbackIsError = true
     } else {
       this.feedback = '保存しました'
+      this.feedbackIsError = false
     }
     this.refreshLists()
   }
@@ -98,12 +104,14 @@ export class ShortcutHelpDialogComponent implements OnDestroy {
   resetRow(id: KeyboardShortcutId): void {
     this.shortcutService.resetBindings(id)
     this.feedback = '初期値に戻しました'
+    this.feedbackIsError = false
     this.refreshLists()
   }
 
   resetAll(): void {
     this.shortcutService.resetBindings()
     this.feedback = 'すべて初期値に戻しました'
+    this.feedbackIsError = false
     this.refreshLists()
   }
 }

@@ -64,4 +64,48 @@ describe('ShortcutHelpDialogComponent (19.11 / 19.9)', () => {
     component.resetRow(KEYBOARD_SHORTCUT_IDS.NEW_TODO)
     expect(shortcutService.resetBindings).toHaveBeenCalledWith(KEYBOARD_SHORTCUT_IDS.NEW_TODO)
   })
+
+  it('should capture a key and show success feedback', () => {
+    shortcutService.comboStringFromEvent.and.returnValue('ctrl+shift+t')
+    shortcutService.setBindingKeys.and.returnValue({ ok: true })
+
+    component.startCapture(KEYBOARD_SHORTCUT_IDS.NEW_TODO)
+    expect(component.captureForId).toBe(KEYBOARD_SHORTCUT_IDS.NEW_TODO)
+
+    const ev = new KeyboardEvent('keydown', { key: 't', ctrlKey: true, shiftKey: true, bubbles: true })
+    document.dispatchEvent(ev)
+
+    expect(component.feedback).toBe('保存しました')
+    expect(component.feedbackIsError).toBe(false)
+    expect(component.captureForId).toBeNull()
+    expect(shortcutService.setBindingKeys).toHaveBeenCalled()
+  })
+
+  it('should show error feedback when setBindingKeys fails', () => {
+    shortcutService.setBindingKeys.and.returnValue({ ok: false, error: '重複しています' })
+    component.startCapture(KEYBOARD_SHORTCUT_IDS.NEW_TODO)
+
+    const ev = new KeyboardEvent('keydown', { key: 'n', ctrlKey: true, bubbles: true })
+    document.dispatchEvent(ev)
+
+    expect(component.feedback).toContain('重複')
+    expect(component.feedbackIsError).toBe(true)
+  })
+
+  it('should cancel capture on Escape', () => {
+    component.startCapture(KEYBOARD_SHORTCUT_IDS.NEW_TODO)
+    const ev = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+    document.dispatchEvent(ev)
+
+    expect(component.captureForId).toBeNull()
+    expect(component.feedback).toBeNull()
+    expect(shortcutService.setBindingKeys).not.toHaveBeenCalled()
+  })
+
+  it('should reset all and show feedback', () => {
+    component.resetAll()
+    expect(shortcutService.resetBindings).toHaveBeenCalledWith()
+    expect(component.feedback).toBe('すべて初期値に戻しました')
+    expect(component.feedbackIsError).toBe(false)
+  })
 })
