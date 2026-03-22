@@ -52,6 +52,13 @@ const {
 const { exportTodos } = require('../../../controllers/exportController');
 const { importTodos } = require('../../../controllers/importController');
 const { shareTodo, getSharedTodos, deleteShare } = require('../../../controllers/shareController');
+const {
+  getCompletionRate,
+  getTodosByPriority: getAnalyticsByPriority,
+  getTodosByTag: getAnalyticsByTag,
+  getTodosByProject: getAnalyticsByProject,
+  getWeeklyStats,
+} = require('../../../controllers/analyticsController');
 
 module.exports = async function (fastify, opts) {
   /**
@@ -652,5 +659,37 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => deleteShare(fastify, request, reply),
+  });
+
+  /**
+   * Analytics（JWT 必須）— 既存 API と同様に /api/v1 配下
+   */
+  fastify.get('/analytics/completion-rate', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          period: { type: 'string', enum: ['week', 'month', 'year', 'all'] },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getCompletionRate(fastify, request, reply),
+  });
+  fastify.get('/analytics/by-priority', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getAnalyticsByPriority(fastify, request, reply),
+  });
+  fastify.get('/analytics/by-tag', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getAnalyticsByTag(fastify, request, reply),
+  });
+  fastify.get('/analytics/by-project', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getAnalyticsByProject(fastify, request, reply),
+  });
+  fastify.get('/analytics/weekly', {
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getWeeklyStats(fastify, request, reply),
   });
 }

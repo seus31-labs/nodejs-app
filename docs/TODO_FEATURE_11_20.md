@@ -62,8 +62,8 @@
 - [x] 13.4: `getTodosByTag(userId)` 実装
 - [x] 13.5: `getTodosByProject(userId)` 実装
 - [x] 13.6: `getWeeklyStats(userId)` 実装
-- [ ] 13.7: AnalyticsController 作成
-- [ ] 13.8: Analytics ルート作成（GET /api/analytics/*)
+- [x] 13.7: AnalyticsController 作成
+- [x] 13.8: Analytics ルート作成（GET /api/v1/analytics/*)
 - [x] 13.9: Backend テスト
 
 ### Frontend タスク（15タスク）
