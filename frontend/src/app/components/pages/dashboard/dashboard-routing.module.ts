@@ -14,6 +14,11 @@ const routes: Routes = [
         loadComponent: () => import('./todo/todo-page/todo-page.component')
       },
       {
+        path: 'calendar',
+        loadComponent: () =>
+          import('./calendar/calendar-page/calendar-page.component').then((m) => m.default)
+      },
+      {
         path: 'archived',
         loadComponent: () => import('./archived-todos/archived-todos-page.component')
       },

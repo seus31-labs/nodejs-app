@@ -14,8 +14,8 @@ import {
 import { TodoCalendarDetailDialogComponent } from '../todo-calendar-detail-dialog/todo-calendar-detail-dialog.component'
 
 /**
- * カレンダーで Todo の期限を表示し、イベントクリックで詳細ダイアログを開く。
- * ダッシュボードへのルート登録は 12.10 で行う（本コンポーネントを lazy load する想定）。
+ * カレンダーで Todo の期限を表示し、クリックで詳細・ドラッグで期限変更する。
+ * `/dashboard/calendar` から lazy load される（dashboard-routing.module）。
  */
 @Component({
   selector: 'app-calendar-page',

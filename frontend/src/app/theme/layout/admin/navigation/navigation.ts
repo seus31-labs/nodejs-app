@@ -45,6 +45,14 @@ const NavigationItems = [
         classes: 'nav-item'
       },
       {
+        id: 'calendar',
+        title: 'カレンダー',
+        type: 'item',
+        url: '/dashboard/calendar',
+        icon: 'feather icon-calendar',
+        classes: 'nav-item'
+      },
+      {
         id: 'archived',
         title: 'アーカイブ',
         type: 'item',
