@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core'
-import { MatDialog } from '@angular/material/dialog'
+import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { Subject, takeUntil } from 'rxjs'
 import type { EventInput } from '@fullcalendar/core'
 import { CardComponent } from '../../../../../theme/shared/components/card/card.component'
@@ -27,6 +27,7 @@ export default class CalendarPageComponent implements OnDestroy {
 
   private range: CalendarDateRange | null = null
   private destroy$ = new Subject<void>()
+  private detailDialogRef: MatDialogRef<TodoCalendarDetailDialogComponent> | null = null
 
   constructor(
     private todoService: TodoService,
@@ -49,9 +50,13 @@ export default class CalendarPageComponent implements OnDestroy {
   }
 
   onTodoClick(todoId: number): void {
-    this.dialog.open(TodoCalendarDetailDialogComponent, {
+    if (this.detailDialogRef) return
+    this.detailDialogRef = this.dialog.open(TodoCalendarDetailDialogComponent, {
       width: '440px',
       data: { todoId }
+    })
+    this.detailDialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.detailDialogRef = null
     })
   }
 

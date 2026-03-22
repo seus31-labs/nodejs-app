@@ -41,7 +41,7 @@ export class TodoCalendarDetailDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>()
 
   constructor(
-    public dialogRef: MatDialogRef<TodoCalendarDetailDialogComponent>,
+    private readonly dialogRef: MatDialogRef<TodoCalendarDetailDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: TodoCalendarDetailDialogData,
     private todoService: TodoService
   ) {}
@@ -56,7 +56,7 @@ export class TodoCalendarDetailDialogComponent implements OnInit, OnDestroy {
           this.loading = false
         },
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '取得に失敗しました。'
+          this.error = err?.error?.message ?? err?.message ?? '取得に失敗しました'
           this.loading = false
         }
       })

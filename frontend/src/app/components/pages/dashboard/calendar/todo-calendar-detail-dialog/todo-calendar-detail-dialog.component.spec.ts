@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { environment } from '../../../../../../environments/environment'
 import { NetworkStatusService } from '../../../../../services/network-status.service'
@@ -39,7 +40,7 @@ describe('TodoCalendarDetailDialogComponent', () => {
     offlineStorage.saveTodos.and.returnValue(Promise.resolve())
 
     await TestBed.configureTestingModule({
-      imports: [TodoCalendarDetailDialogComponent, HttpClientTestingModule],
+      imports: [TodoCalendarDetailDialogComponent, HttpClientTestingModule, NoopAnimationsModule],
       providers: [
         TodoService,
         { provide: NetworkStatusService, useValue: networkStatus },
