@@ -197,6 +197,24 @@ test('PUT /comments/:id by non-author returns 403', async (t) => {
   assert.strictEqual(putRes.statusCode, 403);
 });
 
+test('DELETE /comments/:id by non-author returns 403', async (t) => {
+  const app = await build(t);
+  const { todo, ownerToken, editToken } = await setupOwnerViewEdit(t, app);
+  const postRes = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${todo.id}/comments`,
+    headers: { authorization: `Bearer ${ownerToken}` },
+    payload: { content: 'owner wrote' },
+  });
+  const c = JSON.parse(postRes.payload);
+  const delRes = await app.inject({
+    method: 'DELETE',
+    url: `/api/v1/comments/${c.id}`,
+    headers: { authorization: `Bearer ${editToken}` },
+  });
+  assert.strictEqual(delRes.statusCode, 403);
+});
+
 test('POST comment empty content returns 400', async (t) => {
   const app = await build(t);
   const suffix = uniqueSuffix();

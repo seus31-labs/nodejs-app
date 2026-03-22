@@ -66,6 +66,23 @@ const {
   getWeeklyStats,
 } = require('../../../controllers/analyticsController');
 
+/** コメント API の 201/200 本文。serialization で意図しないフィールドが漏れないよう明示する */
+const commentApiResponseSchema = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['id', 'todoId', 'userId', 'content', 'authorName', 'isMine', 'createdAt', 'updatedAt'],
+  properties: {
+    id: { type: 'integer' },
+    todoId: { type: 'integer' },
+    userId: { type: 'integer' },
+    content: { type: 'string' },
+    authorName: { type: 'string' },
+    isMine: { type: 'boolean' },
+    createdAt: { type: 'string' },
+    updatedAt: { type: 'string' },
+  },
+};
+
 module.exports = async function (fastify, opts) {
   /**
    * Auth
@@ -573,6 +590,9 @@ module.exports = async function (fastify, opts) {
           content: { type: 'string', minLength: 1, maxLength: 8000 },
         },
       },
+      response: {
+        201: commentApiResponseSchema,
+      },
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => postComment(fastify, request, reply),
@@ -590,6 +610,9 @@ module.exports = async function (fastify, opts) {
         properties: {
           content: { type: 'string', minLength: 1, maxLength: 8000 },
         },
+      },
+      response: {
+        200: commentApiResponseSchema,
       },
     },
     preHandler: [fastify.authenticate],

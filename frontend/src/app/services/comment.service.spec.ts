@@ -55,6 +55,25 @@ describe('CommentService (9.12)', () => {
     req.flush(mock)
   })
 
+  it('update should PUT /comments/:id', () => {
+    const body = { content: 'updated' }
+    const mock: Comment = {
+      id: 2,
+      todoId: 1,
+      userId: 1,
+      content: 'updated',
+      createdAt: '',
+      updatedAt: '',
+      authorName: 'A',
+      isMine: true,
+    }
+    service.update(2, body).subscribe((c) => expect(c).toEqual(mock))
+    const req = httpMock.expectOne(`${apiUrl}/comments/2`)
+    expect(req.request.method).toBe('PUT')
+    expect(req.request.body).toEqual(body)
+    req.flush(mock)
+  })
+
   it('delete should DELETE /comments/:id', () => {
     service.delete(9).subscribe(() => undefined)
     const req = httpMock.expectOne(`${apiUrl}/comments/9`)
