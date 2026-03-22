@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { Subject, filter, takeUntil } from 'rxjs'
 import { SharedModule } from './theme/shared/shared.module'
 import { ThemeService } from './services/theme.service'
-import { KeyboardShortcutService } from './services/keyboard-shortcut.service'
+import { KeyboardShortcutService, KEYBOARD_SHORTCUT_IDS } from './services/keyboard-shortcut.service'
 import { SyncService } from './services/sync.service'
 import { ShortcutHelpDialogComponent } from './components/pages/dashboard/todo/shortcut-help-dialog/shortcut-help-dialog.component'
 import { AuthService } from './services/auth.service'
@@ -50,13 +50,17 @@ export class AppComponent implements OnInit, OnDestroy {
         else this.reminderService.stop()
       })
 
-    this.shortcutService.register('Shift+?', () => {
-      this.dialog.open(ShortcutHelpDialogComponent, { width: '400px' })
-    }, 'ショートカット一覧を表示')
+    this.shortcutService.registerBinding({
+      id: KEYBOARD_SHORTCUT_IDS.HELP,
+      defaultKeys: 'shift+?',
+      defaultKeysLabel: 'Shift+?',
+      handler: () => this.dialog.open(ShortcutHelpDialogComponent, { width: '520px' }),
+      description: 'ショートカット一覧を表示',
+    })
   }
 
   ngOnDestroy() {
-    this.shortcutService.unregister('Shift+?')
+    this.shortcutService.unregisterBinding(KEYBOARD_SHORTCUT_IDS.HELP)
     this.destroy$.next()
     this.destroy$.complete()
   }
