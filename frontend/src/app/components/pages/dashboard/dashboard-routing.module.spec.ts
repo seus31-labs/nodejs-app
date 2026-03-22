@@ -1,4 +1,4 @@
-import { CalendarPageComponent } from './calendar/calendar-page/calendar-page.component'
+import CalendarPageComponent from './calendar/calendar-page/calendar-page.component'
 import { DASHBOARD_ROUTES } from './dashboard-routing.module'
 
 describe('DashboardRoutingModule (12.12 calendar)', () => {
@@ -12,7 +12,7 @@ describe('DashboardRoutingModule (12.12 calendar)', () => {
 
   it('should lazy-load CalendarPageComponent for calendar route', async () => {
     const calendarRoute = childRoutes.find((r) => r.path === 'calendar')
-    const Cmp = await calendarRoute!.loadComponent!()
-    expect(Cmp).toBe(CalendarPageComponent)
+    const mod = (await calendarRoute!.loadComponent!()) as { default: typeof CalendarPageComponent }
+    expect(mod.default).toBe(CalendarPageComponent)
   })
 })

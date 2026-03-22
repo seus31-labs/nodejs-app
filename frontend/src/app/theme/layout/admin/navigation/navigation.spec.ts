@@ -9,5 +9,6 @@ describe('NavigationItem (12.12 calendar)', () => {
     expect(calendar).toBeTruthy()
     expect(calendar?.url).toBe('/dashboard/calendar')
     expect(calendar?.title).toBe('カレンダー')
+    expect(calendar?.icon).toBe('feather icon-calendar')
   })
 })

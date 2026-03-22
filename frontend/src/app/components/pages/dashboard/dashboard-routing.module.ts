@@ -16,9 +16,7 @@ export const DASHBOARD_ROUTES: Routes = [
       },
       {
         path: 'calendar',
-        /* named export のため .then が必要（Router の型は default export 前提） */
-        loadComponent: () =>
-          import('./calendar/calendar-page/calendar-page.component').then((m) => m.CalendarPageComponent)
+        loadComponent: () => import('./calendar/calendar-page/calendar-page.component')
       },
       {
         path: 'archived',
