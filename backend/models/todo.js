@@ -73,14 +73,6 @@ module.exports = (sequelize) => {
         allowNull: true,
         field: 'reminder_sent_at',
       },
-      parentId: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        field: 'parent_id',
-        references: { model: 'todos', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-      },
       projectId: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -88,6 +80,14 @@ module.exports = (sequelize) => {
         references: { model: 'projects', key: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
+      },
+      parentId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: 'parent_id',
+        references: { model: 'todos', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
     },
     {
