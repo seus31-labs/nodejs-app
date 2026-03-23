@@ -54,7 +54,7 @@ GET /api/todos/:id/progress
 
 ### Task 5.3: TodoService にサブタスク機能追加
 
-- [ ] 5.3.1: `getSubtasks(todoId, userId)` 実装
+- [x] 5.3.1: `getSubtasks(todoId, userId)` 実装
 - [ ] 5.3.2: `createSubtask(parentId, userId, todoData)` 実装
 - [ ] 5.3.3: `getProgress(todoId, userId)` 実装（完了率計算）
 - [ ] 5.3.4: `getTodosByUserId` でサブタスクを除外（parentId IS NULL）
