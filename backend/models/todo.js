@@ -100,6 +100,10 @@ module.exports = (sequelize) => {
             return;
           }
 
+          if (!this.changed('parentId')) {
+            return;
+          }
+
           if (this.parentId === this.id) {
             throw new Error('親Todoに自分自身は指定できません。');
           }
