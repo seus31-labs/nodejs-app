@@ -147,6 +147,29 @@ async function getTodoById(fastify, todoId, userId) {
 }
 
 /**
+ * 指定 Todo のサブタスク一覧を取得する（親 Todo を閲覧可能なユーザーのみ）
+ * 現段階では 1 階層の子 Todo のみを返し、孫以降は含めない。
+ * 共有経由で親 Todo を閲覧可能な場合も、配下サブタスクは userId で絞らず全件返す。
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} todoId - 親 Todo ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<object[]|null>} サブタスク配列。親 Todo が見つからない/閲覧不可なら null
+ */
+async function getSubtasks(fastify, todoId, userId) {
+  const parentTodo = await getTodoById(fastify, todoId, userId);
+  if (!parentTodo) return null;
+
+  return fastify.models.Todo.findAll({
+    where: {
+      parentId: todoId,
+      archived: false,
+    },
+    include: buildTodoInclude(fastify),
+    order: [['createdAt', 'ASC']],
+  });
+}
+
+/**
  * アーカイブ有無を問わず Todo を 1 件取得する（archive/unarchive 専用）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
@@ -571,6 +594,7 @@ module.exports = {
   getTodosByUserId,
   getTodosByProjectId,
   getTodoById,
+  getSubtasks,
   updateTodo,
   deleteTodo,
   toggleComplete,
