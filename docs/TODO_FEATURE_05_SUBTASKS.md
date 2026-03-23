@@ -48,7 +48,7 @@ GET /api/todos/:id/progress
 
 ### Task 5.2: Todo モデル更新
 
-- [ ] 5.2.1: parentId フィールド追加
+- [x] 5.2.1: parentId フィールド追加
 - [ ] 5.2.2: 自己関連付け定義（hasMany, belongsTo）
 - [ ] 5.2.3: バリデーション（循環参照チェック）
 
