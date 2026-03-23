@@ -94,6 +94,42 @@ module.exports = (sequelize) => {
       tableName: 'todos',
       timestamps: true,
       underscored: true,
+      validate: {
+        async hasNoCircularParentReference() {
+          if (!this.parentId || !this.id) {
+            return;
+          }
+
+          if (!this.changed('parentId')) {
+            return;
+          }
+
+          if (this.parentId === this.id) {
+            throw new Error('親Todoに自分自身は指定できません。');
+          }
+
+          const seenTodoIds = new Set([this.id]);
+          const TodoModel = this.sequelize.models.Todo;
+          let currentParentId = this.parentId;
+
+          while (currentParentId) {
+            if (seenTodoIds.has(currentParentId)) {
+              throw new Error('親子関係が循環するため保存できません。');
+            }
+
+            seenTodoIds.add(currentParentId);
+            const parentTodo = await TodoModel.findByPk(currentParentId, {
+              attributes: ['id', 'parentId'],
+            });
+
+            if (!parentTodo) {
+              break;
+            }
+
+            currentParentId = parentTodo.parentId;
+          }
+        },
+      },
     }
   );
 
