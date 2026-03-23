@@ -73,6 +73,14 @@ module.exports = (sequelize) => {
         allowNull: true,
         field: 'reminder_sent_at',
       },
+      parentId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: 'parent_id',
+        references: { model: 'todos', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
       projectId: {
         type: DataTypes.INTEGER,
         allowNull: true,
