@@ -148,6 +148,8 @@ async function getTodoById(fastify, todoId, userId) {
 
 /**
  * 指定 Todo のサブタスク一覧を取得する（親 Todo を閲覧可能なユーザーのみ）
+ * 現段階では 1 階層の子 Todo のみを返し、孫以降は含めない。
+ * 共有経由で親 Todo を閲覧可能な場合も、配下サブタスクは userId で絞らず全件返す。
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - 親 Todo ID
  * @param {number} userId - ユーザー ID
