@@ -201,6 +201,7 @@ async function createSubtask(fastify, parentId, userId, todoData) {
 
 /**
  * 指定 Todo のサブタスク進捗を取得する（親 Todo を閲覧可能なユーザーのみ）
+ * total が 0 の場合の percentage 計算は呼び出し側で 0 扱いにする。
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - 親 Todo ID
  * @param {number} userId - ユーザー ID
@@ -210,16 +211,15 @@ async function getProgress(fastify, todoId, userId) {
   const parentTodo = await getTodoById(fastify, todoId, userId);
   if (!parentTodo) return null;
 
-  const subtasks = await fastify.models.Todo.findAll({
-    where: {
-      parentId: todoId,
-      archived: false,
-    },
-    attributes: ['completed'],
-  });
+  const baseWhere = {
+    parentId: todoId,
+    archived: false,
+  };
+  const [total, completed] = await Promise.all([
+    fastify.models.Todo.count({ where: baseWhere }),
+    fastify.models.Todo.count({ where: { ...baseWhere, completed: true } }),
+  ]);
 
-  const total = subtasks.length;
-  const completed = subtasks.filter((subtask) => subtask.completed).length;
   return { completed, total };
 }
 
