@@ -42,6 +42,33 @@ function buildOrder(sequelize, sortBy, sortOrder) {
 }
 
 /**
+ * parentId 起点の祖先チェーンに循環がないことを検証する。
+ * 不整合データが混入していた場合に、無限ループ化する処理（進捗計算等）を事前に防ぐ。
+ * @param {object} fastify
+ * @param {number} startParentId
+ * @returns {Promise<void>}
+ */
+async function assertNoCircularParentChain(fastify, startParentId) {
+  if (!Number.isInteger(startParentId) || startParentId <= 0) return;
+
+  const seenTodoIds = new Set();
+  let currentParentId = startParentId;
+
+  while (currentParentId) {
+    if (seenTodoIds.has(currentParentId)) {
+      throw new Error('親子関係が循環しているためサブタスクを作成できません。');
+    }
+    seenTodoIds.add(currentParentId);
+
+    const parentTodo = await fastify.models.Todo.findByPk(currentParentId, {
+      attributes: ['id', 'parentId'],
+    });
+    if (!parentTodo) break;
+    currentParentId = parentTodo.parentId;
+  }
+}
+
+/**
  * 指定ユーザーの Todo を作成する
  * @param {object} fastify - Fastify インスタンス
  * @param {number} userId - ユーザー ID
@@ -68,7 +95,7 @@ async function createTodo(fastify, userId, todoData) {
  * @returns {Promise<object[]>} Todo 配列（Tags, Project を含む）
  */
 async function getTodosByUserId(fastify, userId, options = {}) {
-  const where = { userId, archived: false };
+  const where = { userId, archived: false, parentId: { [Op.is]: null } };
   if (typeof options.completed === 'boolean') {
     where.completed = options.completed;
   }
@@ -186,6 +213,7 @@ async function createSubtask(fastify, parentId, userId, todoData) {
   if (parentTodo.userId !== userId && !(await shareService.canEdit(fastify, parentId, userId))) {
     return null;
   }
+  await assertNoCircularParentChain(fastify, parentId);
 
   const { title, description, priority, dueDate, projectId } = todoData;
   return fastify.models.Todo.create({
@@ -197,6 +225,30 @@ async function createSubtask(fastify, parentId, userId, todoData) {
     dueDate: dueDate ?? null,
     projectId: projectId ?? null,
   });
+}
+
+/**
+ * 指定 Todo のサブタスク進捗を取得する（親 Todo を閲覧可能なユーザーのみ）
+ * total が 0 の場合の percentage 計算は呼び出し側で 0 扱いにする。
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} todoId - 親 Todo ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<{completed: number, total: number}|null>} 進捗情報。親 Todo が見つからない/閲覧不可なら null
+ */
+async function getProgress(fastify, todoId, userId) {
+  const parentTodo = await getTodoById(fastify, todoId, userId);
+  if (!parentTodo) return null;
+
+  const baseWhere = {
+    parentId: todoId,
+    archived: false,
+  };
+  const [total, completed] = await Promise.all([
+    fastify.models.Todo.count({ where: baseWhere }),
+    fastify.models.Todo.count({ where: { ...baseWhere, completed: true } }),
+  ]);
+
+  return { completed, total };
 }
 
 /**
@@ -626,6 +678,7 @@ module.exports = {
   getTodoById,
   getSubtasks,
   createSubtask,
+  getProgress,
   updateTodo,
   deleteTodo,
   toggleComplete,
