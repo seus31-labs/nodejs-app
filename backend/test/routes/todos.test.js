@@ -590,6 +590,43 @@ test('other user cannot delete todo (DELETE) - 404', async (t) => {
   assert.strictEqual(delAsB.statusCode, 404)
 })
 
+test('GET /api/v1/todos does not include subtasks (parentId not null)', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `sublist-${suffix}`, email: `sublist-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent todo' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  const subtaskRes = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Child todo' }
+  })
+  assert.strictEqual(subtaskRes.statusCode, 201)
+  const subtask = JSON.parse(subtaskRes.payload)
+
+  const listRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(listRes.statusCode, 200)
+  const todos = JSON.parse(listRes.payload)
+  assert(todos.some((todo) => todo.id === parent.id), 'parent todo must be included')
+  assert(!todos.some((todo) => todo.id === subtask.id), 'subtask must not be included')
+})
+
 test('GET /api/v1/todos with sortBy and sortOrder returns sorted list', async (t) => {
   const app = await build(t)
   const suffix = uniqueSuffix()
