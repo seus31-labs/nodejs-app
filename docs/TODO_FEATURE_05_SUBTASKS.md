@@ -56,7 +56,7 @@ GET /api/todos/:id/progress
 
 - [x] 5.3.1: `getSubtasks(todoId, userId)` 実装
 - [x] 5.3.2: `createSubtask(parentId, userId, todoData)` 実装
-- [ ] 5.3.3: `getProgress(todoId, userId)` 実装（完了率計算）
+- [x] 5.3.3: `getProgress(todoId, userId)` 実装（完了率計算）
 - [ ] 5.3.4: `getTodosByUserId` でサブタスクを除外（parentId IS NULL）
 - [ ] 5.3.5: 循環参照チェック処理実装
 

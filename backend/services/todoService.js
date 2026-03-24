@@ -200,6 +200,30 @@ async function createSubtask(fastify, parentId, userId, todoData) {
 }
 
 /**
+ * 指定 Todo のサブタスク進捗を取得する（親 Todo を閲覧可能なユーザーのみ）
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} todoId - 親 Todo ID
+ * @param {number} userId - ユーザー ID
+ * @returns {Promise<{completed: number, total: number}|null>} 進捗情報。親 Todo が見つからない/閲覧不可なら null
+ */
+async function getProgress(fastify, todoId, userId) {
+  const parentTodo = await getTodoById(fastify, todoId, userId);
+  if (!parentTodo) return null;
+
+  const subtasks = await fastify.models.Todo.findAll({
+    where: {
+      parentId: todoId,
+      archived: false,
+    },
+    attributes: ['completed'],
+  });
+
+  const total = subtasks.length;
+  const completed = subtasks.filter((subtask) => subtask.completed).length;
+  return { completed, total };
+}
+
+/**
  * アーカイブ有無を問わず Todo を 1 件取得する（archive/unarchive 専用）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
@@ -626,6 +650,7 @@ module.exports = {
   getTodoById,
   getSubtasks,
   createSubtask,
+  getProgress,
   updateTodo,
   deleteTodo,
   toggleComplete,
