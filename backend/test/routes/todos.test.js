@@ -776,6 +776,35 @@ test('GET /api/v1/todos/:id/progress returns completed/total/percentage', async 
   assert.strictEqual(progress.percentage, 50)
 })
 
+test('GET /api/v1/todos/:id/progress returns 0 when no subtasks', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `prog0-${suffix}`, email: `prog0-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent without children' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  const progressRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${parent.id}/progress`,
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(progressRes.statusCode, 200)
+  const progress = JSON.parse(progressRes.payload)
+  assert.strictEqual(progress.completed, 0)
+  assert.strictEqual(progress.total, 0)
+  assert.strictEqual(progress.percentage, 0)
+})
+
 test('GET /api/v1/todos does not include subtasks (parentId not null)', async (t) => {
   const app = await build(t)
   const suffix = uniqueSuffix()
