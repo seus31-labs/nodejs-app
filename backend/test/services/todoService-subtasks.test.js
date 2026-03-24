@@ -77,6 +77,7 @@ test('getProgress: parent todo が見つからない場合は null', async () =>
 test('getProgress: completed/total を返す', async () => {
   const fastify = buildFastifyMock()
   fastify.models.Todo.findOne = async ({ where }) => ({ id: where.id, userId: 10 })
+  // Promise.all([totalCount, completedCount]) の順に対応
   const counts = [3, 2]
   fastify.models.Todo.count = async () => counts.shift()
 
