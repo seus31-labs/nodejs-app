@@ -56,7 +56,9 @@ async function assertNoCircularParentChain(fastify, startParentId) {
 
   while (currentParentId) {
     if (seenTodoIds.has(currentParentId)) {
-      throw new Error('親子関係が循環しているためサブタスクを作成できません。');
+      const err = new Error('親子関係が循環しているためサブタスクを作成できません。');
+      err.code = 'CIRCULAR_REFERENCE';
+      throw err;
     }
     seenTodoIds.add(currentParentId);
 

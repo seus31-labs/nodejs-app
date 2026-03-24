@@ -95,7 +95,7 @@ async function createSubtask(fastify, req, reply) {
     }
     reply.code(201).send(subtask.toJSON());
   } catch (error) {
-    if (error?.message === '親子関係が循環しているためサブタスクを作成できません。') {
+    if (error?.code === 'CIRCULAR_REFERENCE') {
       return reply.code(400).send({ error: error.message });
     }
     handleTodoError(fastify, reply, error, 'Failed to create subtask');

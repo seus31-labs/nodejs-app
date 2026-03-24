@@ -698,7 +698,7 @@ test('POST /api/v1/todos/:id/subtasks with unknown id returns 404', async (t) =>
   assert.strictEqual(createRes.statusCode, 404)
 })
 
-test.skip('GET /api/v1/todos does not include subtasks (parentId not null)', async (t) => {
+test('GET /api/v1/todos does not include subtasks (parentId not null)', async (t) => {
   const app = await build(t)
   const suffix = uniqueSuffix()
   const user = { name: `sublist-${suffix}`, email: `sublist-${suffix}@test.local`, password: 'pass123' }
