@@ -85,3 +85,20 @@ test('getProgress: completed/total を返す', async () => {
   assert.deepStrictEqual(progress, { completed: 2, total: 3 })
 })
 
+test('createSubtask: 親子関係が循環している場合は CIRCULAR_REFERENCE を投げる', async () => {
+  const fastify = buildFastifyMock()
+  fastify.models.Todo.findOne = async ({ where }) => ({ id: where.id, userId: 10 })
+  fastify.models.Todo.findByPk = async (id) => {
+    if (id === 1) return { id: 1, parentId: 2 }
+    if (id === 2) return { id: 2, parentId: 1 }
+    return null
+  }
+
+  await assert.rejects(
+    async () => {
+      await todoService.createSubtask(fastify, 1, 10, { title: 'child' })
+    },
+    (error) => error?.code === 'CIRCULAR_REFERENCE'
+  )
+})
+
