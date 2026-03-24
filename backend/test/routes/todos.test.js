@@ -28,6 +28,15 @@ test('POST /api/v1/todos without auth returns 401', async (t) => {
   assert.strictEqual(res.statusCode, 401)
 })
 
+test('GET /api/v1/todos/:id/subtasks without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/1/subtasks'
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
 test('GET /api/v1/todos/search without auth returns 401', async (t) => {
   const app = await build(t)
   const res = await app.inject({
@@ -590,8 +599,85 @@ test('other user cannot delete todo (DELETE) - 404', async (t) => {
   assert.strictEqual(delAsB.statusCode, 404)
 })
 
+test('GET /api/v1/todos/:id/subtasks with unknown id returns 404', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `sub404-${suffix}`, email: `sub404-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/99999999/subtasks',
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(res.statusCode, 404)
+})
+
+test('GET /api/v1/todos/:id/subtasks returns empty list when no subtasks', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `subok-${suffix}`, email: `subok-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent only todo' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  const res = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const subtasks = JSON.parse(res.payload)
+  assert(Array.isArray(subtasks))
+  assert.strictEqual(subtasks.length, 0)
+})
+
 test.skip('GET /api/v1/todos does not include subtasks (parentId not null)', async (t) => {
-  // Task 5.4.2 のサブタスク作成 API 実装後に、API 経由セットアップへ切り替えて有効化する。
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `sublist-${suffix}`, email: `sublist-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent todo' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  // Task 5.4.2 実装後はサブタスク作成API経由で準備する。
+  const subtaskRes = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Child todo' }
+  })
+  assert.strictEqual(subtaskRes.statusCode, 201)
+  const subtask = JSON.parse(subtaskRes.payload)
+
+  const listRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(listRes.statusCode, 200)
+  const todos = JSON.parse(listRes.payload)
+  assert(todos.some((todo) => todo.id === parent.id), 'parent todo must be included')
+  assert(!todos.some((todo) => todo.id === subtask.id), 'subtask must not be included')
 })
 
 test('GET /api/v1/todos with sortBy and sortOrder returns sorted list', async (t) => {
