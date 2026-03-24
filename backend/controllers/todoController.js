@@ -102,6 +102,24 @@ async function createSubtask(fastify, req, reply) {
   }
 }
 
+async function getProgress(fastify, req, reply) {
+  try {
+    const todoId = parseTodoId(req.params.id);
+    if (todoId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id' });
+    }
+    const progress = await todoService.getProgress(fastify, todoId, req.user.id);
+    if (!progress) {
+      return reply.code(404).send({ error: 'Not found' });
+    }
+    const { completed, total } = progress;
+    const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+    reply.code(200).send({ completed, total, percentage });
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Failed to get progress');
+  }
+}
+
 async function updateTodo(fastify, req, reply) {
   try {
     const todoId = parseTodoId(req.params.id);
@@ -341,6 +359,7 @@ module.exports = {
   getTodoById,
   getSubtasks,
   createSubtask,
+  getProgress,
   updateTodo,
   deleteTodo,
   toggleComplete,

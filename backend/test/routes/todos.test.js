@@ -47,6 +47,15 @@ test('POST /api/v1/todos/:id/subtasks without auth returns 401', async (t) => {
   assert.strictEqual(res.statusCode, 401)
 })
 
+test('GET /api/v1/todos/:id/progress without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/1/progress'
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
 test('GET /api/v1/todos/search without auth returns 401', async (t) => {
   const app = await build(t)
   const res = await app.inject({
@@ -696,6 +705,75 @@ test('POST /api/v1/todos/:id/subtasks with unknown id returns 404', async (t) =>
     payload: { title: 'Child todo' }
   })
   assert.strictEqual(createRes.statusCode, 404)
+})
+
+test('GET /api/v1/todos/:id/progress with unknown id returns 404', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `prog404-${suffix}`, email: `prog404-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const progressRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/99999999/progress',
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(progressRes.statusCode, 404)
+})
+
+test('GET /api/v1/todos/:id/progress returns completed/total/percentage', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `prog-${suffix}`, email: `prog-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent progress todo' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  const child1Res = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Child done' }
+  })
+  assert.strictEqual(child1Res.statusCode, 201)
+  const child1 = JSON.parse(child1Res.payload)
+
+  const child2Res = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Child open' }
+  })
+  assert.strictEqual(child2Res.statusCode, 201)
+
+  const toggleRes = await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${child1.id}/toggle`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(toggleRes.statusCode, 200)
+
+  const progressRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${parent.id}/progress`,
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(progressRes.statusCode, 200)
+  const progress = JSON.parse(progressRes.payload)
+  assert.strictEqual(progress.completed, 1)
+  assert.strictEqual(progress.total, 2)
+  assert.strictEqual(progress.percentage, 50)
 })
 
 test('GET /api/v1/todos does not include subtasks (parentId not null)', async (t) => {

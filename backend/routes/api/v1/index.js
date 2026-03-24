@@ -8,6 +8,7 @@ const {
   getTodoById,
   getSubtasks,
   createSubtask,
+  getProgress,
   updateTodo,
   deleteTodo,
   toggleComplete,
@@ -674,6 +675,28 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => createSubtask(fastify, request, reply),
+  });
+  fastify.get('/todos/:id/progress', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      response: {
+        200: {
+          type: 'object',
+          required: ['completed', 'total', 'percentage'],
+          properties: {
+            completed: { type: 'integer' },
+            total: { type: 'integer' },
+            percentage: { type: 'integer' },
+          },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getProgress(fastify, request, reply),
   });
   fastify.put('/todos/:id', {
     schema: {

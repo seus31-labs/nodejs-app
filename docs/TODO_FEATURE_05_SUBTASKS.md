@@ -64,7 +64,7 @@ GET /api/todos/:id/progress
 
 - [x] 5.4.1: `getSubtasks` ハンドラ実装
 - [x] 5.4.2: `createSubtask` ハンドラ実装
-- [ ] 5.4.3: `getProgress` ハンドラ実装
+- [x] 5.4.3: `getProgress` ハンドラ実装
 
 ### Task 5.5: Todo ルート更新
 
