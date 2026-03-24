@@ -68,10 +68,10 @@ GET /api/todos/:id/progress
 
 ### Task 5.5: Todo ルート更新
 
-- [ ] 5.5.1: GET /api/todos/:id/subtasks のルート定義
-- [ ] 5.5.2: POST /api/todos/:id/subtasks のルート定義
-- [ ] 5.5.3: GET /api/todos/:id/progress のルート定義
-- [ ] 5.5.4: JSON Schema 定義
+- [x] 5.5.1: GET /api/todos/:id/subtasks のルート定義
+- [x] 5.5.2: POST /api/todos/:id/subtasks のルート定義
+- [x] 5.5.3: GET /api/todos/:id/progress のルート定義
+- [x] 5.5.4: JSON Schema 定義
 
 ### Task 5.6: Backend テスト
 
