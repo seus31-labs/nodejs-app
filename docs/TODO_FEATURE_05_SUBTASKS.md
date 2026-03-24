@@ -75,7 +75,7 @@ GET /api/todos/:id/progress
 
 ### Task 5.6: Backend テスト
 
-- [ ] 5.6.1: TodoService サブタスク機能のテスト
+- [x] 5.6.1: TodoService サブタスク機能のテスト
 - [ ] 5.6.2: 循環参照チェックのテスト
 - [ ] 5.6.3: 進捗率計算のテスト
 - [ ] 5.6.4: サブタスク API のテスト
