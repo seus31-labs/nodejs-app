@@ -170,6 +170,36 @@ async function getSubtasks(fastify, todoId, userId) {
 }
 
 /**
+ * 指定親 Todo 配下にサブタスクを作成する（所有者または edit 共有先のみ）
+ * view 共有のみのユーザーは編集不可のため null を返す。コントローラーで null を 404 にする既存パターンと合わせると、
+ * 403 ではなく 404 になる点に注意（存在秘匿を優先する設計）。
+ * getTodoById 内の canView と canEdit が別クエリになるため、edit 共有ユーザーでは DB 参照が複数回走る。
+ * @param {object} fastify - Fastify インスタンス
+ * @param {number} parentId - 親 Todo ID
+ * @param {number} userId - ユーザー ID
+ * @param {object} todoData - { title, description?, priority?, dueDate?, projectId? }
+ * @returns {Promise<object|null>} 作成されたサブタスク。親 Todo が存在しない/閲覧不可/編集不可なら null
+ */
+async function createSubtask(fastify, parentId, userId, todoData) {
+  const parentTodo = await getTodoById(fastify, parentId, userId);
+  if (!parentTodo) return null;
+  if (parentTodo.userId !== userId && !(await shareService.canEdit(fastify, parentId, userId))) {
+    return null;
+  }
+
+  const { title, description, priority, dueDate, projectId } = todoData;
+  return fastify.models.Todo.create({
+    userId,
+    parentId,
+    title,
+    description: description ?? null,
+    priority: priority ?? 'medium',
+    dueDate: dueDate ?? null,
+    projectId: projectId ?? null,
+  });
+}
+
+/**
  * アーカイブ有無を問わず Todo を 1 件取得する（archive/unarchive 専用）
  * @param {object} fastify - Fastify インスタンス
  * @param {number} todoId - Todo ID
@@ -595,6 +625,7 @@ module.exports = {
   getTodosByProjectId,
   getTodoById,
   getSubtasks,
+  createSubtask,
   updateTodo,
   deleteTodo,
   toggleComplete,
