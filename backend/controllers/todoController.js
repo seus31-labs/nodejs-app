@@ -83,6 +83,25 @@ async function getSubtasks(fastify, req, reply) {
   }
 }
 
+async function createSubtask(fastify, req, reply) {
+  try {
+    const parentId = parseTodoId(req.params.id);
+    if (parentId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id' });
+    }
+    const subtask = await todoService.createSubtask(fastify, parentId, req.user.id, req.body);
+    if (!subtask) {
+      return reply.code(404).send({ error: 'Not found' });
+    }
+    reply.code(201).send(subtask.toJSON());
+  } catch (error) {
+    if (error?.code === 'CIRCULAR_REFERENCE') {
+      return reply.code(400).send({ error: error.message });
+    }
+    handleTodoError(fastify, reply, error, 'Failed to create subtask');
+  }
+}
+
 async function updateTodo(fastify, req, reply) {
   try {
     const todoId = parseTodoId(req.params.id);
@@ -321,6 +340,7 @@ module.exports = {
   getTodos,
   getTodoById,
   getSubtasks,
+  createSubtask,
   updateTodo,
   deleteTodo,
   toggleComplete,
