@@ -77,9 +77,7 @@ test('getProgress: parent todo が見つからない場合は null', async () =>
 test('getProgress: completed/total を返す', async () => {
   const fastify = buildFastifyMock()
   fastify.models.Todo.findOne = async ({ where }) => ({ id: where.id, userId: 10 })
-  // Promise.all([totalCount, completedCount]) の順に対応
-  const counts = [3, 2]
-  fastify.models.Todo.count = async () => counts.shift()
+  fastify.models.Todo.count = async ({ where }) => (where.completed === true ? 2 : 3)
 
   const progress = await todoService.getProgress(fastify, 1, 10)
   assert.deepStrictEqual(progress, { completed: 2, total: 3 })
@@ -88,8 +86,7 @@ test('getProgress: completed/total を返す', async () => {
 test('getProgress: サブタスクが 0 件の場合は completed/total ともに 0 を返す', async () => {
   const fastify = buildFastifyMock()
   fastify.models.Todo.findOne = async ({ where }) => ({ id: where.id, userId: 10 })
-  const counts = [0, 0]
-  fastify.models.Todo.count = async () => counts.shift()
+  fastify.models.Todo.count = async ({ where }) => (where.completed === true ? 0 : 0)
 
   const progress = await todoService.getProgress(fastify, 1, 10)
   assert.deepStrictEqual(progress, { completed: 0, total: 0 })
