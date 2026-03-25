@@ -49,6 +49,21 @@
         </div>
       }
     </div>
+    @if (hasSubtasks) {
+      <div class="mt-2">
+        <app-progress-bar [progress]="{ completed: todo.progress?.completed ?? 0, total: todo.progress?.total ?? 0 }"></app-progress-bar>
+      </div>
+    }
+    <div class="mt-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleSubtasks()">
+        {{ showSubtasks ? 'サブタスクを閉じる' : 'サブタスクを表示' }}
+      </button>
+    </div>
+    @if (showSubtasks) {
+      <div class="mt-2">
+        <app-subtask-list [parentId]="todo.id" (subtasksUpdated)="onSubtasksUpdated($event)"></app-subtask-list>
+      </div>
+    }
   </div>
   <div class="btn-group btn-group-sm ms-auto w-100 mt-2 todo-item-actions">
     @if (todo.completed) {

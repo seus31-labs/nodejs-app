@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { SimpleChange } from '@angular/core'
 import { TodoItemComponent } from './todo-item.component'
 import type { ReminderToggleEvent } from './todo-item.component'
 import type { Todo } from '../../../../../models/todo.interface'
@@ -94,6 +95,45 @@ describe('TodoItemComponent (2.12.2)', () => {
     component.share.subscribe((id) => emitted.push(id))
     component.onShare()
     expect(emitted).toEqual([mockTodo.id])
+  })
+
+  it('should recognize todo has subtasks from progress', () => {
+    const todoWithSubtasks: Todo = {
+      ...mockTodo,
+      progress: { completed: 1, total: 2 },
+      subtasks: [
+        { ...mockTodo, id: 11, title: 'child1', parentId: 1, completed: true },
+        { ...mockTodo, id: 12, title: 'child2', parentId: 1, completed: false }
+      ]
+    }
+    component.todo = todoWithSubtasks
+    component.ngOnChanges({
+      todo: new SimpleChange(mockTodo, todoWithSubtasks, false)
+    })
+    fixture.detectChanges()
+
+    expect(component.hasSubtasks).toBeTrue()
+  })
+
+  it('toggleSubtasks should toggle visibility state', () => {
+    expect(component.showSubtasks).toBeFalse()
+    component.toggleSubtasks()
+    expect(component.showSubtasks).toBeTrue()
+    component.toggleSubtasks()
+    expect(component.showSubtasks).toBeFalse()
+  })
+
+  it('onSubtasksUpdated should update todo progress and subtasks', () => {
+    const subtasks: Todo[] = [
+      { ...mockTodo, id: 21, title: 'child1', parentId: 1, completed: true },
+      { ...mockTodo, id: 22, title: 'child2', parentId: 1, completed: false },
+      { ...mockTodo, id: 23, title: 'child3', parentId: 1, completed: true }
+    ]
+
+    component.onSubtasksUpdated(subtasks)
+
+    expect(component.todo.subtasks?.length).toBe(3)
+    expect(component.todo.progress).toEqual({ completed: 2, total: 3 })
   })
 })
 
