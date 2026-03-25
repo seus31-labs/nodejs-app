@@ -51,3 +51,9 @@ export interface TodoCreateUpdate {
   dueDate?: string | null
   projectId?: number | null
 }
+
+/**
+ * サブタスク作成でも利用する DTO の別名。
+ * Todo 作成/更新と同じスキーマ（title 必須、他は任意）で扱えるためエイリアスにする。
+ */
+export type CreateTodoDto = TodoCreateUpdate

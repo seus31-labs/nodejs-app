@@ -90,7 +90,7 @@ GET /api/todos/:id/progress
 ### Task 5.8: TodoService にサブタスク機能追加
 
 - [x] 5.8.1: `getSubtasks(todoId: number): Observable<Todo[]>` 実装
-- [ ] 5.8.2: `createSubtask(parentId: number, todo: CreateTodoDto): Observable<Todo>` 実装
+- [x] 5.8.2: `createSubtask(parentId: number, todo: CreateTodoDto): Observable<Todo>` 実装
 - [ ] 5.8.3: `getProgress(todoId: number): Observable<{completed: number, total: number}>` 実装
 
 ### Task 5.9: SubtaskList コンポーネント作成

@@ -6,7 +6,7 @@ import { NetworkStatusService } from './network-status.service'
 import { OfflineStorageService } from './offline-storage.service'
 import type { SortOptions } from '../models/sort-options.interface'
 import type { SearchParams } from '../models/search-params.interface'
-import type { Todo } from '../models/todo.interface'
+import type { Todo, CreateTodoDto } from '../models/todo.interface'
 
 const mockTodo: Todo = {
   id: 1,
@@ -221,6 +221,22 @@ describe('TodoService', () => {
 
       const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/${todoId}/subtasks` && r.method === 'GET')
       req.flush(mockSubtasks)
+    })
+  })
+
+  describe('subtasks (5.8.2)', () => {
+    it('should call POST /todos/:id/subtasks and return Todo', () => {
+      const parentId = 1
+      const payload: CreateTodoDto = { title: 'new child' }
+      const created: Todo = { ...mockTodo, id: 20, parentId, title: 'new child' }
+
+      service.createSubtask(parentId, payload).subscribe((res) => expect(res).toEqual(created))
+
+      const req = httpMock.expectOne(
+        (r) => r.url === `${apiUrl}/todos/${parentId}/subtasks` && r.method === 'POST'
+      )
+      expect(req.request.body).toEqual(payload)
+      req.flush(created)
     })
   })
 
