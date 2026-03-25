@@ -1,0 +1,71 @@
+<div class="subtask-list-root">
+  <div class="d-flex align-items-center justify-content-between mb-2">
+    <div class="d-flex align-items-center gap-2">
+      <span class="fw-semibold">Subtasks</span>
+      <span class="text-muted small">({{ subtasks.length }})</span>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-outline-primary btn-sm"
+      data-testid="subtask-add-toggle"
+      (click)="onAddClick()"
+    >
+      追加
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="text-muted small">読み込み中...</div>
+  } @else {
+    @if (error) {
+      <div class="text-danger small mb-2">{{ error }}</div>
+    }
+
+    <div class="subtask-indent">
+      @for (subtask of subtasks; track subtask.id) {
+        <div class="subtask-row">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            [checked]="subtask.completed"
+            (change)="toggle(subtask.id)"
+          />
+          <span class="subtask-title" [class.text-decoration-line-through]="subtask.completed">
+            {{ subtask.title }}
+          </span>
+        </div>
+      }
+    </div>
+
+    @if (adding) {
+      <form class="subtask-add-form" (ngSubmit)="create()">
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          name="title"
+          data-testid="subtask-title-input"
+          [(ngModel)]="newTitle"
+          placeholder="サブタスクタイトル"
+          required
+          maxlength="255"
+        />
+
+        <div class="subtask-add-actions">
+          <button
+            type="submit"
+            class="btn btn-sm btn-primary"
+            data-testid="subtask-add-submit"
+            [disabled]="creating"
+          >
+            作成
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="creating" (click)="cancelAdd()">
+            キャンセル
+          </button>
+        </div>
+      </form>
+    }
+  }
+</div>
+

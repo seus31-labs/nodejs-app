@@ -1,0 +1,33 @@
+.subtask-list-root {
+  width: 100%;
+}
+
+.subtask-indent {
+  margin-left: 1rem;
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  padding-left: 0.75rem;
+}
+
+.subtask-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.subtask-title {
+  font-size: 0.875rem;
+}
+
+.subtask-add-form {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.subtask-add-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
