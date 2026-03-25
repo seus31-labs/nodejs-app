@@ -44,6 +44,51 @@ describe('CalendarViewComponent', () => {
     expect(emitSpy).toHaveBeenCalledWith(42)
   })
 
+  it('should emit todoMove with new due date on event drop', () => {
+    const emitSpy = spyOn(component.todoMove, 'emit')
+    const revertSpy = jasmine.createSpy('revert')
+    const start = new Date(2026, 5, 10)
+    component.onEventDrop({
+      event: { extendedProps: { todoId: 7 }, start },
+      revert: revertSpy
+    } as any)
+
+    expect(emitSpy).toHaveBeenCalled()
+    const emitted = emitSpy.calls.mostRecent().args[0] as {
+      todoId: number
+      dueDate: string
+      revert: () => void
+    }
+    expect(emitted.todoId).toBe(7)
+    expect(emitted.dueDate).toBe('2026-06-10')
+    emitted.revert()
+    expect(revertSpy).toHaveBeenCalled()
+  })
+
+  it('should revert when todoId is missing on drop', () => {
+    const emitSpy = spyOn(component.todoMove, 'emit')
+    const revertSpy = jasmine.createSpy('revert')
+    component.onEventDrop({
+      event: { extendedProps: {}, start: new Date(2026, 0, 1) },
+      revert: revertSpy
+    } as any)
+
+    expect(emitSpy).not.toHaveBeenCalled()
+    expect(revertSpy).toHaveBeenCalled()
+  })
+
+  it('should revert when start is null on drop', () => {
+    const emitSpy = spyOn(component.todoMove, 'emit')
+    const revertSpy = jasmine.createSpy('revert')
+    component.onEventDrop({
+      event: { extendedProps: { todoId: 7 }, start: null },
+      revert: revertSpy
+    } as any)
+
+    expect(emitSpy).not.toHaveBeenCalled()
+    expect(revertSpy).toHaveBeenCalled()
+  })
+
   it('should render calendar events', () => {
     const events: EventInput[] = [{ title: 'test', start: '2026-03-20', extendedProps: { todoId: 1 } }]
     component.events = events

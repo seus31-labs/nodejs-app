@@ -53,6 +53,8 @@ describe('todoToCalendarEvent', () => {
         title: 'Buy milk',
         start: '2026-04-01',
         allDay: true,
+        startEditable: true,
+        durationEditable: false,
         extendedProps: jasmine.objectContaining({
           todoId: 42,
           completed: false,
@@ -67,6 +69,7 @@ describe('todoToCalendarEvent', () => {
     const ev = todoToCalendarEvent(makeTodo({ completed: true }))
     expect(ev?.classNames).toEqual(['calendar-todo--completed'])
     expect(ev?.textColor).toBe('#546e7a')
+    expect(ev?.startEditable).toBe(false)
   })
 
   it('should apply high priority colors when not completed', () => {

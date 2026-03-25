@@ -40,44 +40,44 @@ GET /api/todos/:id/progress
 
 ### Task 5.1: parentId カラム追加
 
-- [ ] 5.1.1: マイグレーション生成 `add-parent-id-to-todos`
-- [ ] 5.1.2: parentId カラム追加
-- [ ] 5.1.3: インデックス追加
-- [ ] 5.1.4: 外部キー制約追加（自己参照）
-- [ ] 5.1.5: マイグレーション実行
+- [x] 5.1.1: マイグレーション生成 `add-parent-id-to-todos`
+- [x] 5.1.2: parentId カラム追加
+- [x] 5.1.3: インデックス追加
+- [x] 5.1.4: 外部キー制約追加（自己参照）
+- [x] 5.1.5: マイグレーション実行
 
 ### Task 5.2: Todo モデル更新
 
-- [ ] 5.2.1: parentId フィールド追加
-- [ ] 5.2.2: 自己関連付け定義（hasMany, belongsTo）
-- [ ] 5.2.3: バリデーション（循環参照チェック）
+- [x] 5.2.1: parentId フィールド追加
+- [x] 5.2.2: 自己関連付け定義（hasMany, belongsTo）
+- [x] 5.2.3: バリデーション（循環参照チェック）
 
 ### Task 5.3: TodoService にサブタスク機能追加
 
-- [ ] 5.3.1: `getSubtasks(todoId, userId)` 実装
-- [ ] 5.3.2: `createSubtask(parentId, userId, todoData)` 実装
-- [ ] 5.3.3: `getProgress(todoId, userId)` 実装（完了率計算）
-- [ ] 5.3.4: `getTodosByUserId` でサブタスクを除外（parentId IS NULL）
-- [ ] 5.3.5: 循環参照チェック処理実装
+- [x] 5.3.1: `getSubtasks(todoId, userId)` 実装
+- [x] 5.3.2: `createSubtask(parentId, userId, todoData)` 実装
+- [x] 5.3.3: `getProgress(todoId, userId)` 実装（完了率計算）
+- [x] 5.3.4: `getTodosByUserId` でサブタスクを除外（parentId IS NULL）
+- [x] 5.3.5: 循環参照チェック処理実装
 
 ### Task 5.4: TodoController にサブタスク機能追加
 
-- [ ] 5.4.1: `getSubtasks` ハンドラ実装
-- [ ] 5.4.2: `createSubtask` ハンドラ実装
-- [ ] 5.4.3: `getProgress` ハンドラ実装
+- [x] 5.4.1: `getSubtasks` ハンドラ実装
+- [x] 5.4.2: `createSubtask` ハンドラ実装
+- [x] 5.4.3: `getProgress` ハンドラ実装
 
 ### Task 5.5: Todo ルート更新
 
-- [ ] 5.5.1: GET /api/todos/:id/subtasks のルート定義
-- [ ] 5.5.2: POST /api/todos/:id/subtasks のルート定義
-- [ ] 5.5.3: GET /api/todos/:id/progress のルート定義
-- [ ] 5.5.4: JSON Schema 定義
+- [x] 5.5.1: GET /api/todos/:id/subtasks のルート定義
+- [x] 5.5.2: POST /api/todos/:id/subtasks のルート定義
+- [x] 5.5.3: GET /api/todos/:id/progress のルート定義
+- [x] 5.5.4: JSON Schema 定義
 
 ### Task 5.6: Backend テスト
 
-- [ ] 5.6.1: TodoService サブタスク機能のテスト
-- [ ] 5.6.2: 循環参照チェックのテスト
-- [ ] 5.6.3: 進捗率計算のテスト
+- [x] 5.6.1: TodoService サブタスク機能のテスト
+- [x] 5.6.2: 循環参照チェックのテスト
+- [x] 5.6.3: 進捗率計算のテスト
 - [ ] 5.6.4: サブタスク API のテスト
 
 ---

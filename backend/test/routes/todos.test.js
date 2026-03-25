@@ -28,6 +28,34 @@ test('POST /api/v1/todos without auth returns 401', async (t) => {
   assert.strictEqual(res.statusCode, 401)
 })
 
+test('GET /api/v1/todos/:id/subtasks without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/1/subtasks'
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('POST /api/v1/todos/:id/subtasks without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/1/subtasks',
+    payload: { title: 'child' }
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
+test('GET /api/v1/todos/:id/progress without auth returns 401', async (t) => {
+  const app = await build(t)
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/1/progress'
+  })
+  assert.strictEqual(res.statusCode, 401)
+})
+
 test('GET /api/v1/todos/search without auth returns 401', async (t) => {
   const app = await build(t)
   const res = await app.inject({
@@ -588,6 +616,231 @@ test('other user cannot delete todo (DELETE) - 404', async (t) => {
     headers: { authorization: `Bearer ${tokenB}` }
   })
   assert.strictEqual(delAsB.statusCode, 404)
+})
+
+test('GET /api/v1/todos/:id/subtasks with unknown id returns 404', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `sub404-${suffix}`, email: `sub404-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+  const res = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/99999999/subtasks',
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(res.statusCode, 404)
+})
+
+test('GET /api/v1/todos/:id/subtasks returns empty list when no subtasks', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `subok-${suffix}`, email: `subok-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent only todo' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  const res = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(res.statusCode, 200)
+  const subtasks = JSON.parse(res.payload)
+  assert(Array.isArray(subtasks))
+  assert.strictEqual(subtasks.length, 0)
+})
+
+test('POST /api/v1/todos/:id/subtasks creates subtask', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `subcreate-${suffix}`, email: `subcreate-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent todo for child' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  const createRes = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Child todo' }
+  })
+  assert.strictEqual(createRes.statusCode, 201)
+  const subtask = JSON.parse(createRes.payload)
+  assert.strictEqual(subtask.parentId, parent.id)
+  assert.strictEqual(subtask.title, 'Child todo')
+})
+
+test('POST /api/v1/todos/:id/subtasks with unknown id returns 404', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `subcreate404-${suffix}`, email: `subcreate404-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const createRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos/99999999/subtasks',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Child todo' }
+  })
+  assert.strictEqual(createRes.statusCode, 404)
+})
+
+test('GET /api/v1/todos/:id/progress with unknown id returns 404', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `prog404-${suffix}`, email: `prog404-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const progressRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos/99999999/progress',
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(progressRes.statusCode, 404)
+})
+
+test('GET /api/v1/todos/:id/progress returns completed/total/percentage', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `prog-${suffix}`, email: `prog-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent progress todo' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  const child1Res = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Child done' }
+  })
+  assert.strictEqual(child1Res.statusCode, 201)
+  const child1 = JSON.parse(child1Res.payload)
+
+  const child2Res = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Child open' }
+  })
+  assert.strictEqual(child2Res.statusCode, 201)
+
+  const toggleRes = await app.inject({
+    method: 'PATCH',
+    url: `/api/v1/todos/${child1.id}/toggle`,
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(toggleRes.statusCode, 200)
+
+  const progressRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${parent.id}/progress`,
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(progressRes.statusCode, 200)
+  const progress = JSON.parse(progressRes.payload)
+  assert.strictEqual(progress.completed, 1)
+  assert.strictEqual(progress.total, 2)
+  assert.strictEqual(progress.percentage, 50)
+})
+
+test('GET /api/v1/todos/:id/progress returns 0 when no subtasks', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `prog0-${suffix}`, email: `prog0-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent without children' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  const progressRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${parent.id}/progress`,
+    headers: { authorization: `Bearer ${token}` },
+  })
+  assert.strictEqual(progressRes.statusCode, 200)
+  const progress = JSON.parse(progressRes.payload)
+  assert.strictEqual(progress.completed, 0)
+  assert.strictEqual(progress.total, 0)
+  assert.strictEqual(progress.percentage, 0)
+})
+
+test('GET /api/v1/todos does not include subtasks (parentId not null)', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `sublist-${suffix}`, email: `sublist-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const parentRes = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Parent todo' }
+  })
+  assert.strictEqual(parentRes.statusCode, 201)
+  const parent = JSON.parse(parentRes.payload)
+
+  // Task 5.4.2 実装後はサブタスク作成API経由で準備する。
+  const subtaskRes = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${parent.id}/subtasks`,
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'Child todo' }
+  })
+  assert.strictEqual(subtaskRes.statusCode, 201)
+  const subtask = JSON.parse(subtaskRes.payload)
+
+  const listRes = await app.inject({
+    method: 'GET',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` }
+  })
+  assert.strictEqual(listRes.statusCode, 200)
+  const todos = JSON.parse(listRes.payload)
+  assert(todos.some((todo) => todo.id === parent.id), 'parent todo must be included')
+  assert(!todos.some((todo) => todo.id === subtask.id), 'subtask must not be included')
 })
 
 test('GET /api/v1/todos with sortBy and sortOrder returns sorted list', async (t) => {

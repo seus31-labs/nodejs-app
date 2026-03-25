@@ -6,6 +6,9 @@ const {
   createTodo,
   getTodos,
   getTodoById,
+  getSubtasks,
+  createSubtask,
+  getProgress,
   updateTodo,
   deleteTodo,
   toggleComplete,
@@ -52,6 +55,36 @@ const {
 const { exportTodos } = require('../../../controllers/exportController');
 const { importTodos } = require('../../../controllers/importController');
 const { shareTodo, getSharedTodos, deleteShare } = require('../../../controllers/shareController');
+const {
+  getCommentsForTodo,
+  postComment,
+  putComment,
+  deleteComment,
+} = require('../../../controllers/commentController');
+const {
+  getCompletionRate,
+  getTodosByPriority: getAnalyticsByPriority,
+  getTodosByTag: getAnalyticsByTag,
+  getTodosByProject: getAnalyticsByProject,
+  getWeeklyStats,
+} = require('../../../controllers/analyticsController');
+
+/** コメント API の 201/200 本文。serialization で意図しないフィールドが漏れないよう明示する */
+const commentApiResponseSchema = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['id', 'todoId', 'userId', 'content', 'authorName', 'isMine', 'createdAt', 'updatedAt'],
+  properties: {
+    id: { type: 'integer' },
+    todoId: { type: 'integer' },
+    userId: { type: 'integer' },
+    content: { type: 'string' },
+    authorName: { type: 'string' },
+    isMine: { type: 'boolean' },
+    createdAt: { type: 'string' },
+    updatedAt: { type: 'string' },
+  },
+};
 
 module.exports = async function (fastify, opts) {
   /**
@@ -529,6 +562,76 @@ module.exports = async function (fastify, opts) {
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => removeTagFromTodo(fastify, request, reply),
   });
+  fastify.get('/todos/:todoId/comments', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['todoId'],
+        properties: { todoId: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      response: {
+        200: {
+          type: 'array',
+          items: { type: 'object', additionalProperties: true },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getCommentsForTodo(fastify, request, reply),
+  });
+  fastify.post('/todos/:todoId/comments', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['todoId'],
+        properties: { todoId: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        required: ['content'],
+        properties: {
+          content: { type: 'string', minLength: 1, maxLength: 8000 },
+        },
+      },
+      response: {
+        201: commentApiResponseSchema,
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => postComment(fastify, request, reply),
+  });
+  fastify.put('/comments/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        required: ['content'],
+        properties: {
+          content: { type: 'string', minLength: 1, maxLength: 8000 },
+        },
+      },
+      response: {
+        200: commentApiResponseSchema,
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => putComment(fastify, request, reply),
+  });
+  fastify.delete('/comments/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => deleteComment(fastify, request, reply),
+  });
   fastify.get('/todos/:id', {
     schema: {
       params: {
@@ -539,6 +642,61 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => getTodoById(fastify, request, reply),
+  });
+  fastify.get('/todos/:id/subtasks', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getSubtasks(fastify, request, reply),
+  });
+  fastify.post('/todos/:id/subtasks', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      body: {
+        type: 'object',
+        required: ['title'],
+        properties: {
+          title: { type: 'string', maxLength: 255 },
+          description: { type: 'string' },
+          priority: { type: 'string', enum: ['low', 'medium', 'high'] },
+          dueDate: { type: 'string', format: 'date' },
+          projectId: { type: 'integer' },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => createSubtask(fastify, request, reply),
+  });
+  fastify.get('/todos/:id/progress', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string', pattern: '^[0-9]+$' } },
+      },
+      response: {
+        200: {
+          type: 'object',
+          required: ['completed', 'total', 'percentage'],
+          properties: {
+            completed: { type: 'integer' },
+            total: { type: 'integer' },
+            percentage: { type: 'integer' },
+          },
+        },
+      },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getProgress(fastify, request, reply),
   });
   fastify.put('/todos/:id', {
     schema: {
@@ -652,5 +810,112 @@ module.exports = async function (fastify, opts) {
     },
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => deleteShare(fastify, request, reply),
+  });
+
+  /**
+   * Analytics（JWT 必須）— 既存 API と同様に /api/v1 配下
+   */
+  const analyticsCompletionRateResponse = {
+    type: 'object',
+    required: ['period', 'total', 'completed', 'rate'],
+    properties: {
+      period: { type: 'string' },
+      total: { type: 'number' },
+      completed: { type: 'number' },
+      rate: { type: 'number' },
+    },
+  };
+  const analyticsByPriorityResponse = {
+    type: 'object',
+    required: ['low', 'medium', 'high'],
+    properties: {
+      low: { type: 'number' },
+      medium: { type: 'number' },
+      high: { type: 'number' },
+    },
+  };
+  const analyticsByTagResponse = {
+    type: 'array',
+    items: {
+      type: 'object',
+      required: ['tagId', 'name', 'color', 'count'],
+      properties: {
+        tagId: { type: 'integer' },
+        name: { type: 'string' },
+        color: { type: 'string' },
+        count: { type: 'number' },
+      },
+    },
+  };
+  const analyticsByProjectResponse = {
+    type: 'array',
+    items: {
+      type: 'object',
+      required: ['projectId', 'name', 'count'],
+      properties: {
+        projectId: { type: ['integer', 'null'] },
+        name: { type: 'string' },
+        count: { type: 'number' },
+      },
+    },
+  };
+  const analyticsWeeklyResponse = {
+    type: 'object',
+    required: ['days'],
+    properties: {
+      days: {
+        type: 'array',
+        items: {
+          type: 'object',
+          required: ['date', 'created', 'completed'],
+          properties: {
+            date: { type: 'string' },
+            created: { type: 'number' },
+            completed: { type: 'number' },
+          },
+        },
+      },
+    },
+  };
+  fastify.get('/analytics/completion-rate', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          period: { type: 'string', enum: ['week', 'month', 'year', 'all'], default: 'all' },
+        },
+      },
+      response: { 200: analyticsCompletionRateResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getCompletionRate(fastify, request, reply),
+  });
+  fastify.get('/analytics/by-priority', {
+    schema: {
+      response: { 200: analyticsByPriorityResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getAnalyticsByPriority(fastify, request, reply),
+  });
+  fastify.get('/analytics/by-tag', {
+    schema: {
+      response: { 200: analyticsByTagResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getAnalyticsByTag(fastify, request, reply),
+  });
+  fastify.get('/analytics/by-project', {
+    schema: {
+      response: { 200: analyticsByProjectResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getAnalyticsByProject(fastify, request, reply),
+  });
+  fastify.get('/analytics/weekly', {
+    schema: {
+      response: { 200: analyticsWeeklyResponse },
+    },
+    preHandler: [fastify.authenticate],
+    handler: async (request, reply) => getWeeklyStats(fastify, request, reply),
   });
 }

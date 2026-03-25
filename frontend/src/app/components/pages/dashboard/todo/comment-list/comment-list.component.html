@@ -1,0 +1,33 @@
+@if (comments.length === 0) {
+  <p class="text-muted small mb-0">まだコメントはありません。</p>
+} @else {
+  <ul class="comment-timeline list-unstyled mb-0">
+    @for (c of comments; track c.id) {
+      <li class="comment-timeline-item">
+        <div class="comment-bubble">
+          <div class="d-flex flex-wrap align-items-baseline gap-2 small text-muted mb-1">
+            <span class="fw-semibold text-body">{{ c.authorName || 'ユーザー' }}</span>
+            <span>{{ c.createdAt | date: 'short' }}</span>
+          </div>
+          @if (editingId === c.id) {
+            <textarea class="form-control form-control-sm" rows="3" [(ngModel)]="editDraft" maxlength="8000"></textarea>
+            <div class="btn-group btn-group-sm mt-1">
+              <button type="button" class="btn btn-primary" [disabled]="busyCommentId === c.id || !editDraft.trim()" (click)="saveEdit()">
+                保存
+              </button>
+              <button type="button" class="btn btn-outline-secondary" [disabled]="busyCommentId === c.id" (click)="cancelEdit()">キャンセル</button>
+            </div>
+          } @else {
+            <div class="comment-body text-break">{{ c.content }}</div>
+            @if (c.isMine) {
+              <div class="btn-group btn-group-sm mt-2">
+                <button type="button" class="btn btn-outline-secondary" [disabled]="busyCommentId === c.id" (click)="startEdit(c)">編集</button>
+                <button type="button" class="btn btn-outline-danger" [disabled]="busyCommentId === c.id" (click)="onDelete(c.id)">削除</button>
+              </div>
+            }
+          }
+        </div>
+      </li>
+    }
+  </ul>
+}

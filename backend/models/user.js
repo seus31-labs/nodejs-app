@@ -31,6 +31,7 @@ module.exports = (sequelize) => {
     User.hasMany(models.Tag, { foreignKey: 'userId' });
     User.hasMany(models.Project, { foreignKey: 'userId' });
     User.hasMany(models.TodoShare, { foreignKey: 'sharedWithUserId' });
+    User.hasMany(models.Comment, { foreignKey: 'userId' });
   };
 
   return User;

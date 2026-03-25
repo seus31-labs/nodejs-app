@@ -42,11 +42,11 @@
 - [x] 12.5: CalendarView コンポーネント作成
 - [x] 12.6: Todo を FullCalendar イベントに変換
 - [x] 12.7: イベントクリックで Todo 詳細表示
-- [ ] 12.8: ドラッグ&ドロップで期限変更
-- [ ] 12.9: CalendarPage 作成
-- [ ] 12.10: ルーティング追加
-- [ ] 12.11: スタイリング
-- [ ] 12.12: Frontend テスト
+- [x] 12.8: ドラッグ&ドロップで期限変更
+- [x] 12.9: CalendarPage 作成
+- [x] 12.10: ルーティング追加
+- [x] 12.11: スタイリング
+- [x] 12.12: Frontend テスト
 
 ---
 
@@ -56,26 +56,26 @@
 - 既存テーブルのみ使用（集計クエリ）
 
 ### Backend タスク（10タスク）
-- [ ] 13.1: AnalyticsService 作成
-- [ ] 13.2: `getCompletionRate(userId, period)` 実装
-- [ ] 13.3: `getTodosByPriority(userId)` 実装
-- [ ] 13.4: `getTodosByTag(userId)` 実装
-- [ ] 13.5: `getTodosByProject(userId)` 実装
-- [ ] 13.6: `getWeeklyStats(userId)` 実装
-- [ ] 13.7: AnalyticsController 作成
-- [ ] 13.8: Analytics ルート作成（GET /api/analytics/*)
-- [ ] 13.9: Backend テスト
+- [x] 13.1: AnalyticsService 作成
+- [x] 13.2: `getCompletionRate(userId, period)` 実装
+- [x] 13.3: `getTodosByPriority(userId)` 実装
+- [x] 13.4: `getTodosByTag(userId)` 実装
+- [x] 13.5: `getTodosByProject(userId)` 実装
+- [x] 13.6: `getWeeklyStats(userId)` 実装
+- [x] 13.7: AnalyticsController 作成
+- [x] 13.8: Analytics ルート作成（GET /api/v1/analytics/*)
+- [x] 13.9: Backend テスト
 
 ### Frontend タスク（15タスク）
-- [ ] 13.10: AnalyticsService 作成
-- [ ] 13.11: CompletionRateChart コンポーネント作成（ApexCharts 使用）
-- [ ] 13.12: PriorityDistributionChart コンポーネント作成
-- [ ] 13.13: TagDistributionChart コンポーネント作成
-- [ ] 13.14: WeeklyActivityChart コンポーネント作成
-- [ ] 13.15: AnalyticsPage 作成（各チャート統合）
-- [ ] 13.16: ルーティング追加
-- [ ] 13.17: スタイリング
-- [ ] 13.18: Frontend テスト
+- [x] 13.10: AnalyticsService 作成
+- [x] 13.11: CompletionRateChart コンポーネント作成（ApexCharts 使用）
+- [x] 13.12: PriorityDistributionChart コンポーネント作成
+- [x] 13.13: TagDistributionChart コンポーネント作成
+- [x] 13.14: WeeklyActivityChart コンポーネント作成
+- [x] 13.15: AnalyticsPage 作成（各チャート統合）
+- [x] 13.16: ルーティング追加
+- [x] 13.17: スタイリング
+- [x] 13.18: Frontend テスト
 
 ---
 
@@ -218,7 +218,7 @@
 - [x] 19.6: ShortcutHelp コンポーネント作成
 - [x] 19.7: ショートカット一覧表示
 - [x] 19.8: ヘルプダイアログ実装（? キーで表示）
-- [ ] 19.9: カスタマイズ機能（オプション）
+- [x] 19.9: カスタマイズ機能（オプション）
 - [x] 19.10: スタイリング
 - [x] 19.11: Frontend テスト
 

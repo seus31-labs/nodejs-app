@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 
-const routes: Routes = [
+/** 単体テストで lazy load の解決を検証するため export（12.12） */
+export const DASHBOARD_ROUTES: Routes = [
   {
     path: '',
     children: [
@@ -12,6 +13,10 @@ const routes: Routes = [
       {
         path: 'todos',
         loadComponent: () => import('./todo/todo-page/todo-page.component')
+      },
+      {
+        path: 'calendar',
+        loadComponent: () => import('./calendar/calendar-page/calendar-page.component')
       },
       {
         path: 'archived',
@@ -34,6 +39,10 @@ const routes: Routes = [
         loadComponent: () => import('./templates/templates-page/templates-page.component')
       },
       {
+        path: 'analytics',
+        loadComponent: () => import('./analytics/analytics-page/analytics-page.component')
+      },
+      {
         path: 'projects/:id',
         loadComponent: () => import('./projects/project-detail-page/project-detail-page.component')
       },
@@ -42,7 +51,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forChild(DASHBOARD_ROUTES)],
   exports: [RouterModule]
 })
 export class DashboardRoutingModule {}

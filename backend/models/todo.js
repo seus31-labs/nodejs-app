@@ -81,19 +81,77 @@ module.exports = (sequelize) => {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
+      parentId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: 'parent_id',
+        references: { model: 'todos', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
     },
     {
       tableName: 'todos',
       timestamps: true,
       underscored: true,
+      validate: {
+        async hasNoCircularParentReference() {
+          if (!this.parentId || !this.id) {
+            return;
+          }
+
+          if (!this.changed('parentId')) {
+            return;
+          }
+
+          if (this.parentId === this.id) {
+            throw new Error('親Todoに自分自身は指定できません。');
+          }
+
+          const seenTodoIds = new Set([this.id]);
+          const TodoModel = this.sequelize.models.Todo;
+          let currentParentId = this.parentId;
+
+          while (currentParentId) {
+            if (seenTodoIds.has(currentParentId)) {
+              throw new Error('親子関係が循環するため保存できません。');
+            }
+
+            seenTodoIds.add(currentParentId);
+            const parentTodo = await TodoModel.findByPk(currentParentId, {
+              attributes: ['id', 'parentId'],
+            });
+
+            if (!parentTodo) {
+              break;
+            }
+
+            currentParentId = parentTodo.parentId;
+          }
+        },
+      },
     }
   );
 
   Todo.associate = function (models) {
     Todo.belongsTo(models.User, { foreignKey: 'userId' });
     Todo.belongsTo(models.Project, { foreignKey: 'projectId' });
-    Todo.belongsToMany(models.Tag, { through: models.TodoTag, foreignKey: 'todoId', otherKey: 'tagId' });
+    Todo.belongsTo(models.Todo, {
+      foreignKey: 'parentId',
+      as: 'parent',
+    });
+    Todo.hasMany(models.Todo, {
+      foreignKey: 'parentId',
+      as: 'subtasks',
+    });
+    Todo.belongsToMany(models.Tag, {
+      through: models.TodoTag,
+      foreignKey: 'todoId',
+      otherKey: 'tagId',
+      as: 'Tags',
+    });
     Todo.hasMany(models.TodoShare, { foreignKey: 'todoId' });
+    Todo.hasMany(models.Comment, { foreignKey: 'todoId' });
   };
 
   return Todo;

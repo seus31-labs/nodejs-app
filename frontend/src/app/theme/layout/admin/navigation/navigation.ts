@@ -45,6 +45,14 @@ const NavigationItems = [
         classes: 'nav-item'
       },
       {
+        id: 'calendar',
+        title: 'カレンダー',
+        type: 'item',
+        url: '/dashboard/calendar',
+        icon: 'feather icon-calendar',
+        classes: 'nav-item'
+      },
+      {
         id: 'archived',
         title: 'アーカイブ',
         type: 'item',
@@ -82,6 +90,14 @@ const NavigationItems = [
         type: 'item',
         url: '/dashboard/tags',
         icon: 'feather icon-tag',
+        classes: 'nav-item'
+      },
+      {
+        id: 'analytics',
+        title: '分析',
+        type: 'item',
+        url: '/dashboard/analytics',
+        icon: 'feather icon-bar-chart-2',
         classes: 'nav-item'
       }
     ]

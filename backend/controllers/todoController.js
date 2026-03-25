@@ -67,6 +67,59 @@ async function getTodoById(fastify, req, reply) {
   }
 }
 
+async function getSubtasks(fastify, req, reply) {
+  try {
+    const todoId = parseTodoId(req.params.id);
+    if (todoId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id' });
+    }
+    const subtasks = await todoService.getSubtasks(fastify, todoId, req.user.id);
+    if (!subtasks) {
+      return reply.code(404).send({ error: 'Not found' });
+    }
+    reply.code(200).send(subtasks.map((t) => t.toJSON()));
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Failed to get subtasks');
+  }
+}
+
+async function createSubtask(fastify, req, reply) {
+  try {
+    const parentId = parseTodoId(req.params.id);
+    if (parentId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id' });
+    }
+    const subtask = await todoService.createSubtask(fastify, parentId, req.user.id, req.body);
+    if (!subtask) {
+      return reply.code(404).send({ error: 'Not found' });
+    }
+    reply.code(201).send(subtask.toJSON());
+  } catch (error) {
+    if (error?.code === 'CIRCULAR_REFERENCE') {
+      return reply.code(400).send({ error: error.message });
+    }
+    handleTodoError(fastify, reply, error, 'Failed to create subtask');
+  }
+}
+
+async function getProgress(fastify, req, reply) {
+  try {
+    const todoId = parseTodoId(req.params.id);
+    if (todoId === null) {
+      return reply.code(400).send({ error: 'Invalid todo id' });
+    }
+    const progress = await todoService.getProgress(fastify, todoId, req.user.id);
+    if (!progress) {
+      return reply.code(404).send({ error: 'Not found' });
+    }
+    const { completed, total } = progress;
+    const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+    reply.code(200).send({ completed, total, percentage });
+  } catch (error) {
+    handleTodoError(fastify, reply, error, 'Failed to get progress');
+  }
+}
+
 async function updateTodo(fastify, req, reply) {
   try {
     const todoId = parseTodoId(req.params.id);
@@ -304,6 +357,9 @@ module.exports = {
   createTodo,
   getTodos,
   getTodoById,
+  getSubtasks,
+  createSubtask,
+  getProgress,
   updateTodo,
   deleteTodo,
   toggleComplete,

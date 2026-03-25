@@ -4,6 +4,7 @@ import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/n
 import type { Todo } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import { TagChipComponent } from '../tag-chip/tag-chip.component'
+import { TodoCommentsSectionComponent } from '../todo-comments-section/todo-comments-section.component'
 
 export interface ReminderToggleEvent {
   todoId: number
@@ -13,7 +14,7 @@ export interface ReminderToggleEvent {
 @Component({
   selector: 'app-todo-item',
   standalone: true,
-  imports: [CommonModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, TagChipComponent],
+  imports: [CommonModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, TagChipComponent, TodoCommentsSectionComponent],
   templateUrl: './todo-item.component.html',
   styleUrls: ['./todo-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

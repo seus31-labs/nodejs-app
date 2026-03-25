@@ -1,12 +1,14 @@
-<div class="row">
+<div class="row calendar-page">
   <div class="col-12">
     <app-card cardTitle="カレンダー">
+      <!-- CalendarView は error を1本のみ受け取るため一覧取得エラーを優先（取得失敗中はドラッグ不可で moveError は併存しにくい） -->
       <app-calendar-view
         [events]="calendarEvents"
         [loading]="loading"
-        [error]="error"
+        [error]="error || moveError"
         (dateRangeChange)="onDateRangeChange($event)"
         (todoClick)="onTodoClick($event)"
+        (todoMove)="onTodoMove($event)"
       />
     </app-card>
   </div>

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { TodoItemComponent } from './todo-item.component'
 import type { ReminderToggleEvent } from './todo-item.component'
 import type { Todo } from '../../../../../models/todo.interface'
@@ -28,7 +29,7 @@ describe('TodoItemComponent (2.12.2)', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TodoItemComponent],
+      imports: [TodoItemComponent, HttpClientTestingModule],
     }).compileComponents()
 
     fixture = TestBed.createComponent(TodoItemComponent)
