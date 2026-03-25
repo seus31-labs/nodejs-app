@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { ProgressBarComponent } from './progress-bar.component'
 
 describe('ProgressBarComponent (5.10)', () => {
@@ -7,7 +8,8 @@ describe('ProgressBarComponent (5.10)', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProgressBarComponent]
+      imports: [ProgressBarComponent],
+      providers: [provideNoopAnimations()]
     }).compileComponents()
 
     fixture = TestBed.createComponent(ProgressBarComponent)
