@@ -147,4 +147,12 @@ export class TodoService {
   removeTagFromTodo(todoId: number, tagId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/todos/${todoId}/tags/${tagId}`)
   }
+
+  /**
+   * 指定 Todo のサブタスク一覧を取得する。
+   * Backend は `GET /api/todos/:id/subtasks` で parentId を持つ Todo のみ返す。
+   */
+  getSubtasks(todoId: number): Observable<Todo[]> {
+    return this.http.get<Todo[]>(`${this.apiUrl}/todos/${todoId}/subtasks`)
+  }
 }
