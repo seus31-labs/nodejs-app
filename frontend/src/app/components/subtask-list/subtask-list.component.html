@@ -31,7 +31,7 @@
             [checked]="subtask.completed"
             (change)="toggle(subtask.id)"
           />
-          <span class="subtask-title" [class.text-decoration-line]="subtask.completed">
+          <span class="subtask-title" [class.text-decoration-line-through]="subtask.completed">
             {{ subtask.title }}
           </span>
         </div>
@@ -52,10 +52,17 @@
         />
 
         <div class="subtask-add-actions">
-          <button type="submit" class="btn btn-sm btn-primary" data-testid="subtask-add-submit">
+          <button
+            type="submit"
+            class="btn btn-sm btn-primary"
+            data-testid="subtask-add-submit"
+            [disabled]="creating"
+          >
             作成
           </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelAdd()">キャンセル</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="creating" (click)="cancelAdd()">
+            キャンセル
+          </button>
         </div>
       </form>
     }

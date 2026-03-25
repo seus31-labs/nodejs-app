@@ -10,7 +10,7 @@ import { TodoService } from '../../services/todo.service'
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './subtask-list.component.html',
-  styleUrls: ['./subtask-list.component.scss']
+  styleUrl: './subtask-list.component.scss'
 })
 export default class SubtaskListComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) parentId!: number
@@ -24,6 +24,7 @@ export default class SubtaskListComponent implements OnChanges, OnDestroy {
   /** 追加フォームの表示切り替え */
   adding = false
   newTitle = ''
+  creating = false
 
   private destroy$ = new Subject<void>()
 
@@ -35,32 +36,28 @@ export default class SubtaskListComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private load(): Promise<void> {
+  private load(): void {
     if (!Number.isInteger(this.parentId) || this.parentId <= 0) {
       this.subtasks = []
-      return Promise.resolve()
+      return
     }
 
     this.loading = true
     this.error = null
-    return new Promise((resolve) => {
-      this.todoService
-        .getSubtasks(this.parentId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (list) => {
-            this.subtasks = list
-            this.subtasksUpdated.emit(list)
-            this.loading = false
-            resolve()
-          },
-          error: (err) => {
-            this.error = err?.error?.message ?? err?.message ?? 'サブタスクの取得に失敗しました'
-            this.loading = false
-            resolve()
-          }
-        })
-    })
+    this.todoService
+      .getSubtasks(this.parentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (list) => {
+          this.subtasks = list
+          this.subtasksUpdated.emit(list)
+          this.loading = false
+        },
+        error: (err) => {
+          this.error = err?.error?.message ?? err?.message ?? 'サブタスクの取得に失敗しました'
+          this.loading = false
+        }
+      })
   }
 
   ngOnDestroy(): void {
@@ -96,9 +93,10 @@ export default class SubtaskListComponent implements OnChanges, OnDestroy {
 
   create(): void {
     const title = this.newTitle.trim()
-    if (!title) return
+    if (!title || this.creating) return
 
     const payload: CreateTodoDto = { title }
+    this.creating = true
     this.todoService
       .createSubtask(this.parentId, payload)
       .pipe(takeUntil(this.destroy$))
@@ -108,9 +106,11 @@ export default class SubtaskListComponent implements OnChanges, OnDestroy {
           this.subtasksUpdated.emit(this.subtasks)
           this.adding = false
           this.newTitle = ''
+          this.creating = false
         },
         error: (err) => {
           this.error = err?.error?.message ?? err?.message ?? 'サブタスク作成に失敗しました'
+          this.creating = false
         }
       })
   }
