@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable, from } from 'rxjs'
 import { tap } from 'rxjs/operators'
 import { environment } from '../../environments/environment'
-import type { Todo, TodoCreateUpdate, TodoPriority } from '../models/todo.interface'
+import type { Todo, TodoCreateUpdate, TodoPriority, CreateTodoDto } from '../models/todo.interface'
 import type { SearchParams } from '../models/search-params.interface'
 import type { SortOptions } from '../models/sort-options.interface'
 import { NetworkStatusService } from './network-status.service'
@@ -154,5 +154,13 @@ export class TodoService {
    */
   getSubtasks(todoId: number): Observable<Todo[]> {
     return this.http.get<Todo[]>(`${this.apiUrl}/todos/${todoId}/subtasks`)
+  }
+
+  /**
+   * 指定 Todo（parentId）配下にサブタスクを作成する。
+   * Backend: `POST /api/v1/todos/:id/subtasks`
+   */
+  createSubtask(parentId: number, todo: CreateTodoDto): Observable<Todo> {
+    return this.http.post<Todo>(`${this.apiUrl}/todos/${parentId}/subtasks`, todo)
   }
 }
