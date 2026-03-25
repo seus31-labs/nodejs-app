@@ -8,7 +8,12 @@
     [attr.aria-label]="'完了: ' + todo.title"
   />
   <div class="flex-grow-1 min-width-0">
-    <span class="todo-title" [class.text-decoration-line-through]="todo.completed" [class.text-muted]="todo.completed">
+    <a
+      class="todo-title text-decoration-none"
+      [routerLink]="['/dashboard/todos', todo.id]"
+      [class.text-decoration-line-through]="todo.completed"
+      [class.text-muted]="todo.completed"
+    >
       @for (p of titleParts; track $index) {
         @if (p.match) {
           <mark class="todo-highlight">{{ p.text }}</mark>
@@ -16,7 +21,7 @@
           <span>{{ p.text }}</span>
         }
       }
-    </span>
+    </a>
     @if (todo.description) {
       <span class="d-block small text-muted">
         @for (p of descParts; track $index) {

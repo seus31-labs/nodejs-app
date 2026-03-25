@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { RouterLink } from '@angular/router'
 import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap'
 import type { Todo } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
@@ -18,6 +19,7 @@ export interface ReminderToggleEvent {
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
