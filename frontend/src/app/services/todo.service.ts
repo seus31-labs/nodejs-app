@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { Observable, from } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
 import { environment } from '../../environments/environment'
 import type { Todo, TodoCreateUpdate, TodoPriority, CreateTodoDto } from '../models/todo.interface'
 import type { SearchParams } from '../models/search-params.interface'
@@ -162,5 +162,15 @@ export class TodoService {
    */
   createSubtask(parentId: number, todo: CreateTodoDto): Observable<Todo> {
     return this.http.post<Todo>(`${this.apiUrl}/todos/${parentId}/subtasks`, todo)
+  }
+
+  /**
+   * 指定 Todo のサブタスク進捗（completed/total）。
+   * Backend は percentage も返すが、UI 側では未使用のため正規化して返す。
+   */
+  getProgress(todoId: number): Observable<{ completed: number; total: number }> {
+    return this.http
+      .get<{ completed: number; total: number; percentage?: number }>(`${this.apiUrl}/todos/${todoId}/progress`)
+      .pipe(map(({ completed, total }) => ({ completed, total })))
   }
 }
