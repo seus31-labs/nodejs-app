@@ -103,10 +103,10 @@ GET /api/todos/:id/progress
 
 ### Task 5.10: ProgressBar コンポーネント作成
 
-- [ ] 5.10.1: `ng generate component components/progress-bar` 実行
-- [ ] 5.10.2: Angular Material Progress Bar 使用
-- [ ] 5.10.3: 進捗率表示実装
-- [ ] 5.10.4: @Input() progress: {completed: number, total: number} 実装
+- [x] 5.10.1: `ng generate component components/progress-bar` 実行
+- [x] 5.10.2: Angular Material Progress Bar 使用
+- [x] 5.10.3: 進捗率表示実装
+- [x] 5.10.4: @Input() progress: {completed: number, total: number} 実装
 
 ### Task 5.11: TodoItem に進捗バー追加
 

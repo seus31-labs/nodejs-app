@@ -1,0 +1,9 @@
+<div class="progress-bar-root">
+  <div class="progress-meta">
+    <span class="progress-label">進捗</span>
+    <span class="progress-value">{{ completed }}/{{ total }} ({{ percentage }}%)</span>
+  </div>
+
+  <mat-progress-bar mode="determinate" [value]="percentage" aria-label="サブタスク進捗バー" />
+</div>
+
