@@ -1,0 +1,19 @@
+.progress-bar-root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.progress-label {
+  font-weight: 600;
+  color: #495057;
+}
+
