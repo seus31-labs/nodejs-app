@@ -85,7 +85,7 @@ GET /api/todos/:id/progress
 
 ### Task 5.7: Todo インターフェース更新
 
-- [ ] 5.7.1: Todo インターフェースに parentId, subtasks, progress 追加
+- [x] 5.7.1: Todo インターフェースに parentId, subtasks, progress 追加
 
 ### Task 5.8: TodoService にサブタスク機能追加
 
