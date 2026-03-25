@@ -95,11 +95,11 @@ GET /api/todos/:id/progress
 
 ### Task 5.9: SubtaskList コンポーネント作成
 
-- [ ] 5.9.1: `ng generate component components/subtask-list` 実行
-- [ ] 5.9.2: サブタスク一覧表示実装
-- [ ] 5.9.3: サブタスク追加ボタン実装
-- [ ] 5.9.4: @Input() parentId: number 実装
-- [ ] 5.9.5: インデント表示実装
+- [x] 5.9.1: `ng generate component components/subtask-list` 実行
+- [x] 5.9.2: サブタスク一覧表示実装
+- [x] 5.9.3: サブタスク追加ボタン実装
+- [x] 5.9.4: @Input() parentId: number 実装
+- [x] 5.9.5: インデント表示実装
 
 ### Task 5.10: ProgressBar コンポーネント作成
 
