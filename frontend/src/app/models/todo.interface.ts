@@ -9,7 +9,8 @@ export type TodoPriority = 'low' | 'medium' | 'high'
 export interface TodoProgress {
   completed: number
   total: number
-  percentage: number
+  /** 進捗率（%）。UI 実装が未使用の場合もあるため任意にする */
+  percentage?: number
 }
 
 /**

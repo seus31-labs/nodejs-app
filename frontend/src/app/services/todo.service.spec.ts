@@ -240,6 +240,21 @@ describe('TodoService', () => {
     })
   })
 
+  describe('progress (5.8.3)', () => {
+    it('should call GET /todos/:id/progress and return completed/total', () => {
+      const todoId = 1
+      const backendRes = { completed: 2, total: 5, percentage: 40 }
+      const expected = { completed: 2, total: 5 }
+
+      service.getProgress(todoId).subscribe((res) => expect(res).toEqual(expected))
+
+      const req = httpMock.expectOne(
+        (r) => r.url === `${apiUrl}/todos/${todoId}/progress` && r.method === 'GET'
+      )
+      req.flush(backendRes)
+    })
+  })
+
   describe('bulk (15.17)', () => {
     it('should call POST /todos/bulk-complete with todoIds in body', () => {
       const todoIds = [1, 2, 3]
