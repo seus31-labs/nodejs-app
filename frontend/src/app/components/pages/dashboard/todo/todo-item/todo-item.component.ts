@@ -5,6 +5,8 @@ import type { Todo } from '../../../../../models/todo.interface'
 import type { Tag } from '../../../../../models/tag.interface'
 import { TagChipComponent } from '../tag-chip/tag-chip.component'
 import { TodoCommentsSectionComponent } from '../todo-comments-section/todo-comments-section.component'
+import { ProgressBarComponent } from '../../../../progress-bar/progress-bar.component'
+import SubtaskListComponent from '../../../../subtask-list/subtask-list.component'
 
 export interface ReminderToggleEvent {
   todoId: number
@@ -14,7 +16,16 @@ export interface ReminderToggleEvent {
 @Component({
   selector: 'app-todo-item',
   standalone: true,
-  imports: [CommonModule, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, TagChipComponent, TodoCommentsSectionComponent],
+  imports: [
+    CommonModule,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    TagChipComponent,
+    TodoCommentsSectionComponent,
+    ProgressBarComponent,
+    SubtaskListComponent
+  ],
   templateUrl: './todo-item.component.html',
   styleUrls: ['./todo-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +45,7 @@ export class TodoItemComponent implements OnChanges {
 
   titleParts: Array<{ text: string; match: boolean }> = []
   descParts: Array<{ text: string; match: boolean }> = []
+  showSubtasks = false
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['todo'] || changes['highlightQuery']) {
@@ -72,6 +84,24 @@ export class TodoItemComponent implements OnChanges {
 
   onAddTag(tagId: number): void {
     this.tagAdded.emit({ todoId: this.todo.id, tagId })
+  }
+
+  toggleSubtasks(): void {
+    this.showSubtasks = !this.showSubtasks
+  }
+
+  onSubtasksUpdated(subtasks: Todo[]): void {
+    const completed = subtasks.filter((t) => t.completed).length
+    this.todo = {
+      ...this.todo,
+      subtasks,
+      progress: { completed, total: subtasks.length }
+    }
+  }
+
+  get hasSubtasks(): boolean {
+    const total = this.todo?.progress?.total ?? this.todo?.subtasks?.length ?? 0
+    return total > 0
   }
 
   get tags(): Tag[] {
