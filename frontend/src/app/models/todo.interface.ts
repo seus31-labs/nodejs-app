@@ -6,6 +6,12 @@ import type { Tag } from './tag.interface'
  */
 export type TodoPriority = 'low' | 'medium' | 'high'
 
+export interface TodoProgress {
+  completed: number
+  total: number
+  percentage: number
+}
+
 /**
  * API から返却される Todo 型（タグ付き）
  */
@@ -19,6 +25,8 @@ export interface Todo {
   dueDate: string | null
   sortOrder: number
   projectId: number | null
+  /** 親 Todo を持つ場合はその ID（親なしは null） */
+  parentId?: number | null
   archived: boolean
   archivedAt: string | null
   reminderEnabled: boolean
@@ -27,6 +35,10 @@ export interface Todo {
   updatedAt: string
   Tags?: Tag[]
   Project?: Project
+  /** 1階層分のみ返る想定（再帰的に表現するため型は Todo[]） */
+  subtasks?: Todo[]
+  /** GET /api/todos/:id/progress の結果 */
+  progress?: TodoProgress
 }
 
 /**
