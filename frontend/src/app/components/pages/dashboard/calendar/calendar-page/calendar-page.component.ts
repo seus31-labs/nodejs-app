@@ -41,6 +41,10 @@ export default class CalendarPageComponent implements OnDestroy {
   ) {}
 
   ngOnDestroy(): void {
+    // 画面遷移時に MatDialog のオーバーレイが残り続けるのを防ぐため明示的に閉じる
+    if (typeof this.detailDialogRef?.close === 'function') {
+      this.detailDialogRef.close()
+    }
     this.destroy$.next()
     this.destroy$.complete()
   }
