@@ -212,6 +212,18 @@ describe('TodoService', () => {
     })
   })
 
+  describe('subtasks (5.8.1)', () => {
+    it('should call GET /todos/:id/subtasks and return Todo[]', () => {
+      const todoId = 1
+      const mockSubtasks: Todo[] = [{ ...mockTodo, id: 10, parentId: todoId, title: 'child' }]
+
+      service.getSubtasks(todoId).subscribe((res) => expect(res).toEqual(mockSubtasks))
+
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/${todoId}/subtasks` && r.method === 'GET')
+      req.flush(mockSubtasks)
+    })
+  })
+
   describe('bulk (15.17)', () => {
     it('should call POST /todos/bulk-complete with todoIds in body', () => {
       const todoIds = [1, 2, 3]
