@@ -116,8 +116,8 @@ GET /api/todos/:id/progress
 
 ### Task 5.12: TodoForm にサブタスク作成モード追加
 
-- [ ] 5.12.1: @Input() parentId?: number 追加
-- [ ] 5.12.2: サブタスク作成時の UI 調整
+- [x] 5.12.1: @Input() parentId?: number 追加
+- [x] 5.12.2: サブタスク作成時の UI 調整
 
 ### Task 5.13: TodoDetail ページ作成
 

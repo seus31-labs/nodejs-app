@@ -20,6 +20,7 @@ function noWhitespaceValidator(control: AbstractControl): ValidationErrors | nul
 })
 export class TodoFormComponent implements OnChanges {
   @Input() editingTodo: Todo | null = null
+  @Input() parentId?: number
   @Input() projects: Project[] = []
   @Input() templates: Template[] = []
   @Output() submitForm = new EventEmitter<TodoCreateUpdate>()
@@ -96,5 +97,9 @@ export class TodoFormComponent implements OnChanges {
       priority: template.priority,
     })
     el.value = ''
+  }
+
+  get isSubtaskMode(): boolean {
+    return !this.editingTodo && this.parentId != null
   }
 }

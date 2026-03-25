@@ -1,5 +1,5 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="todo-form">
-  @if (templates.length > 0 && !editingTodo) {
+  @if (templates.length > 0 && !editingTodo && !isSubtaskMode) {
     <div class="mb-2">
       <label for="todo-template" class="form-label">テンプレートから入力（任意）</label>
       <select
@@ -24,7 +24,7 @@
       type="text"
       class="form-control"
       formControlName="title"
-      placeholder="Todo のタイトル"
+      [placeholder]="isSubtaskMode ? 'サブタスクのタイトル' : 'Todo のタイトル'"
       maxlength="255"
     />
     @if (form.get('title')?.invalid && form.get('title')?.touched) {
@@ -42,7 +42,7 @@
     ></textarea>
   </div>
   <div class="row mb-2">
-    <div class="col-md-6">
+    <div class="col-md-6" [class.col-12]="isSubtaskMode">
       <label for="todo-priority" class="form-label">優先度</label>
       <select id="todo-priority" class="form-select" formControlName="priority">
         <option value="low">low</option>
@@ -50,7 +50,8 @@
         <option value="high">high</option>
       </select>
     </div>
-    <div class="col-md-6">
+    @if (!isSubtaskMode) {
+      <div class="col-md-6">
       <label for="todo-dueDate" class="form-label">期限</label>
       <input
         id="todo-dueDate"
@@ -58,9 +59,10 @@
         class="form-control"
         formControlName="dueDate"
       />
-    </div>
+      </div>
+    }
   </div>
-  @if (projects.length > 0) {
+  @if (projects.length > 0 && !isSubtaskMode) {
     <div class="mb-2">
       <label for="todo-project" class="form-label">プロジェクト</label>
       <select id="todo-project" class="form-select" formControlName="projectId">
@@ -73,7 +75,7 @@
   }
   <div class="d-flex gap-2">
     <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
-      {{ editingTodo ? '更新' : '作成' }}
+      {{ editingTodo ? '更新' : (isSubtaskMode ? 'サブタスクを作成' : '作成') }}
     </button>
     @if (editingTodo) {
       <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">キャンセル</button>
