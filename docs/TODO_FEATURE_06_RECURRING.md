@@ -39,16 +39,16 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.1: 繰り返しカラム追加
 
-- [ ] 6.1.1: マイグレーション生成 `add-recurrence-fields-to-todos`
-- [ ] 6.1.2: isRecurring, recurrencePattern, recurrenceInterval, recurrenceEndDate, originalTodoId カラム追加
-- [ ] 6.1.3: インデックス追加
-- [ ] 6.1.4: 外部キー制約追加（originalTodoId）
-- [ ] 6.1.5: マイグレーション実行
+- [x] 6.1.1: マイグレーション生成 `add-recurrence-fields-to-todos`
+- [x] 6.1.2: isRecurring, recurrencePattern, recurrenceInterval, recurrenceEndDate, originalTodoId カラム追加
+- [x] 6.1.3: インデックス追加
+- [x] 6.1.4: 外部キー制約追加（originalTodoId）
+- [x] 6.1.5: マイグレーション実行
 
 ### Task 6.2: Todo モデル更新
 
-- [ ] 6.2.1: 繰り返しフィールド追加
-- [ ] 6.2.2: バリデーション実装
+- [x] 6.2.1: 繰り返しフィールド追加
+- [x] 6.2.2: バリデーション実装
 
 ### Task 6.3: RecurrenceService 作成
 
