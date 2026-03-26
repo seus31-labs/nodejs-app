@@ -15,6 +15,10 @@ export const DASHBOARD_ROUTES: Routes = [
         loadComponent: () => import('./todo/todo-page/todo-page.component')
       },
       {
+        path: 'todos/:id',
+        loadComponent: () => import('./todo/todo-detail-page/todo-detail-page.component')
+      },
+      {
         path: 'calendar',
         loadComponent: () => import('./calendar/calendar-page/calendar-page.component')
       },

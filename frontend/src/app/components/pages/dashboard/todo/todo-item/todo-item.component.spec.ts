@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { SimpleChange } from '@angular/core'
 import { provideNoopAnimations } from '@angular/platform-browser/animations'
+import { ActivatedRoute, convertToParamMap } from '@angular/router'
 import { TodoItemComponent } from './todo-item.component'
 import type { ReminderToggleEvent } from './todo-item.component'
 import type { Todo } from '../../../../../models/todo.interface'
@@ -32,7 +33,13 @@ describe('TodoItemComponent (2.12.2)', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TodoItemComponent, HttpClientTestingModule],
-      providers: [provideNoopAnimations()]
+      providers: [
+        provideNoopAnimations(),
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: convertToParamMap({ id: '1' }) } }
+        }
+      ]
     }).compileComponents()
 
     fixture = TestBed.createComponent(TodoItemComponent)

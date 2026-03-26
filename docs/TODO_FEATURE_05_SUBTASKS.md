@@ -121,10 +121,10 @@ GET /api/todos/:id/progress
 
 ### Task 5.13: TodoDetail ページ作成
 
-- [ ] 5.13.1: `ng generate component pages/todo-detail-page` 実行
-- [ ] 5.13.2: Todo 詳細表示実装
-- [ ] 5.13.3: SubtaskList 統合
-- [ ] 5.13.4: ルーティング追加
+- [x] 5.13.1: `ng generate component pages/todo-detail-page` 実行
+- [x] 5.13.2: Todo 詳細表示実装
+- [x] 5.13.3: SubtaskList 統合
+- [x] 5.13.4: ルーティング追加
 
 ### Task 5.14: スタイリング
 

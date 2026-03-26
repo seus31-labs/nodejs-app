@@ -1,0 +1,37 @@
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h2 class="h5 mb-0">Todo 詳細</h2>
+      <a routerLink="/dashboard/todos" class="btn btn-sm btn-outline-secondary">一覧へ戻る</a>
+    </div>
+
+    @if (loading) {
+      <p class="text-muted mb-0">読み込み中...</p>
+    } @else if (error) {
+      <p class="text-danger mb-0">{{ error }}</p>
+    } @else if (todo) {
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <h3 class="h6 mb-0">{{ todo.title }}</h3>
+            <span class="badge text-bg-secondary">{{ todo.priority }}</span>
+            @if (todo.completed) {
+              <span class="badge text-bg-success">完了</span>
+            }
+          </div>
+
+          @if (todo.description) {
+            <p class="text-muted mt-2 mb-3">{{ todo.description }}</p>
+          }
+
+          <div class="mb-3">
+            <app-progress-bar [progress]="{ completed: todo.progress?.completed ?? 0, total: todo.progress?.total ?? 0 }"></app-progress-bar>
+          </div>
+
+          <app-subtask-list [parentId]="todo.id" (subtasksUpdated)="onSubtasksUpdated($event)"></app-subtask-list>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
