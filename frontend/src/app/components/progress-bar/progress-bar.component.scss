@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #e9ecef;
+  border-radius: 0.5rem;
+  background: #fff;
 }
 
 .progress-meta {
@@ -15,5 +19,10 @@
 .progress-label {
   font-weight: 600;
   color: #495057;
+}
+
+:host ::ng-deep .mat-mdc-progress-bar {
+  border-radius: 999px;
+  overflow: hidden;
 }
 
