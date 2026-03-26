@@ -134,9 +134,9 @@ GET /api/todos/:id/progress
 
 ### Task 5.15: Frontend テスト
 
-- [ ] 5.15.1: TodoService サブタスク機能のテスト
-- [ ] 5.15.2: SubtaskList コンポーネントテスト
-- [ ] 5.15.3: ProgressBar コンポーネントテスト
+- [x] 5.15.1: TodoService サブタスク機能のテスト
+- [x] 5.15.2: SubtaskList コンポーネントテスト
+- [x] 5.15.3: ProgressBar コンポーネントテスト
 
 ---
 

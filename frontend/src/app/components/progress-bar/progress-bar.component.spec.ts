@@ -15,7 +15,7 @@ describe('ProgressBarComponent (5.10)', () => {
     fixture = TestBed.createComponent(ProgressBarComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-})
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy()
@@ -33,6 +33,22 @@ describe('ProgressBarComponent (5.10)', () => {
     fixture.detectChanges()
 
     expect(component.percentage).toBe(0)
+  })
+
+  it('should clamp negative values to zero', () => {
+    component.progress = { completed: -3, total: -10 }
+    fixture.detectChanges()
+
+    expect(component.completed).toBe(0)
+    expect(component.total).toBe(0)
+    expect(component.percentage).toBe(0)
+  })
+
+  it('should clamp percentage to 100 when completed exceeds total', () => {
+    component.progress = { completed: 10, total: 3 }
+    fixture.detectChanges()
+
+    expect(component.percentage).toBe(100)
   })
 })
 
