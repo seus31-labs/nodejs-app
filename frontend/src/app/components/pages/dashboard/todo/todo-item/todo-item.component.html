@@ -9,9 +9,10 @@
   />
   <div class="flex-grow-1 min-width-0">
     <a
-      class="todo-title text-decoration-none"
+      class="todo-title"
       [routerLink]="['/dashboard/todos', todo.id]"
       [class.text-decoration-line-through]="todo.completed"
+      [class.text-decoration-none]="!todo.completed"
       [class.text-muted]="todo.completed"
     >
       @for (p of titleParts; track $index) {

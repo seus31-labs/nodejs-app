@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { ActivatedRoute, convertToParamMap } from '@angular/router'
 import { TodoService } from '../../../../../services/todo.service'
 import { NetworkStatusService } from '../../../../../services/network-status.service'
@@ -39,6 +40,7 @@ describe('TodoDetailPageComponent (5.13)', () => {
     await TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, TodoDetailPageComponent],
       providers: [
+        provideNoopAnimations(),
         TodoService,
         { provide: NetworkStatusService, useValue: networkStatus },
         { provide: OfflineStorageService, useValue: offlineStorage },
