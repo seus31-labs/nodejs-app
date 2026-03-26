@@ -222,6 +222,22 @@ describe('TodoService', () => {
       const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/${todoId}/subtasks` && r.method === 'GET')
       req.flush(mockSubtasks)
     })
+
+    it('should propagate error from GET /todos/:id/subtasks', () => {
+      const todoId = 99
+      const message = 'not found'
+
+      service.getSubtasks(todoId).subscribe({
+        next: () => fail('expected error'),
+        error: (err) => {
+          expect(err.status).toBe(404)
+          expect(err.error?.message).toBe(message)
+        }
+      })
+
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos/${todoId}/subtasks` && r.method === 'GET')
+      req.flush({ message }, { status: 404, statusText: 'Not Found' })
+    })
   })
 
   describe('subtasks (5.8.2)', () => {
@@ -237,6 +253,19 @@ describe('TodoService', () => {
       )
       expect(req.request.body).toEqual(payload)
       req.flush(created)
+    })
+
+    it('should send title payload as-is for createSubtask', () => {
+      const parentId = 3
+      const payload: CreateTodoDto = { title: ' child ' }
+
+      service.createSubtask(parentId, payload).subscribe()
+
+      const req = httpMock.expectOne(
+        (r) => r.url === `${apiUrl}/todos/${parentId}/subtasks` && r.method === 'POST'
+      )
+      expect(req.request.body).toEqual(payload)
+      req.flush({ ...mockTodo, id: 30, parentId, title: ' child ' })
     })
   })
 

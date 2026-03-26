@@ -116,5 +116,34 @@ describe('SubtaskListComponent', () => {
     const patchReq = httpMock.expectOne((r) => r.method === 'PATCH')
     patchReq.flush(updated)
   })
+
+  it('should set error when loading subtasks fails', () => {
+    component.parentId = 1
+    component.ngOnChanges({
+      parentId: new SimpleChange(undefined, 1, true)
+    })
+
+    const req = httpMock.expectOne((r) => r.method === 'GET')
+    req.flush({ message: 'failed' }, { status: 500, statusText: 'Server Error' })
+
+    expect(component.error).toBe('failed')
+    expect(component.loading).toBeFalse()
+  })
+
+  it('should prevent duplicate create calls while creating', () => {
+    component.parentId = 1
+    component.ngOnChanges({
+      parentId: new SimpleChange(undefined, 1, true)
+    })
+    httpMock.expectOne((r) => r.method === 'GET').flush([])
+
+    component.onAddClick()
+    component.newTitle = 'new child'
+    component.creating = true
+    component.create()
+
+    expect(component.subtasks.length).toBe(0)
+    httpMock.expectNone((r) => r.method === 'POST')
+  })
 })
 
