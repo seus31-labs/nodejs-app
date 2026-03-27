@@ -94,11 +94,11 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.10: RecurrenceForm コンポーネント作成
 
-- [ ] 6.10.1: `ng generate component components/recurrence-form` 実行
-- [ ] 6.10.2: 繰り返しパターン選択実装
-- [ ] 6.10.3: 繰り返し間隔入力実装
-- [ ] 6.10.4: 終了日入力実装
-- [ ] 6.10.5: @Output() recurrenceChanged 実装
+- [x] 6.10.1: `ng generate component components/recurrence-form` 実行
+- [x] 6.10.2: 繰り返しパターン選択実装
+- [x] 6.10.3: 繰り返し間隔入力実装
+- [x] 6.10.4: 終了日入力実装
+- [x] 6.10.5: @Output() recurrenceChanged 実装
 
 ### Task 6.11: TodoForm に繰り返し設定追加
 
