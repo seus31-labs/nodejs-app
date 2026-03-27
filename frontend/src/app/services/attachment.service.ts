@@ -38,6 +38,10 @@ export class AttachmentService {
     return this.http.get<Attachment[]>(`${this.apiUrl}/todos/${todoId}/attachments`)
   }
 
+  downloadAttachment(fileUrl: string): Observable<Blob> {
+    return this.http.get(fileUrl, { responseType: 'blob' })
+  }
+
   deleteAttachment(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/attachments/${id}`)
   }
