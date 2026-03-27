@@ -60,6 +60,9 @@ function validateRecurrencePayload(body, { requirePatternWhenRecurring = false }
     if (body.recurrencePattern !== undefined && body.recurrencePattern !== null) {
       return 'recurrencePattern must be null when isRecurring is false';
     }
+    if (body.recurrenceInterval !== undefined && body.recurrenceInterval !== 1) {
+      return 'recurrenceInterval must be 1 when isRecurring is false';
+    }
     if (body.recurrenceEndDate !== undefined && body.recurrenceEndDate !== null) {
       return 'recurrenceEndDate must be null when isRecurring is false';
     }
