@@ -6,11 +6,20 @@ import type { Todo } from '../../../../../models/todo.interface'
 import { TodoService } from '../../../../../services/todo.service'
 import { ProgressBarComponent } from '../../../../progress-bar/progress-bar.component'
 import SubtaskListComponent from '../../../../subtask-list/subtask-list.component'
+import { FileUploadComponent } from '../../../../file-upload/file-upload.component'
+import { AttachmentListComponent } from '../../../../attachment-list/attachment-list.component'
 
 @Component({
   selector: 'app-todo-detail-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ProgressBarComponent, SubtaskListComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    ProgressBarComponent,
+    SubtaskListComponent,
+    FileUploadComponent,
+    AttachmentListComponent
+  ],
   templateUrl: './todo-detail-page.component.html',
   styleUrl: './todo-detail-page.component.scss'
 })
@@ -18,6 +27,7 @@ export default class TodoDetailPageComponent implements OnInit, OnDestroy {
   todo: Todo | null = null
   loading = false
   error: string | null = null
+  attachmentRefreshToken = 0
   private destroy$ = new Subject<void>()
 
   constructor(
@@ -47,6 +57,10 @@ export default class TodoDetailPageComponent implements OnInit, OnDestroy {
       subtasks,
       progress: { completed, total: subtasks.length }
     }
+  }
+
+  onAttachmentUploaded(): void {
+    this.attachmentRefreshToken += 1
   }
 
   private loadTodo(id: number): void {

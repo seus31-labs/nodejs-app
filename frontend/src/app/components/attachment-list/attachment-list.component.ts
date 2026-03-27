@@ -14,6 +14,7 @@ import { environment } from '../../../environments/environment'
 })
 export class AttachmentListComponent implements OnChanges, OnDestroy {
   @Input() todoId!: number
+  @Input() refreshToken = 0
 
   attachments: Attachment[] = []
   loading = false
@@ -28,7 +29,7 @@ export class AttachmentListComponent implements OnChanges, OnDestroy {
   constructor(private attachmentService: AttachmentService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if ('todoId' in changes) {
+    if ('todoId' in changes || 'refreshToken' in changes) {
       this.loadAttachments()
     }
   }

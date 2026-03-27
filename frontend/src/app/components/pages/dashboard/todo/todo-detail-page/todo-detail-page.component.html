@@ -29,6 +29,18 @@
           </div>
 
           <app-subtask-list [parentId]="todo.id" (subtasksUpdated)="onSubtasksUpdated($event)"></app-subtask-list>
+
+          <hr class="my-4" />
+
+          <section class="mb-3">
+            <h4 class="h6 mb-2">添付ファイルを追加</h4>
+            <app-file-upload [todoId]="todo.id" (uploaded)="onAttachmentUploaded()"></app-file-upload>
+          </section>
+
+          <section>
+            <h4 class="h6 mb-2">添付ファイル一覧</h4>
+            <app-attachment-list [todoId]="todo.id" [refreshToken]="attachmentRefreshToken"></app-attachment-list>
+          </section>
         </div>
       </div>
     }

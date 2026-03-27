@@ -134,8 +134,8 @@ DELETE /api/attachments/:id
 
 ### Task 8.13: TodoDetail に添付ファイル機能追加
 
-- [ ] 8.13.1: FileUpload コンポーネント追加
-- [ ] 8.13.2: AttachmentList コンポーネント追加
+- [x] 8.13.1: FileUpload コンポーネント追加
+- [x] 8.13.2: AttachmentList コンポーネント追加
 
 ### Task 8.14: スタイリング
 
