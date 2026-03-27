@@ -72,11 +72,11 @@ DELETE /api/attachments/:id
 
 ### Task 8.5: AttachmentController 作成
 
-- [ ] 8.5.1: `backend/controllers/AttachmentController.js` 作成
-- [ ] 8.5.2: `uploadAttachment` ハンドラ実装
-- [ ] 8.5.3: `getAttachments` ハンドラ実装
-- [ ] 8.5.4: `deleteAttachment` ハンドラ実装
-- [ ] 8.5.5: ファイルバリデーション
+- [x] 8.5.1: `backend/controllers/AttachmentController.js` 作成
+- [x] 8.5.2: `uploadAttachment` ハンドラ実装
+- [x] 8.5.3: `getAttachments` ハンドラ実装
+- [x] 8.5.4: `deleteAttachment` ハンドラ実装
+- [x] 8.5.5: ファイルバリデーション
 
 ### Task 8.6: Attachment ルート作成
 
