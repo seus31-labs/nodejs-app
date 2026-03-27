@@ -338,7 +338,11 @@ async function toggleComplete(fastify, todoId, userId) {
   if (todo.completed === true && todo.isRecurring === true) {
     const nextOccurrencePayload = recurrenceService.createNextOccurrence(todo);
     if (nextOccurrencePayload) {
-      await fastify.models.Todo.create(nextOccurrencePayload);
+      try {
+        await fastify.models.Todo.create(nextOccurrencePayload);
+      } catch (error) {
+        fastify.log?.error(error, '次回繰り返し Todo の生成に失敗');
+      }
     }
   }
 
