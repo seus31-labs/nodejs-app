@@ -73,6 +73,14 @@
       </select>
     </div>
   }
+  @if (!isSubtaskMode) {
+    <div class="mb-3">
+      <app-recurrence-form
+        [value]="recurrence"
+        (recurrenceChanged)="onRecurrenceChanged($event)"
+      />
+    </div>
+  }
   <div class="d-flex gap-2">
     <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
       {{ editingTodo ? '更新' : (isSubtaskMode ? 'サブタスクを作成' : '作成') }}
