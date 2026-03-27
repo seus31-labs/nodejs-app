@@ -103,8 +103,8 @@ DELETE /api/attachments/:id
 
 ### Task 8.9: Attachment インターフェース定義
 
-- [ ] 8.9.1: `frontend/src/app/models/attachment.interface.ts` 作成
-- [ ] 8.9.2: Attachment インターフェース定義
+- [x] 8.9.1: `frontend/src/app/models/attachment.interface.ts` 作成
+- [x] 8.9.2: Attachment インターフェース定義
 
 ### Task 8.10: AttachmentService 作成
 
