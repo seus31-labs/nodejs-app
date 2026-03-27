@@ -57,10 +57,6 @@ module.exports = {
     await queryInterface.removeColumn('todos', 'recurrence_interval');
     await queryInterface.removeColumn('todos', 'recurrence_pattern');
     await queryInterface.removeColumn('todos', 'is_recurring');
-
-    await queryInterface.sequelize.query(
-      "DROP TYPE IF EXISTS `enum_todos_recurrence_pattern`;"
-    ).catch(() => {});
   },
 };
 
