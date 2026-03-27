@@ -1,0 +1,45 @@
+<div class="recurrence-form" [formGroup]="form">
+  <div class="form-check form-switch mb-2">
+    <input
+      id="recurrence-enabled"
+      class="form-check-input"
+      type="checkbox"
+      formControlName="isRecurring"
+    />
+    <label class="form-check-label" for="recurrence-enabled">繰り返しを有効化</label>
+  </div>
+
+  @if (form.get('isRecurring')?.value === true) {
+    <div class="row g-2">
+      <div class="col-md-4">
+        <label for="recurrence-pattern" class="form-label">繰り返しパターン</label>
+        <select id="recurrence-pattern" class="form-select" formControlName="recurrencePattern">
+          @for (p of patterns; track p.value) {
+            <option [ngValue]="p.value">{{ p.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label for="recurrence-interval" class="form-label">間隔</label>
+        <input
+          id="recurrence-interval"
+          type="number"
+          class="form-control"
+          min="1"
+          formControlName="recurrenceInterval"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label for="recurrence-end-date" class="form-label">終了日（任意）</label>
+        <input
+          id="recurrence-end-date"
+          type="date"
+          class="form-control"
+          formControlName="recurrenceEndDate"
+        />
+      </div>
+    </div>
+  }
+</div>
