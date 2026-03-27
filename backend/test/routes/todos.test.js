@@ -147,7 +147,7 @@ test('PUT /api/v1/todos recurrence validation returns 400 as expected', async (t
   const todoId = JSON.parse(created.payload).id
 
   const cases = [
-    { isRecurring: 'false' },
+    { isRecurring: 'not-bool' },
     { recurrencePattern: 'yearly' },
     { recurrenceInterval: 0 },
     { recurrenceInterval: -1 },

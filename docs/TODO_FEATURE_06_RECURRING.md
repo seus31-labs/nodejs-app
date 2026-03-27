@@ -69,8 +69,8 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.6: Todo ルート更新
 
-- [ ] 6.6.1: POST /api/todos の JSON Schema に繰り返しフィールド追加
-- [ ] 6.6.2: PUT /api/todos/:id の JSON Schema に繰り返しフィールド追加
+- [x] 6.6.1: POST /api/todos の JSON Schema に繰り返しフィールド追加
+- [x] 6.6.2: PUT /api/todos/:id の JSON Schema に繰り返しフィールド追加
 
 ### Task 6.7: Backend テスト
 
