@@ -93,9 +93,9 @@ DELETE /api/attachments/:id
 
 ### Task 8.8: Backend テスト
 
-- [ ] 8.8.1: StorageService のテスト
-- [ ] 8.8.2: AttachmentService のテスト
-- [ ] 8.8.3: Attachment API のテスト
+- [x] 8.8.1: StorageService のテスト
+- [x] 8.8.2: AttachmentService のテスト
+- [x] 8.8.3: Attachment API のテスト
 
 ---
 
