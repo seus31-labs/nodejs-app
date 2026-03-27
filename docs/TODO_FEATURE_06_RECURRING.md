@@ -90,7 +90,7 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.9: Todo インターフェース更新
 
-- [ ] 6.9.1: Todo インターフェースに繰り返しフィールド追加
+- [x] 6.9.1: Todo インターフェースに繰り返しフィールド追加
 
 ### Task 6.10: RecurrenceForm コンポーネント作成
 

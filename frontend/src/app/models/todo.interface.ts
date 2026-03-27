@@ -1,4 +1,5 @@
 import type { Project } from './project.interface'
+import type { Recurrence } from './recurrence.interface'
 import type { Tag } from './tag.interface'
 
 /**
@@ -32,6 +33,11 @@ export interface Todo {
   archivedAt: string | null
   reminderEnabled: boolean
   reminderSentAt: string | null
+  isRecurring?: Recurrence['isRecurring']
+  recurrencePattern?: Recurrence['recurrencePattern']
+  recurrenceInterval?: Recurrence['recurrenceInterval']
+  recurrenceEndDate?: Recurrence['recurrenceEndDate']
+  originalTodoId?: number | null
   createdAt: string
   updatedAt: string
   Tags?: Tag[]
@@ -51,6 +57,10 @@ export interface TodoCreateUpdate {
   priority?: TodoPriority
   dueDate?: string | null
   projectId?: number | null
+  isRecurring?: Recurrence['isRecurring']
+  recurrencePattern?: Recurrence['recurrencePattern']
+  recurrenceInterval?: Recurrence['recurrenceInterval']
+  recurrenceEndDate?: Recurrence['recurrenceEndDate']
 }
 
 /**
