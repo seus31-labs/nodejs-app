@@ -65,7 +65,7 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.5: TodoController 更新
 
-- [ ] 6.5.1: 繰り返しフィールドのバリデーション追加
+- [x] 6.5.1: 繰り返しフィールドのバリデーション追加
 
 ### Task 6.6: Todo ルート更新
 
