@@ -124,8 +124,8 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.15: Frontend テスト
 
-- [ ] 6.15.1: RecurrenceForm コンポーネントテスト
-- [ ] 6.15.2: 繰り返しタスク表示のテスト
+- [x] 6.15.1: RecurrenceForm コンポーネントテスト
+- [x] 6.15.2: 繰り返しタスク表示のテスト
 
 ---
 

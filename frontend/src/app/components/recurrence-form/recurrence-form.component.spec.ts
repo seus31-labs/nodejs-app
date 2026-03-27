@@ -90,4 +90,19 @@ describe('RecurrenceFormComponent', () => {
     expect(last.recurrencePattern).toBe('daily')
     expect(component.form.get('recurrencePattern')?.value).toBe(RecurrencePattern.Daily)
   })
+
+  it('should reflect @Input value on ngOnChanges', () => {
+    component.value = {
+      isRecurring: true,
+      recurrencePattern: RecurrencePattern.Monthly,
+      recurrenceInterval: 3,
+      recurrenceEndDate: '2026-06-30'
+    }
+    component.ngOnChanges()
+
+    expect(component.form.get('isRecurring')?.value).toBe(true)
+    expect(component.form.get('recurrencePattern')?.value).toBe(RecurrencePattern.Monthly)
+    expect(component.form.get('recurrenceInterval')?.value).toBe(3)
+    expect(component.form.get('recurrenceEndDate')?.value).toBe('2026-06-30')
+  })
 })
