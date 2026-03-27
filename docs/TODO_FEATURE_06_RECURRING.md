@@ -59,9 +59,9 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.4: TodoService に繰り返し機能追加
 
-- [ ] 6.4.1: `createTodo` で繰り返し設定を保存
-- [ ] 6.4.2: `toggleComplete` で繰り返しタスクの場合、次回生成
-- [ ] 6.4.3: RecurrenceService 呼び出し
+- [x] 6.4.1: `createTodo` で繰り返し設定を保存
+- [x] 6.4.2: `toggleComplete` で繰り返しタスクの場合、次回生成
+- [x] 6.4.3: RecurrenceService 呼び出し
 
 ### Task 6.5: TodoController 更新
 

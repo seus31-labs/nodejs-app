@@ -4,6 +4,7 @@ const { Op } = require('sequelize');
 const tagService = require('./tagService');
 const projectService = require('./projectService');
 const shareService = require('./shareService');
+const recurrenceService = require('./recurrenceService');
 
 const SORT_BY_ALLOWED = ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'];
 const SORT_ORDER_ALLOWED = ['asc', 'desc'];
@@ -78,7 +79,19 @@ async function assertNoCircularParentChain(fastify, startParentId) {
  * @returns {Promise<object>} 作成された Todo
  */
 async function createTodo(fastify, userId, todoData) {
-  const { title, description, priority, dueDate, projectId } = todoData;
+  const {
+    title,
+    description,
+    priority,
+    dueDate,
+    projectId,
+    isRecurring,
+    recurrencePattern,
+    recurrenceInterval,
+    recurrenceEndDate
+  } = todoData;
+  const recurringEnabled = isRecurring === true;
+
   return fastify.models.Todo.create({
     userId,
     title,
@@ -86,6 +99,12 @@ async function createTodo(fastify, userId, todoData) {
     priority: priority ?? 'medium',
     dueDate: dueDate ?? null,
     projectId: projectId ?? null,
+    isRecurring: recurringEnabled,
+    recurrencePattern: recurringEnabled ? (recurrencePattern ?? null) : null,
+    recurrenceInterval: recurringEnabled
+      ? (Number.isInteger(recurrenceInterval) && recurrenceInterval > 0 ? recurrenceInterval : 1)
+      : 1,
+    recurrenceEndDate: recurringEnabled ? (recurrenceEndDate ?? null) : null,
   });
 }
 
@@ -315,6 +334,18 @@ async function toggleComplete(fastify, todoId, userId) {
   if (todo.userId !== userId && !(await shareService.canEdit(fastify, todoId, userId))) return null;
   todo.completed = !todo.completed;
   await todo.save();
+
+  if (todo.completed === true && todo.isRecurring === true) {
+    const nextOccurrencePayload = recurrenceService.createNextOccurrence(todo);
+    if (nextOccurrencePayload) {
+      try {
+        await fastify.models.Todo.create(nextOccurrencePayload);
+      } catch (error) {
+        fastify.log?.error(error, '次回繰り返し Todo の生成に失敗');
+      }
+    }
+  }
+
   return todo;
 }
 
