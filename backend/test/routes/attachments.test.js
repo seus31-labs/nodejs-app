@@ -44,6 +44,22 @@ async function setupUserAndTodo(app) {
   return { token, todoId: todo.id }
 }
 
+async function setupSecondUser(app) {
+  const suffix = uniqueSuffix()
+  const user = {
+    name: `att-other-${suffix}`,
+    email: `att-other-${suffix}@test.local`,
+    password: 'pass123'
+  }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const login = await app.inject({
+    method: 'POST',
+    url: '/api/v1/login',
+    payload: { email: user.email, password: user.password }
+  })
+  return JSON.parse(login.payload).token
+}
+
 test('attachments routes without auth return 401', async (t) => {
   const app = await build(t)
 
@@ -123,4 +139,57 @@ test('attachments API: upload -> list -> delete works for owner', async (t) => {
     headers: { authorization: `Bearer ${token}` }
   })
   assert.strictEqual(deleteRes.statusCode, 204)
+})
+
+test('GET /api/v1/todos/:todoId/attachments by other user returns 403', async (t) => {
+  const app = await build(t)
+  const { token, todoId } = await setupUserAndTodo(app)
+  const otherToken = await setupSecondUser(app)
+  const boundary = `----boundary-${crypto.randomUUID()}`
+  const payload = buildMultipartPayload(boundary, 'image.png', 'image/png', 'png-bytes')
+
+  const uploadRes = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${todoId}/attachments`,
+    headers: {
+      authorization: `Bearer ${token}`,
+      'content-type': `multipart/form-data; boundary=${boundary}`
+    },
+    payload
+  })
+  assert.strictEqual(uploadRes.statusCode, 201)
+
+  const getRes = await app.inject({
+    method: 'GET',
+    url: `/api/v1/todos/${todoId}/attachments`,
+    headers: { authorization: `Bearer ${otherToken}` }
+  })
+  assert.strictEqual(getRes.statusCode, 403)
+})
+
+test('DELETE /api/v1/attachments/:id by other user returns 404', async (t) => {
+  const app = await build(t)
+  const { token, todoId } = await setupUserAndTodo(app)
+  const otherToken = await setupSecondUser(app)
+  const boundary = `----boundary-${crypto.randomUUID()}`
+  const payload = buildMultipartPayload(boundary, 'image.png', 'image/png', 'png-bytes')
+
+  const uploadRes = await app.inject({
+    method: 'POST',
+    url: `/api/v1/todos/${todoId}/attachments`,
+    headers: {
+      authorization: `Bearer ${token}`,
+      'content-type': `multipart/form-data; boundary=${boundary}`
+    },
+    payload
+  })
+  assert.strictEqual(uploadRes.statusCode, 201)
+  const uploaded = JSON.parse(uploadRes.payload)
+
+  const deleteRes = await app.inject({
+    method: 'DELETE',
+    url: `/api/v1/attachments/${uploaded.id}`,
+    headers: { authorization: `Bearer ${otherToken}` }
+  })
+  assert.strictEqual(deleteRes.statusCode, 404)
 })
