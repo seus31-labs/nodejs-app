@@ -19,10 +19,14 @@ async function uploadAttachment(fastify, req, reply) {
     const file = await req.file()
     if (!file) return reply.code(400).send({ error: 'File is required' })
 
-    const isAllowedMimeType = typeof fastify.isAllowedAttachmentMimeType === 'function'
-      ? fastify.isAllowedAttachmentMimeType(file.mimetype)
-      : true
-    if (!isAllowedMimeType) {
+    if (typeof fastify.isAllowedAttachmentMimeType !== 'function') {
+      fastify.log.error('isAllowedAttachmentMimeType is not registered')
+      await file.toBuffer()
+      return reply.code(500).send({ error: 'Server configuration error' })
+    }
+
+    if (!fastify.isAllowedAttachmentMimeType(file.mimetype)) {
+      await file.toBuffer()
       return reply.code(400).send({ error: 'Unsupported mime type' })
     }
 
@@ -58,6 +62,7 @@ async function deleteAttachment(fastify, req, reply) {
     if (attachmentId === null) return reply.code(400).send({ error: 'Invalid attachment id' })
 
     const deleted = await attachmentService.deleteAttachment(fastify, attachmentId, req.user.id)
+    // false は「存在しない」と「権限なし」の両方を含む（存在秘匿のため区別しない）
     if (!deleted) return reply.code(404).send({ error: 'Not found' })
     return reply.code(204).send()
   } catch (error) {
