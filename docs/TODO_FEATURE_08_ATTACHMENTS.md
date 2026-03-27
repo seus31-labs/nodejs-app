@@ -80,11 +80,11 @@ DELETE /api/attachments/:id
 
 ### Task 8.6: Attachment ルート作成
 
-- [ ] 8.6.1: `backend/routes/api/attachments.js` 作成
-- [ ] 8.6.2: POST /api/todos/:todoId/attachments のルート定義
-- [ ] 8.6.3: GET /api/todos/:todoId/attachments のルート定義
-- [ ] 8.6.4: DELETE /api/attachments/:id のルート定義
-- [ ] 8.6.5: JWT 認証 preHandler 適用
+- [x] 8.6.1: `backend/routes/api/attachments.js` 作成
+- [x] 8.6.2: POST /api/todos/:todoId/attachments のルート定義
+- [x] 8.6.3: GET /api/todos/:todoId/attachments のルート定義
+- [x] 8.6.4: DELETE /api/attachments/:id のルート定義
+- [x] 8.6.5: JWT 認証 preHandler 適用
 
 ### Task 8.7: 静的ファイル配信設定
 

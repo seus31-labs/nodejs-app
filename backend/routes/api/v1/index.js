@@ -819,6 +819,7 @@ module.exports = async function (fastify, opts) {
     preHandler: [fastify.authenticate],
     handler: async (request, reply) => deleteShare(fastify, request, reply),
   });
+  fastify.register(require('./attachments'));
 
   /**
    * Analytics（JWT 必須）— 既存 API と同様に /api/v1 配下
