@@ -55,12 +55,12 @@ DELETE /api/attachments/:id
 
 ### Task 8.3: StorageService 作成
 
-- [ ] 8.3.1: `backend/services/StorageService.js` 作成
-- [ ] 8.3.2: ローカルストレージ実装（開発用）
-- [ ] 8.3.3: `uploadFile(file, todoId)` 実装
-- [ ] 8.3.4: `deleteFile(fileUrl)` 実装
-- [ ] 8.3.5: ファイル名のサニタイズ処理
-- [ ] 8.3.6: ユニークファイル名生成（UUID）
+- [x] 8.3.1: `backend/services/StorageService.js` 作成
+- [x] 8.3.2: ローカルストレージ実装（開発用）
+- [x] 8.3.3: `uploadFile(file, todoId)` 実装
+- [x] 8.3.4: `deleteFile(fileUrl)` 実装
+- [x] 8.3.5: ファイル名のサニタイズ処理
+- [x] 8.3.6: ユニークファイル名生成（UUID）
 
 ### Task 8.4: AttachmentService 作成
 
