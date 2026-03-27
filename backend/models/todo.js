@@ -203,6 +203,7 @@ module.exports = (sequelize) => {
     });
     Todo.hasMany(models.TodoShare, { foreignKey: 'todoId' });
     Todo.hasMany(models.Comment, { foreignKey: 'todoId' });
+    Todo.hasMany(models.Attachment, { foreignKey: 'todoId' });
   };
 
   return Todo;

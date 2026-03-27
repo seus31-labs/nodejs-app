@@ -38,14 +38,14 @@ DELETE /api/attachments/:id
 
 ### Task 8.1: Attachment モデル作成
 
-- [ ] 8.1.1: マイグレーション生成 `create-attachments`
-- [ ] 8.1.2: attachments テーブル定義
-- [ ] 8.1.3: インデックス追加（todoId）
-- [ ] 8.1.4: 外部キー制約追加
-- [ ] 8.1.5: `backend/models/Attachment.js` 作成
-- [ ] 8.1.6: Attachment モデル定義
-- [ ] 8.1.7: Todo との関連付け
-- [ ] 8.1.8: マイグレーション実行
+- [x] 8.1.1: マイグレーション生成 `create-attachments`
+- [x] 8.1.2: attachments テーブル定義
+- [x] 8.1.3: インデックス追加（todoId）
+- [x] 8.1.4: 外部キー制約追加
+- [x] 8.1.5: `backend/models/Attachment.js` 作成
+- [x] 8.1.6: Attachment モデル定義
+- [x] 8.1.7: Todo との関連付け
+- [x] 8.1.8: マイグレーション実行
 
 ### Task 8.2: ファイルアップロード設定
 
