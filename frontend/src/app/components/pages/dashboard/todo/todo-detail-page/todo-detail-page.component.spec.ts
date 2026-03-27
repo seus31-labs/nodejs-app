@@ -75,5 +75,11 @@ describe('TodoDetailPageComponent (5.13)', () => {
     ])
     expect(component.todo.progress).toEqual({ completed: 1, total: 2 })
   })
+
+  it('should increase attachment refresh token when upload completes', () => {
+    expect(component.attachmentRefreshToken).toBe(0)
+    component.onAttachmentUploaded()
+    expect(component.attachmentRefreshToken).toBe(1)
+  })
 })
 
