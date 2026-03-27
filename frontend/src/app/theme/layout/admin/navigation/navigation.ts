@@ -45,6 +45,14 @@ const NavigationItems = [
         classes: 'nav-item'
       },
       {
+        id: 'recurring-todos',
+        title: '繰り返しTodo',
+        type: 'item',
+        url: '/dashboard/todos/recurring',
+        icon: 'feather icon-refresh-cw',
+        classes: 'nav-item'
+      },
+      {
         id: 'calendar',
         title: 'カレンダー',
         type: 'item',
