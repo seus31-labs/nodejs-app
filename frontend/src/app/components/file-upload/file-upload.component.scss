@@ -1,11 +1,31 @@
 .file-upload {
   border: 2px dashed #ced4da;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   padding: 1rem;
   background-color: #f8f9fa;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+
+  p {
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control {
+    background-color: #fff;
+  }
+
+  .progress {
+    height: 0.5rem;
+    background-color: #e9ecef;
+  }
+
+  .progress-bar {
+    font-size: 0.65rem;
+    line-height: 0.5rem;
+  }
 }
 
 .file-upload.dragging {
   border-color: #0d6efd;
   background-color: #e7f1ff;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
 }
