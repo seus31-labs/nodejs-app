@@ -88,8 +88,8 @@ DELETE /api/attachments/:id
 
 ### Task 8.7: 静的ファイル配信設定
 
-- [ ] 8.7.1: `@fastify/static` インストール
-- [ ] 8.7.2: uploads ディレクトリの静的配信設定
+- [x] 8.7.1: `@fastify/static` インストール
+- [x] 8.7.2: uploads ディレクトリの静的配信設定
 
 ### Task 8.8: Backend テスト
 
