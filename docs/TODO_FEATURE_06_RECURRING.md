@@ -84,9 +84,9 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.8: Recurrence インターフェース定義
 
-- [ ] 6.8.1: `frontend/src/app/models/recurrence.interface.ts` 作成
-- [ ] 6.8.2: RecurrencePattern enum 定義
-- [ ] 6.8.3: Recurrence インターフェース定義
+- [x] 6.8.1: `frontend/src/app/models/recurrence.interface.ts` 作成
+- [x] 6.8.2: RecurrencePattern enum 定義
+- [x] 6.8.3: Recurrence インターフェース定義
 
 ### Task 6.9: Todo インターフェース更新
 
