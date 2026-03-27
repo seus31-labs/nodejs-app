@@ -1,6 +1,5 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
 import { Subscription } from 'rxjs'
 import { AttachmentService } from '../../services/attachment.service'
 import type { Attachment } from '../../models/attachment.interface'
@@ -24,11 +23,9 @@ export class AttachmentListComponent implements OnChanges, OnDestroy {
   private readonly apiOrigin = new URL(environment.apiUrl).origin
   private listSub: Subscription | null = null
   private downloadSub: Subscription | null = null
+  private removeSub: Subscription | null = null
 
-  constructor(
-    private attachmentService: AttachmentService,
-    private http: HttpClient
-  ) {}
+  constructor(private attachmentService: AttachmentService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('todoId' in changes) {
@@ -39,6 +36,7 @@ export class AttachmentListComponent implements OnChanges, OnDestroy {
   ngOnDestroy(): void {
     this.listSub?.unsubscribe()
     this.downloadSub?.unsubscribe()
+    this.removeSub?.unsubscribe()
   }
 
   getFileIcon(mimeType: string): string {
@@ -50,7 +48,7 @@ export class AttachmentListComponent implements OnChanges, OnDestroy {
   download(attachment: Attachment): void {
     const fileUrl = this.resolveAbsoluteFileUrl(attachment.fileUrl)
     this.downloadSub?.unsubscribe()
-    this.downloadSub = this.http.get(fileUrl, { responseType: 'blob' }).subscribe({
+    this.downloadSub = this.attachmentService.downloadAttachment(fileUrl).subscribe({
       next: (blob) => {
         const objectUrl = URL.createObjectURL(blob)
         const link = document.createElement('a')
@@ -68,7 +66,8 @@ export class AttachmentListComponent implements OnChanges, OnDestroy {
   remove(attachment: Attachment): void {
     if (this.deletingIds.has(attachment.id)) return
     this.deletingIds.add(attachment.id)
-    this.attachmentService.deleteAttachment(attachment.id).subscribe({
+    this.removeSub?.unsubscribe()
+    this.removeSub = this.attachmentService.deleteAttachment(attachment.id).subscribe({
       next: () => {
         this.attachments = this.attachments.filter((item) => item.id !== attachment.id)
         this.deletingIds.delete(attachment.id)
