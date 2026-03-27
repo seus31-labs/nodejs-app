@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { of } from 'rxjs'
-import { HttpEventType } from '@angular/common/http'
+import { HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http'
 import { FileUploadComponent } from './file-upload.component'
 import { AttachmentService } from '../../services/attachment.service'
+import type { Attachment } from '../../models/attachment.interface'
 
 describe('FileUploadComponent', () => {
   let component: FileUploadComponent
@@ -58,5 +59,29 @@ describe('FileUploadComponent', () => {
 
     expect(component.selectedFile).toBeNull()
     expect(component.errorMessage).toContain('許可されていないファイル形式')
+  })
+
+  it('アップロード成功時に uploaded を emit する', () => {
+    const responseBody: Attachment = {
+      id: 11,
+      todoId: 1,
+      fileName: 'ok.png',
+      fileSize: 10,
+      mimeType: 'image/png',
+      fileUrl: '/uploads/1/ok.png',
+      createdAt: '2026-01-01T00:00:00.000Z'
+    }
+    const progressEvent = { type: HttpEventType.UploadProgress, loaded: 5, total: 10 } as HttpEvent<Attachment>
+    const responseEvent = new HttpResponse<Attachment>({ body: responseBody })
+    attachmentServiceSpy.uploadAttachmentWithProgress.and.returnValue(of(progressEvent, responseEvent))
+    const emitSpy = spyOn(component.uploaded, 'emit')
+    component.selectedFile = new File(['dummy'], 'ok.png', { type: 'image/png' })
+
+    component.startUpload()
+
+    expect(component.uploadProgress).toBe(100)
+    expect(component.uploading).toBeFalse()
+    expect(component.selectedFile).toBeNull()
+    expect(emitSpy).toHaveBeenCalledWith(responseBody)
   })
 })
