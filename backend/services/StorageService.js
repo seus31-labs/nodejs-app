@@ -8,6 +8,7 @@ const { randomUUID } = require('node:crypto')
 
 const UPLOAD_URL_PREFIX = '/uploads'
 const DEFAULT_UPLOAD_DIR = path.join(__dirname, '..', 'uploads')
+const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.pdf'])
 
 function parseTodoId(todoId) {
   const parsed = Number.parseInt(todoId, 10)
@@ -68,9 +69,16 @@ function isUnderUploadRoot(targetPath) {
 function generateUniqueFileName(originalFileName) {
   const safeName = sanitizeFileName(originalFileName)
   const ext = path.extname(safeName).toLowerCase()
-  return `${randomUUID()}${ext}`
+  const safeExt = ALLOWED_EXTENSIONS.has(ext) ? ext : ''
+  return `${randomUUID()}${safeExt}`
 }
 
+/**
+ * @param {object} file - @fastify/multipart のファイルオブジェクト
+ * 呼び出し前に MIME タイプ検証を行うこと（StorageService は保存処理に専念する）。
+ * @param {number|string} todoId
+ * @returns {Promise<{originalFileName: string, storedFileName: string, fileSize: number, mimeType: string, fileUrl: string}>}
+ */
 async function uploadFile(file, todoId) {
   const safeTodoId = parseTodoId(todoId)
   if (!file || typeof file !== 'object' || typeof file.file?.pipe !== 'function') {
