@@ -350,7 +350,7 @@ frontend/src/app/
 
 - [x] Task 11.1: Frontend ユニットテスト
 - [x] Task 11.2: E2E 動作確認
-- [ ] Task 11.3: README 更新
+- [x] Task 11.3: README 更新
 
 ---
 
