@@ -5,6 +5,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { ActivatedRoute, convertToParamMap } from '@angular/router'
 import { TodoItemComponent } from './todo-item.component'
 import type { ReminderToggleEvent } from './todo-item.component'
+import { RecurrencePattern } from '../../../../../models/recurrence.interface'
 import type { Todo } from '../../../../../models/todo.interface'
 
 const mockTodo: Todo = {
@@ -144,5 +145,17 @@ describe('TodoItemComponent (2.12.2)', () => {
     expect(component.todo.subtasks?.length).toBe(3)
     expect(component.todo.progress).toEqual({ completed: 2, total: 3 })
   })
+
+  it('should return recurrence tooltip text for recurring todo', () => {
+    component.todo = {
+      ...mockTodo,
+      isRecurring: true,
+      recurrencePattern: RecurrencePattern.Weekly,
+      recurrenceInterval: 2,
+      recurrenceEndDate: '2026-12-31'
+    }
+    expect(component.recurrenceTooltip).toBe('毎週 / 2 回ごと（終了日: 2026-12-31）')
+  })
+
 })
 

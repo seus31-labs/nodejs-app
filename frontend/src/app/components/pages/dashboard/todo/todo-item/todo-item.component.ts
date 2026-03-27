@@ -115,6 +115,19 @@ export class TodoItemComponent implements OnChanges {
     return this.allTags.filter((t) => !onTodo.has(t.id))
   }
 
+  get recurrenceTooltip(): string {
+    if (!this.todo?.isRecurring) return ''
+    const patternMap: Record<string, string> = {
+      daily: '毎日',
+      weekly: '毎週',
+      monthly: '毎月'
+    }
+    const pattern = this.todo.recurrencePattern ? (patternMap[this.todo.recurrencePattern] ?? this.todo.recurrencePattern) : '繰り返し'
+    const interval = this.todo.recurrenceInterval ?? 1
+    const endDate = this.todo.recurrenceEndDate ? `（終了日: ${this.todo.recurrenceEndDate}）` : ''
+    return `${pattern} / ${interval} 回ごと${endDate}`
+  }
+
   /** 優先度バッジの Bootstrap クラス */
   priorityClass(priority: string): string {
     switch (priority) {
