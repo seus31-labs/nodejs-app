@@ -116,12 +116,12 @@ DELETE /api/attachments/:id
 
 ### Task 8.11: FileUpload コンポーネント作成
 
-- [ ] 8.11.1: `ng generate component components/file-upload` 実行
-- [ ] 8.11.2: ファイル選択 UI 実装
-- [ ] 8.11.3: ドラッグ&ドロップ実装
-- [ ] 8.11.4: アップロード進捗バー表示
-- [ ] 8.11.5: @Input() todoId: number 実装
-- [ ] 8.11.6: @Output() uploaded 実装
+- [x] 8.11.1: `ng generate component components/file-upload` 実行
+- [x] 8.11.2: ファイル選択 UI 実装
+- [x] 8.11.3: ドラッグ&ドロップ実装
+- [x] 8.11.4: アップロード進捗バー表示
+- [x] 8.11.5: @Input() todoId: number 実装
+- [x] 8.11.6: @Output() uploaded 実装
 
 ### Task 8.12: AttachmentList コンポーネント作成
 

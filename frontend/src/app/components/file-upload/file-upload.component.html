@@ -1,0 +1,41 @@
+<div
+  class="file-upload"
+  [class.dragging]="isDragging"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  <p class="mb-2">ファイルをドラッグ&ドロップ、または選択してください</p>
+  <input
+    type="file"
+    class="form-control form-control-sm mb-2"
+    [disabled]="uploading"
+    (change)="onFileSelected($event)"
+    accept="image/jpeg,image/png,image/webp,application/pdf"
+  />
+
+  @if (selectedFile) {
+    <p class="small text-muted mb-2">
+      選択中: {{ selectedFile.name }} ({{ selectedFile.size }} bytes)
+    </p>
+  }
+
+  @if (uploading) {
+    <div class="progress mb-2" role="progressbar" [attr.aria-valuenow]="uploadProgress" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar" [style.width.%]="uploadProgress">{{ uploadProgress }}%</div>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <p class="small text-danger mb-2">{{ errorMessage }}</p>
+  }
+
+  <button
+    type="button"
+    class="btn btn-primary btn-sm"
+    [disabled]="!selectedFile || uploading"
+    (click)="startUpload()"
+  >
+    アップロード
+  </button>
+</div>
