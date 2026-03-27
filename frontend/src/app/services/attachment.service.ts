@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http'
+import { HttpClient, HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http'
 import { Observable, filter, map } from 'rxjs'
 import { environment } from '../../environments/environment'
 import type { Attachment } from '../models/attachment.interface'
@@ -14,8 +14,13 @@ export class AttachmentService {
 
   uploadAttachment(todoId: number, file: File): Observable<Attachment> {
     return this.uploadAttachmentWithProgress(todoId, file).pipe(
-      filter((event) => event.type === HttpEventType.Response),
-      map((event) => event.body as Attachment)
+      filter((event): event is HttpResponse<Attachment> => event.type === HttpEventType.Response),
+      map((event) => {
+        if (!event.body) {
+          throw new Error('Attachment response body is empty')
+        }
+        return event.body
+      })
     )
   }
 
