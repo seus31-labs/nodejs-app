@@ -349,7 +349,7 @@ frontend/src/app/
 ### Phase 11: Testing & Documentation
 
 - [x] Task 11.1: Frontend ユニットテスト
-- [ ] Task 11.2: E2E 動作確認
+- [x] Task 11.2: E2E 動作確認
 - [ ] Task 11.3: README 更新
 
 ---
