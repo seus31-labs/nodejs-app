@@ -49,9 +49,9 @@ DELETE /api/attachments/:id
 
 ### Task 8.2: ファイルアップロード設定
 
-- [ ] 8.2.1: `@fastify/multipart` インストール
-- [ ] 8.2.2: Fastify multipart プラグイン登録
-- [ ] 8.2.3: アップロード制限設定（ファイルサイズ、MIME タイプ）
+- [x] 8.2.1: `@fastify/multipart` インストール
+- [x] 8.2.2: Fastify multipart プラグイン登録
+- [x] 8.2.3: アップロード制限設定（ファイルサイズ、MIME タイプ）
 
 ### Task 8.3: StorageService 作成
 
