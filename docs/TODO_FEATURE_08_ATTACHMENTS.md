@@ -64,11 +64,11 @@ DELETE /api/attachments/:id
 
 ### Task 8.4: AttachmentService 作成
 
-- [ ] 8.4.1: `backend/services/AttachmentService.js` 作成
-- [ ] 8.4.2: `createAttachment(todoId, fileData)` 実装
-- [ ] 8.4.3: `getAttachmentsByTodoId(todoId, userId)` 実装
-- [ ] 8.4.4: `deleteAttachment(attachmentId, userId)` 実装
-- [ ] 8.4.5: StorageService 呼び出し
+- [x] 8.4.1: `backend/services/AttachmentService.js` 作成
+- [x] 8.4.2: `createAttachment(todoId, fileData)` 実装
+- [x] 8.4.3: `getAttachmentsByTodoId(todoId, userId)` 実装
+- [x] 8.4.4: `deleteAttachment(attachmentId, userId)` 実装
+- [x] 8.4.5: StorageService 呼び出し
 
 ### Task 8.5: AttachmentController 作成
 
