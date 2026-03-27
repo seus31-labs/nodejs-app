@@ -89,3 +89,17 @@ test('createNextOccurrence: 生成条件を満たさない場合は null', () =>
   assert.equal(createNextOccurrence(todo), null);
 });
 
+test('createNextOccurrence: 終了日を超える場合は null を返す', () => {
+  const todo = {
+    id: 40,
+    userId: 1,
+    title: '終了日超過',
+    isRecurring: true,
+    recurrencePattern: 'daily',
+    recurrenceInterval: 1,
+    dueDate: '2026-03-25',
+    recurrenceEndDate: '2026-03-25'
+  };
+  assert.equal(createNextOccurrence(todo), null);
+});
+

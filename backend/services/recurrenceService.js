@@ -1,9 +1,5 @@
 'use strict';
 
-module.exports = require('./recurrenceService');
-
-'use strict';
-
 function toDateOnlyString(date) {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
@@ -89,13 +85,15 @@ function shouldCreateNext(todo) {
  * 実際の DB 保存は呼び出し側サービスに委譲する。
  */
 function createNextOccurrence(todo) {
-  if (!shouldCreateNext(todo)) return null;
+  if (!todo?.isRecurring) return null;
+  if (!todo.recurrencePattern) return null;
 
   const nextDueDate = calculateNextDueDate(
     todo.recurrencePattern,
     todo.recurrenceInterval,
     todo.dueDate ?? toDateOnlyString(new Date())
   );
+  if (todo.recurrenceEndDate && nextDueDate > todo.recurrenceEndDate) return null;
 
   return {
     userId: todo.userId,
