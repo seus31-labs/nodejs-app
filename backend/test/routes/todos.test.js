@@ -88,6 +88,87 @@ test('GET /api/v1/todos/search with empty q returns 400', async (t) => {
   assert.strictEqual(resMissing.statusCode, 400)
 })
 
+test('POST /api/v1/todos recurrence validation returns 400/201 as expected', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `recur-create-${suffix}`, email: `recur-create-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const cases = [
+    { payload: { title: 'ng1', isRecurring: 'true' }, status: 400 },
+    { payload: { title: 'ng2', isRecurring: true, recurrencePattern: 'yearly' }, status: 400 },
+    { payload: { title: 'ng3', isRecurring: true, recurrencePattern: 'daily', recurrenceInterval: 0 }, status: 400 },
+    { payload: { title: 'ng4', isRecurring: true, recurrencePattern: 'daily', recurrenceInterval: -1 }, status: 400 },
+    { payload: { title: 'ng5', isRecurring: true, recurrencePattern: 'daily', recurrenceInterval: 1.5 }, status: 400 },
+    { payload: { title: 'ng6', isRecurring: true, recurrencePattern: 'daily', recurrenceEndDate: '2026-13-01' }, status: 400 },
+    { payload: { title: 'ng7', isRecurring: true, recurrencePattern: 'daily', recurrenceEndDate: 'abc' }, status: 400 },
+    { payload: { title: 'ng8', isRecurring: false, recurrencePattern: 'daily' }, status: 400 },
+    { payload: { title: 'ng9', isRecurring: true }, status: 400 },
+    {
+      payload: {
+        title: 'ok1',
+        isRecurring: true,
+        recurrencePattern: 'weekly',
+        recurrenceInterval: 2,
+        recurrenceEndDate: '2026-12-31',
+      },
+      status: 201
+    },
+  ]
+
+  for (const c of cases) {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/v1/todos',
+      headers: { authorization: `Bearer ${token}` },
+      payload: c.payload
+    })
+    assert.strictEqual(res.statusCode, c.status)
+  }
+})
+
+test('PUT /api/v1/todos recurrence validation returns 400 as expected', async (t) => {
+  const app = await build(t)
+  const suffix = uniqueSuffix()
+  const user = { name: `recur-put-${suffix}`, email: `recur-put-${suffix}@test.local`, password: 'pass123' }
+  await app.inject({ method: 'POST', url: '/api/v1/register', payload: user })
+  const loginRes = await app.inject({ method: 'POST', url: '/api/v1/login', payload: { email: user.email, password: user.password } })
+  const token = JSON.parse(loginRes.payload).token
+
+  const created = await app.inject({
+    method: 'POST',
+    url: '/api/v1/todos',
+    headers: { authorization: `Bearer ${token}` },
+    payload: { title: 'target todo' }
+  })
+  assert.strictEqual(created.statusCode, 201)
+  const todoId = JSON.parse(created.payload).id
+
+  const cases = [
+    { isRecurring: 'false' },
+    { recurrencePattern: 'yearly' },
+    { recurrenceInterval: 0 },
+    { recurrenceInterval: -1 },
+    { recurrenceInterval: 1.5 },
+    { recurrenceEndDate: '2026-13-01' },
+    { recurrenceEndDate: 'abc' },
+    { isRecurring: false, recurrencePattern: 'daily' },
+    { isRecurring: false, recurrenceInterval: 2 },
+  ]
+
+  for (const payload of cases) {
+    const res = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/todos/${todoId}`,
+      headers: { authorization: `Bearer ${token}` },
+      payload
+    })
+    assert.strictEqual(res.statusCode, 400)
+  }
+})
+
 test('GET /api/v1/todos/search with auth returns matching todos', async (t) => {
   const app = await build(t)
   const suffix = uniqueSuffix()

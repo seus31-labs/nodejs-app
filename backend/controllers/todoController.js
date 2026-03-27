@@ -12,8 +12,75 @@ function parseTodoId(paramId) {
   return Number.isNaN(id) ? null : id;
 }
 
+function isDateOnly(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [yearText, monthText, dayText] = value.split('-');
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() + 1 === month &&
+    date.getUTCDate() === day
+  );
+}
+
+function validateRecurrencePayload(body, { requirePatternWhenRecurring = false } = {}) {
+  if (body == null || typeof body !== 'object') return null;
+
+  if (body.isRecurring !== undefined && typeof body.isRecurring !== 'boolean') {
+    return 'isRecurring must be boolean';
+  }
+
+  if (
+    body.recurrencePattern !== undefined &&
+    body.recurrencePattern !== null &&
+    !['daily', 'weekly', 'monthly'].includes(body.recurrencePattern)
+  ) {
+    return 'recurrencePattern must be one of daily, weekly, monthly';
+  }
+
+  if (
+    body.recurrenceInterval !== undefined &&
+    (!Number.isInteger(body.recurrenceInterval) || body.recurrenceInterval <= 0)
+  ) {
+    return 'recurrenceInterval must be a positive integer';
+  }
+
+  if (
+    body.recurrenceEndDate !== undefined &&
+    body.recurrenceEndDate !== null &&
+    !isDateOnly(body.recurrenceEndDate)
+  ) {
+    return 'recurrenceEndDate must be date format (YYYY-MM-DD)';
+  }
+
+  if (body.isRecurring === false) {
+    if (body.recurrencePattern !== undefined && body.recurrencePattern !== null) {
+      return 'recurrencePattern must be null when isRecurring is false';
+    }
+    if (body.recurrenceInterval !== undefined && body.recurrenceInterval !== 1) {
+      return 'recurrenceInterval must be 1 when isRecurring is false';
+    }
+    if (body.recurrenceEndDate !== undefined && body.recurrenceEndDate !== null) {
+      return 'recurrenceEndDate must be null when isRecurring is false';
+    }
+  }
+
+  if (body.isRecurring === true && requirePatternWhenRecurring && body.recurrencePattern == null) {
+    return 'recurrencePattern is required when isRecurring is true';
+  }
+
+  return null;
+}
+
 async function createTodo(fastify, req, reply) {
   try {
+    const recurrenceError = validateRecurrencePayload(req.body, { requirePatternWhenRecurring: true });
+    if (recurrenceError) {
+      return reply.code(400).send({ error: recurrenceError });
+    }
     const userId = req.user.id;
     const todo = await todoService.createTodo(fastify, userId, req.body);
     reply.code(201).send(todo.toJSON());
@@ -125,6 +192,10 @@ async function updateTodo(fastify, req, reply) {
     const todoId = parseTodoId(req.params.id);
     if (todoId === null) {
       return reply.code(400).send({ error: 'Invalid todo id' });
+    }
+    const recurrenceError = validateRecurrencePayload(req.body);
+    if (recurrenceError) {
+      return reply.code(400).send({ error: recurrenceError });
     }
     const todo = await todoService.updateTodo(fastify, todoId, req.user.id, req.body);
     if (!todo) {
