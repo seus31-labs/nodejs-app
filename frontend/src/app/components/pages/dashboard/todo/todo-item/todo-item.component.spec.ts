@@ -157,5 +157,24 @@ describe('TodoItemComponent (2.12.2)', () => {
     expect(component.recurrenceTooltip).toBe('毎週 / 2 回ごと（終了日: 2026-12-31）')
   })
 
+  it('should return empty recurrence tooltip for non-recurring todo', () => {
+    component.todo = {
+      ...mockTodo,
+      isRecurring: false
+    }
+    expect(component.recurrenceTooltip).toBe('')
+  })
+
+  it('should fallback recurrence tooltip when pattern is null', () => {
+    component.todo = {
+      ...mockTodo,
+      isRecurring: true,
+      recurrencePattern: null,
+      recurrenceInterval: 1,
+      recurrenceEndDate: null
+    }
+    expect(component.recurrenceTooltip).toBe('繰り返し / 1 回ごと')
+  })
+
 })
 
