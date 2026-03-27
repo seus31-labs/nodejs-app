@@ -125,12 +125,12 @@ DELETE /api/attachments/:id
 
 ### Task 8.12: AttachmentList コンポーネント作成
 
-- [ ] 8.12.1: `ng generate component components/attachment-list` 実行
-- [ ] 8.12.2: 添付ファイル一覧表示
-- [ ] 8.12.3: ファイルアイコン表示（MIME タイプ別）
-- [ ] 8.12.4: ダウンロードボタン実装
-- [ ] 8.12.5: 削除ボタン実装
-- [ ] 8.12.6: @Input() todoId: number 実装
+- [x] 8.12.1: `ng generate component components/attachment-list` 実行
+- [x] 8.12.2: 添付ファイル一覧表示
+- [x] 8.12.3: ファイルアイコン表示（MIME タイプ別）
+- [x] 8.12.4: ダウンロードボタン実装
+- [x] 8.12.5: 削除ボタン実装
+- [x] 8.12.6: @Input() todoId: number 実装
 
 ### Task 8.13: TodoDetail に添付ファイル機能追加
 
