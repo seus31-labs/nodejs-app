@@ -1,6 +1,5 @@
 'use strict'
 
-const fp = require('fastify-plugin')
 const path = require('node:path')
 const fastifyStatic = require('@fastify/static')
 
@@ -14,9 +13,11 @@ function getUploadRootDir() {
   return DEFAULT_UPLOAD_DIR
 }
 
-module.exports = fp(async function staticUploadPlugin(fastify) {
+module.exports = async function staticUploadPlugin(fastify) {
+  fastify.addHook('preHandler', fastify.authenticate)
+
   await fastify.register(fastifyStatic, {
     root: getUploadRootDir(),
     prefix: '/uploads/'
   })
-})
+}
