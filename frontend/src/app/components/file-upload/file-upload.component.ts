@@ -13,6 +13,8 @@ import type { Attachment } from '../../models/attachment.interface'
   styleUrl: './file-upload.component.scss'
 })
 export class FileUploadComponent implements OnDestroy {
+  private readonly allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+
   @Input() todoId!: number
   @Output() uploaded = new EventEmitter<Attachment>()
 
@@ -92,6 +94,12 @@ export class FileUploadComponent implements OnDestroy {
   }
 
   private handleSelectedFile(file: File | null): void {
+    if (file && !this.allowedMimeTypes.includes(file.type)) {
+      this.selectedFile = null
+      this.errorMessage = '許可されていないファイル形式です（JPEG / PNG / WebP / PDF）。'
+      this.uploadProgress = 0
+      return
+    }
     this.selectedFile = file
     this.errorMessage = ''
     this.uploadProgress = 0
