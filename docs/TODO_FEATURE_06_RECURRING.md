@@ -113,9 +113,9 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.13: RecurringTodoList ページ作成
 
-- [ ] 6.13.1: `ng generate component pages/recurring-todo-list-page` 実行
-- [ ] 6.13.2: 繰り返しタスク一覧表示
-- [ ] 6.13.3: ルーティング追加
+- [x] 6.13.1: `ng generate component pages/recurring-todo-list-page` 実行
+- [x] 6.13.2: 繰り返しタスク一覧表示
+- [x] 6.13.3: ルーティング追加
 
 ### Task 6.14: スタイリング
 

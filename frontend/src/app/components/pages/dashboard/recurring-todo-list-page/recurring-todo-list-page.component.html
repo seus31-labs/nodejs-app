@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-12">
+    <app-card cardTitle="繰り返し Todo 一覧（{{ todos.length }} 件）">
+      <p class="text-muted small mb-3">繰り返し設定が有効な Todo のみ表示します。</p>
+
+      <app-todo-list
+        [todos]="todos"
+        [loading]="loading"
+        [error]="error"
+        [dragDisabled]="true"
+        [selectedIds]="[]"
+        (toggle)="onToggle($event)"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+        (archive)="onArchive($event)"
+        (share)="onShare($event)"
+        (reminderToggled)="onReminderToggled($event)"
+        (tagRemoved)="onTagRemoved($event)"
+        (tagAdded)="onTagAdded($event)"
+      />
+    </app-card>
+  </div>
+</div>
