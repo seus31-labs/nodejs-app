@@ -38,6 +38,15 @@
     <span *ngIf="todo.dueDate" class="ms-2 small" [ngClass]="dueDateClass(todo.dueDate)">
       {{ todo.dueDate }}
     </span>
+    @if (todo.isRecurring) {
+      <span
+        class="ms-2 recurring-icon"
+        [attr.title]="recurrenceTooltip"
+        [attr.aria-label]="'繰り返し設定: ' + recurrenceTooltip"
+      >
+        <i class="feather icon-refresh-cw" aria-hidden="true"></i>
+      </span>
+    }
     <div class="mt-1 d-flex flex-wrap align-items-center gap-1">
       @for (tag of tags; track tag.id) {
         <app-tag-chip [tag]="tag" [removable]="true" (removed)="onTagRemoved(tag)" />
