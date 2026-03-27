@@ -72,4 +72,22 @@ describe('RecurrenceFormComponent', () => {
       recurrenceEndDate: null
     })
   })
+
+  it('should initialize daily pattern when enabled with null pattern', () => {
+    const emitted: unknown[] = []
+    component.recurrenceChanged.subscribe((v) => emitted.push(v))
+
+    component.form.patchValue({
+      isRecurring: true,
+      recurrencePattern: null
+    })
+
+    const last = emitted[emitted.length - 1] as {
+      isRecurring: boolean
+      recurrencePattern: string | null
+    }
+    expect(last.isRecurring).toBe(true)
+    expect(last.recurrencePattern).toBe('daily')
+    expect(component.form.get('recurrencePattern')?.value).toBe(RecurrencePattern.Daily)
+  })
 })

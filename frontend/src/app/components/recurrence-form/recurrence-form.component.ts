@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core'
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms'
+import { Subject, takeUntil } from 'rxjs'
 import { RecurrencePattern, type Recurrence } from '../../models/recurrence.interface'
 
 @Component({
@@ -10,7 +11,8 @@ import { RecurrencePattern, type Recurrence } from '../../models/recurrence.inte
   templateUrl: './recurrence-form.component.html',
   styleUrl: './recurrence-form.component.scss'
 })
-export class RecurrenceFormComponent implements OnChanges {
+export class RecurrenceFormComponent implements OnChanges, OnDestroy {
+  private readonly destroy$ = new Subject<void>()
   @Input() value: Recurrence = {
     isRecurring: false,
     recurrencePattern: null,
@@ -33,9 +35,11 @@ export class RecurrenceFormComponent implements OnChanges {
   })
 
   constructor(private fb: FormBuilder) {
-    this.form.valueChanges.subscribe(() => {
-      this.emitCurrentValue()
-    })
+    this.form.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.emitCurrentValue()
+      })
   }
 
   ngOnChanges(): void {
@@ -51,15 +55,25 @@ export class RecurrenceFormComponent implements OnChanges {
     const raw = this.form.getRawValue()
     const recurring = raw.isRecurring === true
 
+    if (recurring && !raw.recurrencePattern) {
+      this.form.patchValue({ recurrencePattern: RecurrencePattern.Daily }, { emitEvent: false })
+    }
+    const patchedRaw = this.form.getRawValue()
+
     this.recurrenceChanged.emit({
       isRecurring: recurring,
-      recurrencePattern: recurring ? (raw.recurrencePattern ?? RecurrencePattern.Daily) : null,
+      recurrencePattern: recurring ? (patchedRaw.recurrencePattern ?? RecurrencePattern.Daily) : null,
       recurrenceInterval: recurring
-        ? Math.max(1, Number(raw.recurrenceInterval ?? 1))
+        ? Math.max(1, Number(patchedRaw.recurrenceInterval ?? 1))
         : 1,
       recurrenceEndDate: recurring
-        ? (raw.recurrenceEndDate?.trim() || null)
+        ? (patchedRaw.recurrenceEndDate?.trim() || null)
         : null
     })
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next()
+    this.destroy$.complete()
   }
 }
