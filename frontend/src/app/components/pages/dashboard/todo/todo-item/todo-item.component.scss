@@ -40,5 +40,16 @@
 .recurring-icon {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
   color: #0d6efd;
+  background-color: rgba(13, 110, 253, 0.1);
+  border-radius: 999px;
+  cursor: help;
+}
+
+.recurring-icon i {
+  font-size: 0.9rem;
+  line-height: 1;
 }
