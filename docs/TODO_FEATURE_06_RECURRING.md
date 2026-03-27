@@ -52,10 +52,10 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.3: RecurrenceService 作成
 
-- [ ] 6.3.1: `backend/services/RecurrenceService.js` 作成
-- [ ] 6.3.2: `calculateNextDueDate(pattern, interval, currentDate)` 実装
-- [ ] 6.3.3: `createNextOccurrence(todo)` 実装
-- [ ] 6.3.4: `shouldCreateNext(todo)` 実装（終了日チェック）
+- [x] 6.3.1: `backend/services/RecurrenceService.js` 作成
+- [x] 6.3.2: `calculateNextDueDate(pattern, interval, currentDate)` 実装
+- [x] 6.3.3: `createNextOccurrence(todo)` 実装
+- [x] 6.3.4: `shouldCreateNext(todo)` 実装（終了日チェック）
 
 ### Task 6.4: TodoService に繰り返し機能追加
 
@@ -74,9 +74,9 @@ PATCH /api/todos/:id/complete (繰り返しタスクの場合、次回生成)
 
 ### Task 6.7: Backend テスト
 
-- [ ] 6.7.1: RecurrenceService のテスト
-- [ ] 6.7.2: 次回 Todo 生成のテスト
-- [ ] 6.7.3: 繰り返し終了日のテスト
+- [x] 6.7.1: RecurrenceService のテスト
+- [x] 6.7.2: 次回 Todo 生成のテスト
+- [x] 6.7.3: 繰り返し終了日のテスト
 
 ---
 
