@@ -145,9 +145,9 @@ DELETE /api/attachments/:id
 
 ### Task 8.15: Frontend テスト
 
-- [ ] 8.15.1: AttachmentService のテスト
-- [ ] 8.15.2: FileUpload コンポーネントテスト
-- [ ] 8.15.3: AttachmentList コンポーネントテスト
+- [x] 8.15.1: AttachmentService のテスト
+- [x] 8.15.2: FileUpload コンポーネントテスト
+- [x] 8.15.3: AttachmentList コンポーネントテスト
 
 ---
 
