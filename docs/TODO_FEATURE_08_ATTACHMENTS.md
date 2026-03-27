@@ -108,11 +108,11 @@ DELETE /api/attachments/:id
 
 ### Task 8.10: AttachmentService 作成
 
-- [ ] 8.10.1: `frontend/src/app/services/attachment.service.ts` 作成
-- [ ] 8.10.2: `uploadAttachment(todoId: number, file: File): Observable<Attachment>` 実装
-- [ ] 8.10.3: `getAttachments(todoId: number): Observable<Attachment[]>` 実装
-- [ ] 8.10.4: `deleteAttachment(id: number): Observable<void>` 実装
-- [ ] 8.10.5: アップロード進捗の実装
+- [x] 8.10.1: `frontend/src/app/services/attachment.service.ts` 作成
+- [x] 8.10.2: `uploadAttachment(todoId: number, file: File): Observable<Attachment>` 実装
+- [x] 8.10.3: `getAttachments(todoId: number): Observable<Attachment[]>` 実装
+- [x] 8.10.4: `deleteAttachment(id: number): Observable<void>` 実装
+- [x] 8.10.5: アップロード進捗の実装
 
 ### Task 8.11: FileUpload コンポーネント作成
 
