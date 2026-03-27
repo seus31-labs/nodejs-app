@@ -10,9 +10,13 @@
         [dragDisabled]="true"
         [selectedIds]="[]"
         (toggle)="onToggle($event)"
+        (edit)="onEdit($event)"
         (delete)="onDelete($event)"
         (archive)="onArchive($event)"
+        (share)="onShare($event)"
         (reminderToggled)="onReminderToggled($event)"
+        (tagRemoved)="onTagRemoved($event)"
+        (tagAdded)="onTagAdded($event)"
       />
     </app-card>
   </div>
