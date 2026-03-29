@@ -66,6 +66,18 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>()
 
+  /** API が `{ error: string }` または `{ message: string }` で返す場合がある */
+  private apiErrorText(err: unknown): string | undefined {
+    const e = err as { error?: string | { error?: string; message?: string }; message?: string }
+    if (typeof e?.error === 'string') return e.error
+    if (typeof e?.error === 'object' && e.error != null) {
+      if (typeof e.error.error === 'string') return e.error.error
+      if (typeof e.error.message === 'string') return e.error.message
+    }
+    if (typeof e?.message === 'string') return e.message
+    return undefined
+  }
+
   constructor(
     private todoService: TodoService,
     private tagService: TagService,
@@ -156,7 +168,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
         this.loading = false
       },
       error: (err) => {
-        this.error = err?.error?.message ?? err?.message ?? '取得に失敗しました'
+        this.error = this.apiErrorText(err) ?? '取得に失敗しました'
         this.loading = false
       }
     })
@@ -175,7 +187,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (blob) => this.exportService.triggerDownload(blob, 'todos.json'),
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? 'エクスポートに失敗しました。'
+          this.error = this.apiErrorText(err) ?? 'エクスポートに失敗しました。'
         }
       })
   }
@@ -187,7 +199,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (blob) => this.exportService.triggerDownload(blob, 'todos.csv'),
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? 'エクスポートに失敗しました。'
+          this.error = this.apiErrorText(err) ?? 'エクスポートに失敗しました。'
         }
       })
   }
@@ -243,7 +255,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {},
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '共有に失敗しました'
+          this.error = this.apiErrorText(err) ?? '共有に失敗しました'
         }
       })
   }
@@ -312,14 +324,14 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
   onTagRemoved(event: { todoId: number; tag: Tag }): void {
     this.todoService.removeTagFromTodo(event.todoId, event.tag.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.loadTodos(),
-      error: (err) => { this.error = err?.error?.message ?? err?.message ?? 'タグの削除に失敗しました' }
+      error: (err) => { this.error = this.apiErrorText(err) ?? 'タグの削除に失敗しました' }
     })
   }
 
   onTagAdded(event: { todoId: number; tagId: number }): void {
     this.todoService.addTagToTodo(event.todoId, event.tagId).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => { this.loadTodos() },
-      error: (err) => { this.error = err?.error?.message ?? err?.message ?? 'タグの追加に失敗しました' }
+      error: (err) => { this.error = this.apiErrorText(err) ?? 'タグの追加に失敗しました' }
     })
   }
 
@@ -330,7 +342,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => this.loadTodos(),
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '並び替えに失敗しました'
+          this.error = this.apiErrorText(err) ?? '並び替えに失敗しました'
         }
       })
   }
@@ -350,7 +362,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
           this.loadTodos()
         },
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '一括完了に失敗しました'
+          this.error = this.apiErrorText(err) ?? '一括完了に失敗しました'
         }
       })
   }
@@ -367,7 +379,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
           this.loadTodos()
         },
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '一括削除に失敗しました'
+          this.error = this.apiErrorText(err) ?? '一括削除に失敗しました'
         }
       })
   }
@@ -383,7 +395,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
           this.loadTodos()
         },
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '一括アーカイブに失敗しました'
+          this.error = this.apiErrorText(err) ?? '一括アーカイブに失敗しました'
         }
       })
   }
@@ -399,7 +411,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
           this.loadTodos()
         },
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '一括タグ付けに失敗しました'
+          this.error = this.apiErrorText(err) ?? '一括タグ付けに失敗しました'
         }
       })
   }
@@ -411,7 +423,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => this.loadTodos(),
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? 'アーカイブに失敗しました'
+          this.error = this.apiErrorText(err) ?? 'アーカイブに失敗しました'
         }
       })
   }
@@ -423,7 +435,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => this.loadTodos(),
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '更新に失敗しました'
+          this.error = this.apiErrorText(err) ?? '更新に失敗しました'
         }
       })
   }
@@ -437,7 +449,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
           this.todos = this.todos.map((t) => (t.id === updated.id ? updated : t))
         },
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '更新に失敗しました'
+          this.error = this.apiErrorText(err) ?? '更新に失敗しました'
         }
       })
   }
@@ -461,7 +473,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
             this.loadTodos()
           },
           error: (err) => {
-            this.error = err?.error?.message ?? err?.message ?? '更新に失敗しました'
+            this.error = this.apiErrorText(err) ?? '更新に失敗しました'
           }
         })
     } else {
@@ -471,7 +483,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
         .subscribe({
           next: () => this.loadTodos(),
           error: (err) => {
-            this.error = err?.error?.message ?? err?.message ?? '作成に失敗しました'
+            this.error = this.apiErrorText(err) ?? '作成に失敗しました'
           }
         })
     }
@@ -488,7 +500,7 @@ export default class TodoPageComponent implements OnInit, OnDestroy {
           this.loadTodos()
         },
         error: (err) => {
-          this.error = err?.error?.message ?? err?.message ?? '削除に失敗しました'
+          this.error = this.apiErrorText(err) ?? '削除に失敗しました'
         }
       })
   }

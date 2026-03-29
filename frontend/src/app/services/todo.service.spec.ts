@@ -103,6 +103,20 @@ describe('TodoService', () => {
     })
   })
 
+  describe('create / projectId normalization', () => {
+    it('should POST with projectId null when body had projectId 0', () => {
+      service
+        .create({
+          title: 'x',
+          projectId: 0
+        })
+        .subscribe()
+      const req = httpMock.expectOne((r) => r.url === `${apiUrl}/todos` && r.method === 'POST')
+      expect(req.request.body.projectId).toBeNull()
+      req.flush(mockTodo)
+    })
+  })
+
   describe('list with date range (12.7 calendar)', () => {
     it('should call GET /todos with startDate and endDate when filters include them', () => {
       service

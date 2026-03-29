@@ -1,5 +1,7 @@
 'use strict';
 
+const { normalizeOptionalProjectId } = require('../utils/projectId');
+
 function toDateOnlyString(date) {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
@@ -101,7 +103,7 @@ function createNextOccurrence(todo) {
     description: todo.description ?? null,
     priority: todo.priority ?? 'medium',
     dueDate: nextDueDate,
-    projectId: todo.projectId ?? null,
+    projectId: normalizeOptionalProjectId(todo.projectId),
     completed: false,
     archived: false,
     archivedAt: null,
