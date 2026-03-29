@@ -81,7 +81,12 @@ export class TodoFormComponent implements OnChanges {
   onSubmit(): void {
     if (this.form.invalid) return
     const v = this.form.value
-    const projectId = v.projectId != null ? Number(v.projectId) : null
+    const rawPid = v.projectId
+    let projectId: number | null = null
+    if (rawPid != null && rawPid !== '') {
+      const n = Number(rawPid)
+      if (Number.isInteger(n) && n > 0) projectId = n
+    }
     const payload: TodoCreateUpdate = {
       title: v.title.trim(),
       description: v.description?.trim() || null,

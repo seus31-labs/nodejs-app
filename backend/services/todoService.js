@@ -5,6 +5,7 @@ const tagService = require('./tagService');
 const projectService = require('./projectService');
 const shareService = require('./shareService');
 const recurrenceService = require('./recurrenceService');
+const { normalizeOptionalProjectId } = require('../utils/projectId');
 
 const SORT_BY_ALLOWED = ['dueDate', 'priority', 'createdAt', 'updatedAt', 'sortOrder'];
 const SORT_ORDER_ALLOWED = ['asc', 'desc'];
@@ -98,7 +99,7 @@ async function createTodo(fastify, userId, todoData) {
     description: description ?? null,
     priority: priority ?? 'medium',
     dueDate: dueDate ?? null,
-    projectId: projectId ?? null,
+    projectId: normalizeOptionalProjectId(projectId),
     isRecurring: recurringEnabled,
     recurrencePattern: recurringEnabled ? (recurrencePattern ?? null) : null,
     recurrenceInterval: recurringEnabled
@@ -244,7 +245,7 @@ async function createSubtask(fastify, parentId, userId, todoData) {
     description: description ?? null,
     priority: priority ?? 'medium',
     dueDate: dueDate ?? null,
-    projectId: projectId ?? null,
+    projectId: normalizeOptionalProjectId(projectId),
   });
 }
 
@@ -300,7 +301,9 @@ async function updateTodo(fastify, todoId, userId, updateData) {
   const { title, description, priority, dueDate, projectId } = updateData;
   const allowed = { title, description, priority, dueDate, projectId };
   Object.keys(allowed).forEach((k) => {
-    if (allowed[k] !== undefined) todo.set(k, allowed[k]);
+    if (allowed[k] === undefined) return;
+    const v = k === 'projectId' ? normalizeOptionalProjectId(allowed[k]) : allowed[k];
+    todo.set(k, v);
   });
   await todo.save();
   return todo;

@@ -31,8 +31,21 @@ export class TodoService {
     private offlineStorage: OfflineStorageService
   ) {}
 
+  /**
+   * projectId に 0 が入ると MySQL の FK で失敗するため、正の整数のみ送る（それ以外は null）。
+   */
+  private withNormalizedProjectId<T extends TodoCreateUpdate>(body: T): T {
+    if (body.projectId === undefined) return body
+    if (body.projectId === null) return body
+    const n = Number(body.projectId)
+    if (!Number.isInteger(n) || n <= 0) {
+      return { ...body, projectId: null }
+    }
+    return n === body.projectId ? body : { ...body, projectId: n }
+  }
+
   create(body: TodoCreateUpdate): Observable<Todo> {
-    return this.http.post<Todo>(`${this.apiUrl}/todos`, body)
+    return this.http.post<Todo>(`${this.apiUrl}/todos`, this.withNormalizedProjectId(body))
   }
 
   /**
@@ -47,7 +60,10 @@ export class TodoService {
     if (filters?.completed !== undefined) params['completed'] = String(filters.completed)
     if (filters?.priority) params['priority'] = filters.priority
     if (filters?.tagIds?.length) params['tags'] = filters.tagIds.join(',')
-    if (filters?.projectId != null) params['projectId'] = String(filters.projectId)
+    if (filters?.projectId != null) {
+      const n = Number(filters.projectId)
+      if (Number.isInteger(n) && n > 0) params['projectId'] = String(n)
+    }
     if (filters?.startDate) params['startDate'] = filters.startDate
     if (filters?.endDate) params['endDate'] = filters.endDate
     if (sort?.sortBy) params['sortBy'] = sort.sortBy
@@ -66,7 +82,7 @@ export class TodoService {
   }
 
   update(id: number, body: TodoCreateUpdate): Observable<Todo> {
-    return this.http.put<Todo>(`${this.apiUrl}/todos/${id}`, body)
+    return this.http.put<Todo>(`${this.apiUrl}/todos/${id}`, this.withNormalizedProjectId(body))
   }
 
   delete(id: number): Observable<void> {
@@ -161,7 +177,10 @@ export class TodoService {
    * Backend: `POST /api/v1/todos/:id/subtasks`
    */
   createSubtask(parentId: number, todo: CreateTodoDto): Observable<Todo> {
-    return this.http.post<Todo>(`${this.apiUrl}/todos/${parentId}/subtasks`, todo)
+    return this.http.post<Todo>(
+      `${this.apiUrl}/todos/${parentId}/subtasks`,
+      this.withNormalizedProjectId(todo)
+    )
   }
 
   /**

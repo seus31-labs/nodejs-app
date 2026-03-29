@@ -185,6 +185,10 @@ PATCH /api/projects/:id/archive
 - [x] 7.21.1: ProjectService のテスト
 - [x] 7.21.2: 各コンポーネントのテスト
 
+### Task 7.22: projectId 正規化と FK エラー応答（フォローアップ）
+
+- [x] 7.22.1: BE/FE で 0・不正値を NULL に正規化し、スキーマは null または正の整数に制限。残存する `project_id` FK 失敗は 400 と日本語メッセージ。`projectId` ユーティリティとテストを追加。
+
 ---
 
 ## 📝 依存関係

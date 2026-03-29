@@ -7,6 +7,26 @@ function handleTodoError(fastify, reply, error, clientMessage, statusCode = 500)
   reply.code(statusCode).send({ error: clientMessage });
 }
 
+const PROJECT_ID_FK_CLIENT_MESSAGE =
+  'プロジェクトが存在しません。一覧から選び直すか「なし」にしてください。';
+
+function isProjectIdForeignKeyError(error) {
+  return (
+    error?.name === 'SequelizeForeignKeyConstraintError' &&
+    Array.isArray(error.fields) &&
+    error.fields.includes('project_id')
+  );
+}
+
+/** 作成・更新・サブタスク作成で project_id の FK 失敗時は 400 と分かりやすい文面にする */
+function handleTodoWriteError(fastify, reply, error, genericMessage) {
+  if (isProjectIdForeignKeyError(error)) {
+    fastify.log.error({ err: error }, `${genericMessage} (project_id FK)`);
+    return reply.code(400).send({ error: PROJECT_ID_FK_CLIENT_MESSAGE });
+  }
+  handleTodoError(fastify, reply, error, genericMessage);
+}
+
 function parseTodoId(paramId) {
   const id = parseInt(paramId, 10);
   return Number.isNaN(id) ? null : id;
@@ -85,7 +105,7 @@ async function createTodo(fastify, req, reply) {
     const todo = await todoService.createTodo(fastify, userId, req.body);
     reply.code(201).send(todo.toJSON());
   } catch (error) {
-    handleTodoError(fastify, reply, error, 'Todo creation failed');
+    handleTodoWriteError(fastify, reply, error, 'Todo creation failed');
   }
 }
 
@@ -165,7 +185,7 @@ async function createSubtask(fastify, req, reply) {
     if (error?.code === 'CIRCULAR_REFERENCE') {
       return reply.code(400).send({ error: error.message });
     }
-    handleTodoError(fastify, reply, error, 'Failed to create subtask');
+    handleTodoWriteError(fastify, reply, error, 'Failed to create subtask');
   }
 }
 
@@ -203,7 +223,7 @@ async function updateTodo(fastify, req, reply) {
     }
     reply.code(200).send(todo.toJSON());
   } catch (error) {
-    handleTodoError(fastify, reply, error, 'Failed to update todo');
+    handleTodoWriteError(fastify, reply, error, 'Failed to update todo');
   }
 }
 
